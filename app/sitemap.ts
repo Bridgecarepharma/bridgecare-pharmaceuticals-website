@@ -1,0 +1,3 @@
+import type {MetadataRoute} from "next";
+const p=["","/about","/products","/products/aspivit","/products/asfenositol","/products/globivida","/products/herbal-bitter-tea","/cart","/checkout","/health-centre","/quality-compliance","/csr","/news","/contact","/distributors","/careers","/faq","/downloads","/privacy-policy","/terms","/cookie-policy"];
+export default function sitemap():MetadataRoute.Sitemap{const b=process.env.NEXT_PUBLIC_SITE_URL||"https://www.bridgecarepharma.com";return p.map(x=>({url:`${b}${x}`,lastModified:new Date(),changeFrequency:"monthly",priority:x===""?1:.7}))}

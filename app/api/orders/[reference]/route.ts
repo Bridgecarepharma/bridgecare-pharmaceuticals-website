@@ -1,0 +1,2 @@
+import { NextResponse } from "next/server";import { prisma } from "@/lib/prisma";
+export async function GET(_:Request,{params}:{params:Promise<{reference:string}>}){const{reference}=await params;const order=await prisma.order.findUnique({where:{paystackReference:reference},include:{items:true}});if(!order)return NextResponse.json({error:"Order not found"},{status:404});return NextResponse.json({order})}

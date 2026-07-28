@@ -1,30 +1,75 @@
-# Bridgecare Pharmaceuticals — Netlify Zero-Build Edition
+# Bridgecare Pharmaceuticals E-commerce Website
 
-This project intentionally does **not** use Next.js. It avoids the static-export/API-route conflict that caused the previous Netlify failures.
+A Next.js, TypeScript, Tailwind CSS, PostgreSQL and Paystack starter for the Bridgecare public website and online store.
 
-## Deploy
+## Included
 
-1. Upload this folder to a new GitHub repository or replace the contents of the existing repository.
-2. Connect the repository to Netlify.
-3. Netlify reads `netlify.toml`; no framework preset is required.
-4. Add environment variable:
-   - `PAYSTACK_SECRET_KEY=sk_test_...` while testing, then use the live key for production.
-5. Deploy.
+- Public corporate and product pages
+- Persistent browser cart
+- Required customer and delivery-address form
+- State-based standard and express delivery fees
+- Server-side price calculation
+- Order creation before payment
+- Paystack transaction initialization
+- Paystack callback verification
+- Signed Paystack webhook handling
+- PostgreSQL order and order-item storage
+- Order confirmation page
+- Cart clearing only after verified payment
 
-Expected build settings:
-- Build command: `echo 'Bridgecare static site: no framework build required'`
-- Publish directory: `site`
-- Functions directory: `netlify/functions`
+## Setup
 
-## Paystack
+1. Install packages:
 
-The secret key is only used inside Netlify Functions. The browser calls:
-- `/api/paystack/initialize`
-- `/api/paystack/verify`
+```bash
+npm install
+```
 
-Recommended webhook URL for future order automation:
-`https://bridgecarepharmang.com/.netlify/functions/paystack-webhook`
+2. Copy the environment template:
 
-## Important
+```bash
+cp .env.example .env
+```
 
-Prices in `site/assets/js/store.js` are placeholders until Bridgecare confirms final retail prices and delivery fees.
+3. Add your PostgreSQL URL and Paystack **test** secret key.
+
+4. Create the database tables:
+
+```bash
+npm run db:generate
+npm run db:migrate -- --name initial
+```
+
+5. Start development:
+
+```bash
+npm run dev
+```
+
+## Paystack dashboard configuration
+
+Set the webhook URL to:
+
+```text
+https://bridgecarepharmang.com/api/paystack/webhook
+```
+
+The application sets the successful transaction callback URL to:
+
+```text
+https://bridgecarepharmang.com/order-success
+```
+
+Use test keys until checkout and webhook verification are fully tested. Never expose `PAYSTACK_SECRET_KEY` to browser code or commit `.env` to GitHub.
+
+## Before launch
+
+- Replace sample product prices in `lib/store.ts`.
+- Replace sample delivery fees in `lib/store.ts`.
+- Add official product images.
+- Verify every public product claim against current approved packaging.
+- Insert approved legal policies.
+- Connect email/SMS fulfilment notifications.
+- Add an authenticated order-management dashboard or connect the database to your existing operations system.
+- Test failed, abandoned, duplicate and delayed payments.
+- Configure the production database, domain and live Paystack key.
