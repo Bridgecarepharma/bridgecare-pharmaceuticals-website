@@ -10,7 +10,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "prebuild": "node scripts/check-deployment-config.mjs"
   },
   "dependencies": {
     "next": "15.5.9",
