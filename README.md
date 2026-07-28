@@ -1,31 +1,75 @@
-# Bridgecare Website v1.0
+# Bridgecare Pharmaceuticals E-commerce Website
 
-Developer-ready starter package for Bridgecare Pharmaceuticals Limited and the Bridgecare Health Academy.
+A Next.js, TypeScript, Tailwind CSS, PostgreSQL and Paystack starter for the Bridgecare public website and online store.
 
-## What is included
+## Included
 
-- Responsive static website prototype
-- Corporate and product page copy
-- Health Academy starter structure and cornerstone articles
-- Brand and editorial guidelines
-- Sitemap, functional specification, CMS model, launch checklist
-- SEO metadata sheet
-- Legal-page drafts
-- Marketing launch starter kit
+- Public corporate and product pages
+- Persistent browser cart
+- Required customer and delivery-address form
+- State-based standard and express delivery fees
+- Server-side price calculation
+- Order creation before payment
+- Paystack transaction initialization
+- Paystack callback verification
+- Signed Paystack webhook handling
+- PostgreSQL order and order-item storage
+- Order confirmation page
+- Cart clearing only after verified payment
 
-## Start the prototype
+## Setup
 
-Open `02_Website/index.html` in a browser, or serve the folder with a local web server.
-
-Example:
+1. Install packages:
 
 ```bash
-cd 02_Website
-python -m http.server 8000
+npm install
 ```
 
-Then visit `http://localhost:8000`.
+2. Copy the environment template:
 
-## Important publication note
+```bash
+cp .env.example .env
+```
 
-Product formulations, ingredient quantities, directions, warnings, regulatory numbers, manufacturer details and claims must be checked against approved product labels and applicable Nigerian regulatory requirements before publication. Placeholders are clearly marked where source data was unavailable.
+3. Add your PostgreSQL URL and Paystack **test** secret key.
+
+4. Create the database tables:
+
+```bash
+npm run db:generate
+npm run db:migrate -- --name initial
+```
+
+5. Start development:
+
+```bash
+npm run dev
+```
+
+## Paystack dashboard configuration
+
+Set the webhook URL to:
+
+```text
+https://bridgecarepharmang.com/api/paystack/webhook
+```
+
+The application sets the successful transaction callback URL to:
+
+```text
+https://bridgecarepharmang.com/order-success
+```
+
+Use test keys until checkout and webhook verification are fully tested. Never expose `PAYSTACK_SECRET_KEY` to browser code or commit `.env` to GitHub.
+
+## Before launch
+
+- Replace sample product prices in `lib/store.ts`.
+- Replace sample delivery fees in `lib/store.ts`.
+- Add official product images.
+- Verify every public product claim against current approved packaging.
+- Insert approved legal policies.
+- Connect email/SMS fulfilment notifications.
+- Add an authenticated order-management dashboard or connect the database to your existing operations system.
+- Test failed, abandoned, duplicate and delayed payments.
+- Configure the production database, domain and live Paystack key.
