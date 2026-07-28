@@ -73,3 +73,30 @@ Use test keys until checkout and webhook verification are fully tested. Never ex
 - Add an authenticated order-management dashboard or connect the database to your existing operations system.
 - Test failed, abandoned, duplicate and delayed payments.
 - Configure the production database, domain and live Paystack key.
+
+## Netlify deployment
+
+This application is a server-rendered/hybrid Next.js application because it contains Paystack API routes, webhooks, dynamic order lookup, and Prisma database access. It must **not** be deployed as a static export.
+
+Use these Netlify build settings:
+
+```text
+Build command: npm run build
+Publish directory: .next
+```
+
+A matching `netlify.toml` is included. In the Netlify dashboard, remove any old `out` publish-directory override under **Site configuration → Build & deploy → Build settings**. Then clear the build cache and redeploy.
+
+Required production environment variables:
+
+```text
+NEXT_PUBLIC_SITE_URL=https://bridgecarepharmang.com
+PAYSTACK_SECRET_KEY=sk_live_...
+DATABASE_URL=postgresql://...
+```
+
+Configure the Paystack webhook as:
+
+```text
+https://bridgecarepharmang.com/api/paystack/webhook
+```
