@@ -1,0 +1,10 @@
+const PRODUCTS={aspivit:{id:'aspivit',name:'Aspivit®',price:15000,image:'/assets/images/products/aspivit.png',desc:'Omega-3, multivitamin and mineral nutritional support.'},asfenositol:{id:'asfenositol',name:'AsFenositol®',price:18500,image:'/assets/images/products/asfenositol.png',desc:'Targeted nutritional support for women’s wellness.'},globivida:{id:'globivida',name:'Globivida®',price:12500,image:'/assets/images/products/globivida.png',desc:'Daily nutritional support for vitality and wellbeing.'},tea:{id:'tea',name:'Bridgecare Herbal Bitter Tea®',price:8000,image:'/assets/images/products/herbal-bitter-tea.png',desc:'A convenient herbal tea for everyday wellness support.'}};
+function money(n){return new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN',maximumFractionDigits:0}).format(n)}
+function getCart(){try{return JSON.parse(localStorage.getItem('bridgecare_cart'))||{}}catch{return {}}}
+function saveCart(c){localStorage.setItem('bridgecare_cart',JSON.stringify(c));updateCount()}
+function addToCart(id,qty=1){const c=getCart();c[id]=(c[id]||0)+qty;saveCart(c);showToast(`${PRODUCTS[id].name} added to cart`)}
+function updateCount(){const el=document.querySelector('[data-cart-count]');if(el)el.textContent=Object.values(getCart()).reduce((a,b)=>a+b,0)}
+function showToast(msg){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style='position:fixed;right:20px;bottom:20px;background:#0a2b25;color:#fff;padding:14px 18px;border-radius:10px;z-index:99;box-shadow:0 10px 30px #0003';document.body.appendChild(t)}t.textContent=msg;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),2200)}
+function cartItems(){const c=getCart();return Object.entries(c).filter(([,q])=>q>0).map(([id,qty])=>({...PRODUCTS[id],qty,subtotal:PRODUCTS[id].price*qty}))}
+function cartTotal(){return cartItems().reduce((s,i)=>s+i.subtotal,0)}
+document.addEventListener('DOMContentLoaded',()=>{updateCount();document.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>addToCart(b.dataset.add)))});
