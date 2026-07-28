@@ -23,6 +23,7 @@ export default function Home() {
             </div>
           </div>
           <div className="hero-products" aria-label="Bridgecare product range">
+            <div className="hero-family"><Image src="/images/hero-family.jpg" alt="Happy family enjoying everyday wellness" fill priority sizes="(max-width: 900px) 100vw, 50vw" /></div>
             <div className="hero-glow" />
             <div className="hero-product hero-product-aspivit"><Image src="/images/products/aspivit.png" alt="Aspivit product pack" fill priority sizes="(max-width: 900px) 58vw, 28vw" /></div>
             <div className="hero-product hero-product-asfenositol"><Image src="/images/products/asfenositol.png" alt="AsFenositol product pack" fill priority sizes="(max-width: 900px) 58vw, 28vw" /></div>

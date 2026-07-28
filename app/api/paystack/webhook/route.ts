@@ -1,6 +1,9 @@
 import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function POST(request:Request){
  const secret=process.env.PAYSTACK_SECRET_KEY;
  if(!secret)return NextResponse.json({error:"Not configured"},{status:500});

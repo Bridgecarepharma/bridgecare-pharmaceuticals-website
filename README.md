@@ -100,3 +100,7 @@ Configure the Paystack webhook as:
 ```text
 https://bridgecarepharmang.com/api/paystack/webhook
 ```
+
+## Version 2 deployment correction
+
+All order and Paystack route handlers explicitly use the Node.js runtime and dynamic rendering. The project has no `output: "export"` configuration and must not be published from an `out` directory. See `DEPLOYMENT.md`.

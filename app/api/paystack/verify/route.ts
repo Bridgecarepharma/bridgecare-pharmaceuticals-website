@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function GET(request:Request){
  const reference=new URL(request.url).searchParams.get("reference");
  if(!reference)return NextResponse.json({error:"Missing reference."},{status:400});

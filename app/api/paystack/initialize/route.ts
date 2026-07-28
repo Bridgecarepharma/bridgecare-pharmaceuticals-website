@@ -3,6 +3,9 @@ import { checkoutSchema } from "@/lib/checkout-schema";
 import { prisma } from "@/lib/prisma";
 import { shippingFeeForState, STORE_PRODUCTS } from "@/lib/store";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 function orderNumber(){return `BC-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`}
 function reference(){return `BC-${Date.now()}-${Math.random().toString(36).slice(2,10)}`}
 
