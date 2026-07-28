@@ -60,3 +60,5 @@ In Netlify, clear any old overrides that still say:
 - Publish directory: `site`
 
 Also remove a manually installed Next.js plugin from **Extensions/Plugins** if one remains from the static-site deployment. Netlify will attach the supported Next.js runtime automatically during framework detection.
+
+Security update: Next.js and eslint-config-next pinned to 16.0.10 (patched release line).
