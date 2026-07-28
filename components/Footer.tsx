@@ -1,7 +1,29 @@
+import Image from "next/image";
 import Link from "next/link";
-export function Footer(){return <footer className="footer"><div className="container footer-grid">
-<div><div className="brand light"><span className="brand-mark">B</span><span><strong>Bridgecare</strong><small>Pharmaceuticals Limited</small></span></div><p>Improving lives through quality healthcare products, responsible information and trusted partnerships.</p></div>
-<div><h3>Company</h3><Link href="/about">About</Link><Link href="/quality-compliance">Quality</Link><Link href="/csr">CSR</Link><Link href="/careers">Careers</Link></div>
-<div><h3>Resources</h3><Link href="/health-centre">Health Centre</Link><Link href="/news">News</Link><Link href="/downloads">Downloads</Link><Link href="/faq">FAQ</Link></div>
-<div><h3>Legal</h3><Link href="/privacy-policy">Privacy Policy</Link><Link href="/terms">Terms of Use</Link><Link href="/cookie-policy">Cookie Policy</Link><Link href="/contact">Contact</Link></div>
-</div><div className="container footer-bottom">© {new Date().getFullYear()} Bridgecare Pharmaceuticals Limited. All rights reserved.</div></footer>}
+import { Mail, MapPin, Phone } from "lucide-react";
+
+export function Footer() {
+  return (
+    <footer className="footer">
+      <div className="container footer-top">
+        <div><span className="eyebrow footer-eyebrow">Healthier communities start with trusted care</span><h2>Stay informed with Bridgecare.</h2></div>
+        <form className="newsletter-form" action="/newsletter/success">
+          <label className="sr-only" htmlFor="footer-email">Email address</label>
+          <input id="footer-email" type="email" name="email" placeholder="Enter your email address" required />
+          <button className="button" type="submit">Subscribe</button>
+        </form>
+      </div>
+      <div className="container footer-grid">
+        <div className="footer-brand-column">
+          <Link href="/" className="footer-logo"><Image src="/images/brand/bridgecare-logo.png" alt="Bridgecare Pharmaceuticals Limited" width={205} height={92} /></Link>
+          <p>Quality healthcare products, responsible information and dependable partnerships for families across Nigeria.</p>
+          <div className="footer-contact"><span><Phone size={17}/>0818 000 4532</span><span><Mail size={17}/>info@bridgecarepharmang.com</span><span><MapPin size={17}/>Enugu, Nigeria</span></div>
+        </div>
+        <div><h3>Company</h3><Link href="/about">About us</Link><Link href="/quality-compliance">Quality & Compliance</Link><Link href="/csr">Corporate responsibility</Link><Link href="/careers">Careers</Link></div>
+        <div><h3>Explore</h3><Link href="/products">Products</Link><Link href="/health-centre">Health Centre</Link><Link href="/news">News</Link><Link href="/downloads">Downloads</Link></div>
+        <div><h3>Support</h3><Link href="/faq">Frequently asked questions</Link><Link href="/distributors">Become a distributor</Link><Link href="/contact">Contact us</Link><Link href="/privacy-policy">Privacy policy</Link></div>
+      </div>
+      <div className="container footer-bottom"><span>© {new Date().getFullYear()} Bridgecare Pharmaceuticals Limited.</span><span>Advancing Health. Inspiring Life.</span></div>
+    </footer>
+  );
+}
