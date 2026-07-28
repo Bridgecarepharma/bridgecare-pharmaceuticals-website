@@ -30,3 +30,38 @@
 .hero-product-aspivit{z-index:7}.hero-product-asfenositol{z-index:6}.hero-product-globivida{z-index:8}.hero-product-tea{z-index:5}
 @media(max-width:900px){.hero-family{inset:8px -20px 88px 5px}.hero-family img{object-position:center 30%}.hero-family-fade{left:-20px;right:-20px;bottom:18px;height:190px}}
 @media(max-width:600px){.hero-family{inset:0 -38px 78px -38px;border-radius:25px}.hero-family img{object-position:center 24%}.hero-family-fade{left:-40px;right:-40px;bottom:5px;height:165px}.hero-products{margin-top:26px}}
+
+/* Hero composition correction: transparent packs, visible family, grounded product stage */
+.hero-products{height:590px;overflow:visible}
+.hero-family{inset:26px -18px 78px 42px;border-radius:36px}
+.hero-family img{object-position:center 27%}
+.hero-family:after{background:linear-gradient(90deg,rgba(240,251,247,.18),transparent 38%),linear-gradient(0deg,rgba(240,251,247,.72),transparent 36%)}
+.hero-family-fade{left:4px;right:-24px;bottom:16px;height:190px}
+.hero-products:after{content:"";position:absolute;z-index:3;left:7%;right:-1%;bottom:20px;height:76px;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(222,238,232,.82));box-shadow:0 25px 42px rgba(16,35,33,.20);transform:perspective(500px) rotateX(66deg)}
+.hero-product{animation:heroFloat 6s ease-in-out infinite;transform-origin:center bottom}
+.hero-product img{object-fit:contain!important;padding:0!important;filter:drop-shadow(0 18px 17px rgba(6,29,24,.30))}
+.hero-product-aspivit{width:34%;height:45%;left:3%;top:37%;z-index:7}
+.hero-product-asfenositol{width:46%;height:34%;left:27%;top:42%;z-index:6;animation-delay:-1.2s}
+.hero-product-globivida{width:25%;height:36%;left:57%;bottom:5%;z-index:8;animation-delay:-2.4s}
+.hero-product-tea{width:29%;height:38%;right:-1%;bottom:4%;z-index:7;animation-delay:-3.2s}
+@keyframes heroFloat{0%,100%{translate:0 0}50%{translate:0 -7px}}
+@media (prefers-reduced-motion:reduce){.hero-product{animation:none}}
+@media(max-width:900px){
+ .hero-products{height:540px}
+ .hero-family{inset:8px 0 80px 0}.hero-family img{object-position:center 25%}
+ .hero-products:after{left:5%;right:3%;bottom:20px}
+ .hero-product-aspivit{width:33%;height:44%;left:4%;top:39%}
+ .hero-product-asfenositol{width:46%;height:33%;left:27%;top:44%}
+ .hero-product-globivida{width:24%;height:34%;left:58%;bottom:6%}
+ .hero-product-tea{width:28%;height:36%;right:0;bottom:5%}
+}
+@media(max-width:600px){
+ .hero-products{height:430px;margin-top:18px}
+ .hero-family{inset:0 -12px 66px -12px}.hero-family img{object-position:center 24%}
+ .hero-family-fade{left:-12px;right:-12px;bottom:0;height:130px}
+ .hero-products:after{left:0;right:0;bottom:10px;height:58px}
+ .hero-product-aspivit{width:35%;height:42%;left:0;top:41%}
+ .hero-product-asfenositol{width:47%;height:31%;left:25%;top:47%}
+ .hero-product-globivida{width:25%;height:32%;left:57%;bottom:3%}
+ .hero-product-tea{width:29%;height:34%;right:-2%;bottom:2%}
+}
