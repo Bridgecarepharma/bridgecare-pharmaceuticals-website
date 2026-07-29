@@ -14,6 +14,13 @@ export const metadata: Metadata = {
   },
   description:
     "Improving lives through quality healthcare products, trusted partnerships and responsible health information.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
