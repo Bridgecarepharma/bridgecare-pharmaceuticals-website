@@ -1,61 +1,75 @@
 # Bridgecare Pharmaceuticals E-commerce Website
 
-Production-oriented Next.js e-commerce website for Bridgecare Pharmaceuticals Limited.
-
-## Public product portfolio
-
-- Aspivit®
-- AsFenositol®
-- Globivida®
-- Bridgecare Herbal Bitter Tea®
-
+A Next.js, TypeScript, Tailwind CSS, PostgreSQL and Paystack starter for the Bridgecare public website and online store.
 
 ## Included
 
-- Responsive corporate website and family-backed product hero
-- Product catalogue and product detail pages
+- Public corporate and product pages
 - Persistent browser cart
-- Checkout with required customer and delivery address information
+- Required customer and delivery-address form
 - State-based standard and express delivery fees
 - Server-side price calculation
-- Paystack payment initialization, callback verification and signed webhook processing
-- PostgreSQL order and order-item storage through Prisma
-- Order confirmation and failed-payment pages
-- SEO metadata, sitemap, robots file and legal/support pages
+- Order creation before payment
+- Paystack transaction initialization
+- Paystack callback verification
+- Signed Paystack webhook handling
+- PostgreSQL order and order-item storage
+- Order confirmation page
+- Cart clearing only after verified payment
 
-## Local setup
+## Setup
+
+1. Install packages:
 
 ```bash
 npm install
+```
+
+2. Copy the environment template:
+
+```bash
 cp .env.example .env
+```
+
+3. Add your PostgreSQL URL and Paystack **test** secret key.
+
+4. Create the database tables:
+
+```bash
+npm run db:generate
 npm run db:migrate -- --name initial
+```
+
+5. Start development:
+
+```bash
 npm run dev
 ```
 
-Use a Paystack test secret key during development.
+## Paystack dashboard configuration
 
-## Production build
+Set the webhook URL to:
 
-```bash
-npm run build
-npm start
+```text
+https://bridgecarepharmang.com/api/paystack/webhook
 ```
 
-## Netlify
+The application sets the successful transaction callback URL to:
 
-Deployment configuration is included in `netlify.toml`. See `NETLIFY_DEPLOYMENT.md` for the exact environment variables, database migration step and the stale static-site settings that must be removed from the Netlify dashboard.
+```text
+https://bridgecarepharmang.com/order-success
+```
 
-## Production URLs
+Use test keys until checkout and webhook verification are fully tested. Never expose `PAYSTACK_SECRET_KEY` to browser code or commit `.env` to GitHub.
 
-- Website: `https://bridgecarepharmang.com`
-- Purchase conversion page: `https://bridgecarepharmang.com/order-success`
-- Paystack webhook: `https://bridgecarepharmang.com/api/paystack/webhook`
+## Before launch
 
-## Before accepting live orders
-
-- Confirm product prices and delivery fees in `lib/store.ts`.
-- Review all claims against approved packaging and current regulatory requirements.
-- Apply the Prisma production migration.
-- Add the live Paystack secret only after successful test transactions.
-- Test successful, failed, abandoned, duplicate and delayed payment scenarios.
-- Connect fulfilment email/SMS notifications and an authenticated order-management workflow.
+- Replace sample product prices in `lib/store.ts`.
+- Replace sample delivery fees in `lib/store.ts`.
+- Add official product images.
+- Verify every public product claim against current approved packaging.
+- Insert approved legal policies.
+- Connect email/SMS fulfilment notifications.
+- Add an authenticated order-management dashboard or connect the database to your existing operations system.
+- Test failed, abandoned, duplicate and delayed payments.
+- Configure the production database, domain and live Paystack key.

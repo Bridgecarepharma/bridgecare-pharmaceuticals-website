@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Building2, CheckCircle2, Headphones, ShieldCheck, Sparkles, Truck } from "lucide-react";
+import { Building2, Headphones, ShieldCheck, Truck } from "lucide-react";
 import { CTA, ProductGrid } from "@/components/Sections";
 
 export default function Home() {
@@ -9,7 +9,7 @@ export default function Home() {
       <section className="hero">
         <div className="container hero-grid">
           <div className="hero-copy">
-            <span className="eyebrow hero-eyebrow"><Sparkles size={14}/> Bridgecare Pharmaceuticals Limited</span>
+            <span className="eyebrow">Bridgecare Pharmaceuticals Limited</span>
             <h1>Advancing Health.<br />Inspiring Life.</h1>
             <p className="lead">Quality healthcare products, trusted partnerships and practical health information for healthier families and stronger communities.</p>
             <div className="hero-actions">
@@ -17,9 +17,9 @@ export default function Home() {
               <Link className="button secondary" href="/about">Discover Bridgecare</Link>
             </div>
             <div className="hero-assurance">
-              <span><CheckCircle2 size={16}/> Secure Paystack checkout</span>
-              <span><CheckCircle2 size={16}/> Delivery across Nigeria</span>
-              <span><CheckCircle2 size={16}/> Responsive customer support</span>
+              <span>Secure Paystack checkout</span>
+              <span>Delivery across Nigeria</span>
+              <span>Responsive customer support</span>
             </div>
           </div>
           <div className="hero-products" aria-label="Bridgecare products supporting healthier families">
@@ -38,7 +38,6 @@ export default function Home() {
             <div className="hero-product hero-product-asfenositol"><Image src="/images/products/asfenositol.png" alt="AsFenositol product pack" fill priority sizes="(max-width: 900px) 58vw, 28vw" /></div>
             <div className="hero-product hero-product-globivida"><Image src="/images/products/globivida.png" alt="Globivida product pack" fill priority sizes="(max-width: 900px) 42vw, 20vw" /></div>
             <div className="hero-product hero-product-tea"><Image src="/images/products/herbal-bitter-tea.png" alt="Bridgecare Herbal Bitter Tea product pack" fill priority sizes="(max-width: 900px) 42vw, 20vw" /></div>
-            <div className="hero-proof"><strong>4</strong><span>carefully selected wellness products</span></div>
           </div>
         </div>
       </section>
@@ -56,7 +55,7 @@ export default function Home() {
         <div className="container">
           <div className="section-head">
             <div><span className="eyebrow">Shop Bridgecare</span><h2>Our healthcare portfolio</h2></div>
-            <Link className="section-link" href="/products">View all products <ArrowRight size={18}/></Link>
+            <Link className="button secondary" href="/products">View all products</Link>
           </div>
           <ProductGrid />
         </div>
