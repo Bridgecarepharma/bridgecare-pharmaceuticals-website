@@ -15,9 +15,8 @@ export async function POST(request:Request){
    return {...product,quantity:item.quantity,lineTotalKobo:product.priceKobo*item.quantity};
   });
   const subtotalKobo=items.reduce((sum,item)=>sum+item.lineTotalKobo,0);
-  const totalPacks=items.reduce((sum,item)=>sum+item.quantity,0);
   const baseShipping=shippingFeeForState(payload.delivery.state);
-  const shippingKobo=totalPacks>=3?0:(payload.delivery.deliveryMethod==="express"?Math.round(baseShipping*1.5):baseShipping);
+  const shippingKobo=payload.delivery.deliveryMethod==="express"?Math.round(baseShipping*1.5):baseShipping;
   const totalKobo=subtotalKobo+shippingKobo;
   const paystackReference=reference();
   const siteUrl=process.env.NEXT_PUBLIC_SITE_URL||"http://localhost:3000";

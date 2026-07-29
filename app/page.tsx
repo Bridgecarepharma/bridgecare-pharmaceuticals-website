@@ -93,20 +93,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section health-preview">
-        <div className="container">
-          <div className="section-head">
-            <div><span className="eyebrow">Health Centre</span><h2>Clear information for healthier decisions</h2><p>Customer-friendly educational content designed to support—not replace—professional healthcare advice.</p></div>
-            <Link className="button secondary" href="/health-centre">Visit Health Centre</Link>
-          </div>
-          <div className="health-card-grid">
-            <Link href="/health-centre" className="health-card"><span className="health-art women-art" aria-hidden="true"><i/><b/></span><small>Women’s wellness</small><h3>Building practical daily wellness routines</h3><p>Simple ways to prepare for productive conversations with your healthcare professional.</p><strong>Read more →</strong></Link>
-            <Link href="/health-centre" className="health-card"><span className="health-art nutrition-art" aria-hidden="true"><i/><b/></span><small>Nutrition</small><h3>Understanding supplement labels</h3><p>Learn how to read ingredients, strengths, directions and important safety information.</p><strong>Read more →</strong></Link>
-            <Link href="/health-centre" className="health-card"><span className="health-art family-art" aria-hidden="true"><i/><b/></span><small>Family health</small><h3>Keeping medicines and supplements safely</h3><p>Storage habits that help protect product quality and household safety.</p><strong>Read more →</strong></Link>
-          </div>
-        </div>
-      </section>
-
       <CTA />
     </>
   );
