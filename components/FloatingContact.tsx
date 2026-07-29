@@ -1,8 +1,8 @@
 import { MessageCircle, Phone } from "lucide-react";
 
-const phoneDisplay = "0818 000 4532";
-const phoneInternational = "+2348180004532";
-const whatsappNumber = "2348180004532";
+const phoneDisplay = "+234 807 773 3373";
+const phoneInternational = "+2348077733373";
+const whatsappNumber = "2348077733373";
 const whatsappMessage = encodeURIComponent("Hello Bridgecare Pharmaceuticals, I need help with your products.");
 
 export function FloatingContact() {
@@ -14,7 +14,7 @@ export function FloatingContact() {
       </a>
       <a
         className="floating-contact-button whatsapp"
-        href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
+        href="https://wa.link/bridgecarepharmaltd"
         target="_blank"
         rel="noreferrer"
         aria-label="Chat with Bridgecare on WhatsApp"

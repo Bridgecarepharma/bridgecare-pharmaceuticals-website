@@ -17,7 +17,7 @@ export function Footer() {
         <div className="footer-brand-column">
           <Link href="/" className="footer-logo"><Image src="/images/brand/bridgecare-logo.png" alt="Bridgecare Pharmaceuticals Limited" width={205} height={92} /></Link>
           <p>Quality healthcare products, responsible information and dependable partnerships for families across Nigeria.</p>
-          <div className="footer-contact"><span><Phone size={17}/>0818 000 4532</span><span><Mail size={17}/>info@bridgecarepharmang.com</span><span><MapPin size={17}/>Enugu, Nigeria</span></div>
+          <div className="footer-contact"><span><Phone size={17}/>+234 807 773 3373</span><span><Mail size={17}/>info@bridgecarepharmang.com</span><span><MapPin size={17}/>LASCOFED Building, Ogba, Lagos</span></div>
         </div>
         <div><h3>Company</h3><Link href="/about">About us</Link><Link href="/quality-compliance">Quality & Compliance</Link><Link href="/csr">Corporate responsibility</Link><Link href="/careers">Careers</Link></div>
         <div><h3>Explore</h3><Link href="/products">Products</Link><Link href="/health-centre">Health Centre</Link><Link href="/news">News</Link><Link href="/downloads">Downloads</Link></div>
