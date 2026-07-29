@@ -13,7 +13,8 @@ export default function CheckoutPage(){
  const [deliveryMethod,setDeliveryMethod]=useState<"standard"|"express">("standard");
  const [loading,setLoading]=useState(false);
  const [error,setError]=useState("");
- const shippingKobo=useMemo(()=>{const base=shippingFeeForState(state);return deliveryMethod==="express"?Math.round(base*1.5):base},[state,deliveryMethod]);
+ const totalPacks=useMemo(()=>items.reduce((sum,item)=>sum+item.quantity,0),[items]);
+ const shippingKobo=useMemo(()=>{if(totalPacks>=3)return 0;const base=shippingFeeForState(state);return deliveryMethod==="express"?Math.round(base*1.5):base},[state,deliveryMethod,totalPacks]);
  const totalKobo=subtotalKobo+shippingKobo;
 
  async function submit(event:FormEvent<HTMLFormElement>){
@@ -48,6 +49,6 @@ export default function CheckoutPage(){
  <label className="radio-card"><input type="radio" name="deliveryMethod" value="express" checked={deliveryMethod==="express"} onChange={()=>setDeliveryMethod("express")}/><span><strong>Express delivery</strong><small>{formatNaira(Math.round(shippingFeeForState(state)*1.5))}</small></span></label>
  {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading}>{loading?"Opening Paystack…":`Pay ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
  </form>
- <aside className="order-summary"><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{formatNaira(shippingKobo)}</strong></div><div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div></aside>
+ <aside className="order-summary"><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{shippingKobo===0?"FREE":formatNaira(shippingKobo)}</strong></div><div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div></aside>
  </div></section></>
 }

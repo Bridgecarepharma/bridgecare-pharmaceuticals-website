@@ -1,0 +1,36 @@
+Bridgecare Pharmaceuticals Milestone 1
+
+Homepage
+- Family background hero
+- Floating glass product stage
+- Four official product pack images
+- Premium lighting and motion
+- Shop Products and distributor CTA
+- Trust strip
+- Reception and warehouse photography
+- Featured products
+- Health Centre cards
+- Corporate footer
+
+AsFenositol product page
+- Premium hero and purchase controls
+- Overview and why-this-product cards
+- Expandable active ingredients
+- Approved benefits
+- Dosage cards
+- Storage
+- Warning panel
+- FAQs
+- Resources
+- Related products
+- Closing purchase panel
+
+System
+- Dynamic product routing via /products/[slug]
+- Central product model in data/products.ts
+- Reusable pharmaceutical components
+- Cart and checkout
+- Delivery-address collection
+- Lagos/outside-Lagos shipping
+- Free shipping for any 3+ packs
+- Paystack initialize, verify and webhook routes
