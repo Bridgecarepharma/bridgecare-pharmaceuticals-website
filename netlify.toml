@@ -6,5 +6,5 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--include=dev"
 
-# Netlify detects Next.js automatically and installs the current runtime adapter.
-# Do not add a manual @netlify/plugin-nextjs block unless pinning a specific adapter version.
+# Required Netlify environment variables:
+# DATABASE_URL, PAYSTACK_SECRET_KEY, NEXT_PUBLIC_SITE_URL

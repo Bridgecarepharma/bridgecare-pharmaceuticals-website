@@ -39,6 +39,7 @@ model Order {
   deliveryInstructions String?
   deliveryMethod String
   paymentChannel String?
+  paystackTransactionId String? @unique
   paidAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -6,6 +6,12 @@ export const STORE_PRODUCTS:Record<string,StoreProduct>={
  "herbal-bitter-tea":{slug:"herbal-bitter-tea",name:"Bridgecare Herbal Bitter Tea®",priceKobo:550000}
 };
 export const SHIPPING_FEES_KOBO:Record<string,number>={Lagos:250000,default:300000};
+export const FREE_SHIPPING_PACK_COUNT=3;
+export function shippingFeeForOrder(state:string,packCount:number){
+ if(packCount>=FREE_SHIPPING_PACK_COUNT)return 0;
+ return SHIPPING_FEES_KOBO[state]??SHIPPING_FEES_KOBO.default;
+}
+/** @deprecated Use shippingFeeForOrder so free-shipping rules are applied. */
 export function shippingFeeForState(state:string){return SHIPPING_FEES_KOBO[state]??SHIPPING_FEES_KOBO.default}
 export function formatNaira(kobo:number){return new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",maximumFractionDigits:0}).format(kobo/100)}
 export function productImageForSlug(slug:string){return `/images/products/${slug}.png`}
