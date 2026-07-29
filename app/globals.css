@@ -221,3 +221,47 @@ body{background:#fff;color:var(--ink)}
 @media(max-width:600px){
   .hero-product-asfenositol{width:35%!important;height:24%!important;left:20%!important;bottom:2%!important}
 }
+
+/* AsFenositol flagship product page */
+.asf-page{--asf:#0a9f9b;--asf-deep:#08716f;--asf-ink:#103f4a;--asf-soft:#edfafa;--asf-line:#cdebea}
+.asf-hero{position:relative;overflow:hidden;padding:76px 0 68px;background:radial-gradient(circle at 16% 15%,rgba(47,193,188,.22),transparent 28%),radial-gradient(circle at 82% 28%,rgba(11,111,174,.13),transparent 30%),linear-gradient(135deg,#f1fbfb,#fff 54%,#eaf8fb)}
+.asf-hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(10,159,155,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(10,159,155,.035) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,#000,transparent 90%)}
+.asf-hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(360px,.9fr) 1.1fr;gap:78px;align-items:center}
+.asf-product-stage{position:relative;min-height:520px;display:grid;place-items:center}
+.asf-orb{position:absolute;width:430px;height:430px;border-radius:50%;background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(177,232,229,.72));box-shadow:inset 0 0 0 1px rgba(255,255,255,.86),0 38px 90px rgba(8,113,111,.18)}
+.asf-pack-float{position:relative;width:min(390px,84%);height:410px;z-index:2;animation:asfFloat 5.6s ease-in-out infinite}
+.asf-pack-float img{object-fit:contain;filter:drop-shadow(0 28px 25px rgba(5,67,78,.28))}
+.asf-pedestal{position:absolute;z-index:1;bottom:49px;width:78%;height:76px;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(190,226,229,.72));border:1px solid rgba(255,255,255,.88);box-shadow:0 30px 38px rgba(7,89,93,.20);transform:perspective(500px) rotateX(58deg)}
+@keyframes asfFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-12px) rotate(1deg)}}
+.asf-kicker{display:inline-flex;padding:8px 13px;border-radius:999px;background:#fff;border:1px solid var(--asf-line);color:var(--asf-deep);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.13em}
+.asf-hero-copy h1{margin:18px 0 17px;color:var(--asf-ink)}
+.asf-indication{font-size:22px;line-height:1.45;color:#385861;max-width:690px}
+.asf-approved-copy{padding:17px 18px;border-left:4px solid var(--asf);border-radius:0 14px 14px 0;background:rgba(255,255,255,.76);color:#2e555d}
+.asf-price-row{display:flex;align-items:center;justify-content:space-between;gap:25px;margin-top:26px;padding:20px 0;border-top:1px solid var(--asf-line);border-bottom:1px solid var(--asf-line)}
+.asf-price-row div{display:grid}.asf-price-row span{color:#647b80;font-size:13px}.asf-price-row strong{font-size:30px;color:var(--asf-deep)}
+.asf-pack-size{display:flex;align-items:center;gap:8px;padding:10px 13px;border-radius:999px;background:#fff;border:1px solid var(--asf-line);font-weight:800!important;color:var(--asf-deep)!important}
+.asf-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.asf-actions .button{background:var(--asf-deep);border-color:var(--asf-deep)}.asf-actions .button.secondary{background:#fff;color:var(--asf-deep)}
+.asf-trust-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:24px}.asf-trust-row span{display:flex;align-items:center;gap:7px;color:#526d72;font-size:13px;font-weight:800}.asf-trust-row svg{color:var(--asf)}
+.asf-section-nav{position:sticky;top:76px;z-index:12;background:rgba(255,255,255,.94);border-top:1px solid #e2f1f0;border-bottom:1px solid #dcebea;backdrop-filter:blur(12px)}
+.asf-section-nav .container{display:flex;gap:26px;overflow:auto;padding-top:13px;padding-bottom:13px}.asf-section-nav a{white-space:nowrap;font-size:13px;font-weight:900;color:#476970}.asf-section-nav a:hover{color:var(--asf-deep)}
+.asf-two-column{display:grid;grid-template-columns:.8fr 1.2fr;gap:75px;align-items:start}.asf-two-column h2{color:var(--asf-ink)}
+.asf-soft{background:linear-gradient(180deg,#f6fcfc,var(--asf-soft))}
+.asf-feature-grid,.asf-benefit-grid,.asf-direction-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.asf-feature-grid article,.asf-benefit-grid article,.asf-direction-card{padding:29px;border:1px solid var(--asf-line);border-radius:24px;background:#fff;box-shadow:0 16px 35px rgba(15,93,91,.07)}
+.asf-feature-grid svg,.asf-benefit-grid svg,.asf-direction-card>svg{width:34px;height:34px;color:var(--asf);margin-bottom:18px}
+.asf-feature-grid p,.asf-benefit-grid p,.asf-direction-card p{color:#60767a;margin-bottom:0}
+.asf-ingredient-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.asf-ingredient-card{margin:0;padding:0;overflow:hidden;border-color:var(--asf-line);background:#fff}
+.asf-ingredient-card summary{list-style:none;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px;padding:22px 23px;cursor:pointer}.asf-ingredient-card summary::-webkit-details-marker{display:none}
+.asf-ingredient-card summary span{display:flex;align-items:center;gap:10px;color:var(--asf-ink)}.asf-ingredient-card summary svg{color:var(--asf)}.asf-ingredient-card summary strong{color:var(--asf-deep)}
+.asf-ingredient-card p{margin:0;padding:0 23px 22px;color:#5c7479}.asf-chevron{transition:transform .2s}.asf-ingredient-card[open] .asf-chevron{transform:rotate(180deg)}
+.asf-benefits-section{background:linear-gradient(130deg,#083f4b,#08716f);color:#fff}.asf-benefits-section .eyebrow{color:#82e1dd}.asf-benefits-section h2,.asf-benefits-section .section-head p{color:#fff}.asf-benefit-grid{grid-template-columns:repeat(4,1fr)}.asf-benefit-grid article{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.19);box-shadow:none}.asf-benefit-grid h3,.asf-benefit-grid p{color:#fff}.asf-benefit-grid svg{color:#83e7e2}
+.asf-direction-card{position:relative}.asf-direction-card>span{position:absolute;right:22px;top:18px;font-size:42px;font-weight:900;color:#e2f3f2}.asf-direction-card h3{color:var(--asf-ink)}
+.asf-safety-section{padding-top:30px}.asf-safety-box{display:grid;grid-template-columns:auto 1fr;gap:28px;padding:36px;border:1px solid #f1d19e;border-radius:26px;background:linear-gradient(135deg,#fffaf0,#fff);box-shadow:0 18px 45px rgba(114,78,13,.08)}
+.asf-safety-icon{display:grid;place-items:center;width:68px;height:68px;border-radius:20px;background:#fff0d5;color:#a46400}.asf-safety-box h2{font-size:36px}.asf-safety-box li{margin:8px 0;color:#5e5546}
+.asf-quality-section{background:#f7fbfc}.asf-quality-section .text-link{display:inline-block;margin-top:12px;color:var(--asf-deep);font-weight:900}
+.asf-faq-list details{background:#fff;border-color:var(--asf-line);padding:0;overflow:hidden}.asf-faq-list summary{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:21px 22px;list-style:none}.asf-faq-list summary::-webkit-details-marker{display:none}.asf-faq-list details p{padding:0 22px 22px;margin:0;color:#587176}
+.asf-purchase-section{padding-top:60px}.asf-purchase-card{display:flex;align-items:center;justify-content:space-between;gap:42px;padding:42px;border-radius:30px;background:linear-gradient(135deg,#ecfbfa,#fff);border:1px solid var(--asf-line);box-shadow:0 25px 60px rgba(11,111,113,.10)}
+.asf-purchase-card h2{margin-bottom:12px;color:var(--asf-ink)}.asf-purchase-card p{margin:0;color:#5e777b}.asf-purchase-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap}.asf-purchase-actions>strong{font-size:28px;color:var(--asf-deep);margin-right:8px}.asf-purchase-actions .button{background:var(--asf-deep);border-color:var(--asf-deep)}.asf-purchase-actions .button.secondary{background:#fff;color:var(--asf-deep)}
+@media(max-width:900px){.asf-hero-grid,.asf-two-column{grid-template-columns:1fr}.asf-product-stage{min-height:430px}.asf-feature-grid,.asf-direction-grid{grid-template-columns:1fr}.asf-benefit-grid{grid-template-columns:1fr 1fr}.asf-purchase-card{align-items:flex-start;flex-direction:column}.asf-purchase-actions{justify-content:flex-start}.asf-section-nav{top:76px}}
+@media(max-width:600px){.asf-hero{padding-top:38px}.asf-hero-grid{gap:30px}.asf-product-stage{min-height:340px}.asf-orb{width:310px;height:310px}.asf-pack-float{height:300px;width:88%}.asf-pedestal{bottom:28px}.asf-indication{font-size:18px}.asf-price-row{align-items:flex-start;flex-direction:column}.asf-trust-row{display:grid;gap:10px}.asf-ingredient-grid,.asf-benefit-grid{grid-template-columns:1fr}.asf-safety-box{grid-template-columns:1fr;padding:27px}.asf-purchase-card{padding:29px}.asf-purchase-actions{display:grid;width:100%}.asf-purchase-actions .button{width:100%}}
