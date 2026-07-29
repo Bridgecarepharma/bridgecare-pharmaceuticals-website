@@ -1,0 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--include=dev"
+
+# Netlify detects Next.js automatically and installs the current runtime adapter.
+# Do not add a manual @netlify/plugin-nextjs block unless pinning a specific adapter version.
