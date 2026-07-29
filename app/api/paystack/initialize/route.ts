@@ -8,6 +8,10 @@ function reference(){return `BC-${Date.now()}-${Math.random().toString(36).slice
 
 export async function POST(request:Request){
  try{
+  if(!process.env.DATABASE_URL){
+   console.error("DATABASE_URL is not configured.");
+   return NextResponse.json({error:"Checkout is temporarily unavailable. Please contact Bridgecare support or use the direct Paystack payment link while we resolve this issue."},{status:503});
+  }
   const payload=checkoutSchema.parse(await request.json());
   const items=payload.items.map(item=>{
    const product=STORE_PRODUCTS[item.slug];
@@ -57,7 +61,7 @@ export async function POST(request:Request){
   }
   return NextResponse.json({authorizationUrl:result.data.authorization_url,reference:paystackReference,orderNumber:order.orderNumber});
  }catch(error){
-  const message=error instanceof Error?error.message:"Invalid checkout request.";
-  return NextResponse.json({error:message},{status:400});
+    console.error(error);
+  return NextResponse.json({error:"We could not process your checkout. Please try again later or contact Bridgecare support."},{status:500});
  }
 }
