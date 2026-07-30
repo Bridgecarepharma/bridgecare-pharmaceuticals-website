@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 enum OrderStatus {
   PENDING_PAYMENT
   PAID
@@ -15,43 +17,95 @@ enum OrderStatus {
   CANCELLED
   REFUNDED
 }
-model Order {
-  id String @id @default(cuid())
-  orderNumber String @unique
-  paystackReference String @unique
-  status OrderStatus @default(PENDING_PAYMENT)
-  currency String @default("NGN")
-  subtotalKobo Int
-  shippingKobo Int
-  totalKobo Int
-  customerName String
-  customerEmail String
-  customerPhone String
-  recipientName String
-  recipientPhone String
-  addressLine1 String
-  addressLine2 String?
-  landmark String?
-  city String
-  lga String
-  state String
-  postalCode String?
-  deliveryInstructions String?
-  deliveryMethod String
-  paymentChannel String?
-  paystackTransactionId String? @unique
-  paidAt DateTime?
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  ABANDONED
+  REFUNDED
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  items OrderItem[]
+  orders    Order[]
+
+  @@index([phone])
+  @@index([createdAt])
 }
+
+model Order {
+  id                     String      @id @default(cuid())
+  orderNumber            String      @unique
+  paystackReference      String      @unique
+  status                 OrderStatus @default(PENDING_PAYMENT)
+  currency               String      @default("NGN")
+  subtotalKobo           Int
+  shippingKobo           Int
+  totalKobo              Int
+  customerId             String?
+  customerName           String
+  customerEmail          String
+  customerPhone          String
+  recipientName          String
+  recipientPhone         String
+  addressLine1           String
+  addressLine2           String?
+  landmark               String?
+  city                   String
+  lga                    String
+  state                  String
+  postalCode             String?
+  deliveryInstructions   String?
+  deliveryMethod         String
+  paymentChannel         String?
+  paystackTransactionId  String?     @unique
+  paidAt                 DateTime?
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+  customer               Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items                  OrderItem[]
+  payment                Payment?
+
+  @@index([status, createdAt])
+  @@index([customerEmail])
+  @@index([customerId])
+}
+
 model OrderItem {
-  id String @id @default(cuid())
-  orderId String
-  productSlug String
-  productName String
-  quantity Int
-  unitPriceKobo Int
-  lineTotalKobo Int
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id             String @id @default(cuid())
+  orderId        String
+  productSlug    String
+  productName    String
+  quantity       Int
+  unitPriceKobo  Int
+  lineTotalKobo  Int
+  order          Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([productSlug])
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  orderId               String        @unique
+  provider              String        @default("paystack")
+  reference             String        @unique
+  amountKobo            Int
+  currency              String        @default("NGN")
+  status                PaymentStatus @default(PENDING)
+  channel               String?
+  providerTransactionId String?       @unique
+  paidAt                DateTime?
+  rawEvent              Json?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  order                 Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
 }

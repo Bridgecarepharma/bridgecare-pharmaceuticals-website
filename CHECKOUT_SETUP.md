@@ -43,3 +43,13 @@ Use Paystack test keys and complete one successful order. Confirm that:
 - The order exists in PostgreSQL before payment.
 - The order status changes from `PENDING_PAYMENT` to `PAID`.
 - Three or more packs receive free delivery.
+
+## v2 database foundation
+
+Version 2.0.1 adds Customer and Payment tables. After configuring `DATABASE_URL`, apply the included migration once:
+
+```bash
+npm run db:deploy
+```
+
+The checkout then creates the customer, order, order items and pending payment record together before opening Paystack. Successful Paystack verification updates the order and payment records together.

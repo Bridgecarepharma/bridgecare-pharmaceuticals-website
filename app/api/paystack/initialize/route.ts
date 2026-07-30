@@ -48,16 +48,25 @@ export async function POST(request:Request){
   let savedOrderNumber=generatedOrderNumber;
 
   if(databaseEnabled){
-   const order=await prisma.order.create({data:{
-    orderNumber:generatedOrderNumber,paystackReference,subtotalKobo,shippingKobo,totalKobo,
-    customerName:payload.customer.fullName,customerEmail:payload.customer.email,customerPhone:payload.customer.phone,
-    recipientName:payload.delivery.recipientName,recipientPhone:payload.delivery.recipientPhone,
-    addressLine1:payload.delivery.addressLine1,addressLine2:payload.delivery.addressLine2||null,
-    landmark:payload.delivery.landmark||null,city:payload.delivery.city,lga:payload.delivery.lga,state:payload.delivery.state,
-    postalCode:payload.delivery.postalCode||null,deliveryInstructions:payload.delivery.deliveryInstructions||null,
-    deliveryMethod:"standard",
-    items:{create:items.map(item=>({productSlug:item.slug,productName:item.name,quantity:item.quantity,unitPriceKobo:item.priceKobo,lineTotalKobo:item.lineTotalKobo}))}
-   }});
+   const order=await prisma.$transaction(async tx=>{
+    const customer=await tx.customer.upsert({
+     where:{email:payload.customer.email.toLowerCase()},
+     update:{name:payload.customer.fullName,phone:payload.customer.phone},
+     create:{name:payload.customer.fullName,email:payload.customer.email.toLowerCase(),phone:payload.customer.phone}
+    });
+    return tx.order.create({data:{
+     orderNumber:generatedOrderNumber,paystackReference,subtotalKobo,shippingKobo,totalKobo,
+     customerId:customer.id,
+     customerName:payload.customer.fullName,customerEmail:payload.customer.email.toLowerCase(),customerPhone:payload.customer.phone,
+     recipientName:payload.delivery.recipientName,recipientPhone:payload.delivery.recipientPhone,
+     addressLine1:payload.delivery.addressLine1,addressLine2:payload.delivery.addressLine2||null,
+     landmark:payload.delivery.landmark||null,city:payload.delivery.city,lga:payload.delivery.lga,state:payload.delivery.state,
+     postalCode:payload.delivery.postalCode||null,deliveryInstructions:payload.delivery.deliveryInstructions||null,
+     deliveryMethod:"standard",
+     items:{create:items.map(item=>({productSlug:item.slug,productName:item.name,quantity:item.quantity,unitPriceKobo:item.priceKobo,lineTotalKobo:item.lineTotalKobo}))},
+     payment:{create:{reference:paystackReference,amountKobo:totalKobo,currency:"NGN",status:"PENDING"}}
+    }});
+   });
    orderId=order.id;
    savedOrderId=order.id;
    savedOrderNumber=order.orderNumber;

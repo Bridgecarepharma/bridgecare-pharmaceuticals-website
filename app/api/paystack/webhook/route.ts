@@ -15,11 +15,24 @@ export async function POST(request:Request){
   const event=JSON.parse(raw);
   if(event.event==="charge.success"&&process.env.DATABASE_URL){
    const tx=event.data;
-   const order=await prisma.order.findUnique({where:{paystackReference:tx.reference}});
+   const order=await prisma.order.findUnique({where:{paystackReference:tx.reference},include:{payment:true}});
    if(order&&tx.status==="success"&&tx.amount===order.totalKobo&&tx.currency===order.currency){
-    await prisma.order.update({where:{id:order.id},data:{status:"PAID",paidAt:new Date(tx.paid_at||Date.now()),paymentChannel:tx.channel||null,paystackTransactionId:String(tx.id)}});
-   }else if(order){console.error("Webhook amount/currency mismatch",{reference:tx.reference,receivedAmount:tx.amount,expectedAmount:order.totalKobo,receivedCurrency:tx.currency});}
+    const paidAt=new Date(tx.paid_at||Date.now());
+    await prisma.$transaction([
+     prisma.order.update({where:{id:order.id},data:{status:"PAID",paidAt,paymentChannel:tx.channel||null,paystackTransactionId:String(tx.id)}}),
+     prisma.payment.upsert({
+      where:{reference:tx.reference},
+      update:{status:"SUCCESS",channel:tx.channel||null,providerTransactionId:String(tx.id),paidAt,rawEvent:event},
+      create:{orderId:order.id,reference:tx.reference,amountKobo:tx.amount,currency:tx.currency,status:"SUCCESS",channel:tx.channel||null,providerTransactionId:String(tx.id),paidAt,rawEvent:event}
+     })
+    ]);
+   }else if(order){
+    console.error("Webhook amount/currency mismatch",{reference:tx.reference,receivedAmount:tx.amount,expectedAmount:order.totalKobo,receivedCurrency:tx.currency});
+   }
   }
   return NextResponse.json({received:true});
- }catch(error){console.error("Paystack webhook processing error",error);return NextResponse.json({received:true});}
+ }catch(error){
+  console.error("Paystack webhook processing error",error);
+  return NextResponse.json({received:true});
+ }
 }
