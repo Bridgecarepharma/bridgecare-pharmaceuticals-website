@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Building2, CheckCircle2, Headphones, ShieldCheck, Sparkles, Truck } from "lucide-react";
+import { ArrowRight, BookOpenCheck, Building2, CheckCircle2, HeartPulse, Headphones, ShieldCheck, Sparkles, Stethoscope, Truck } from "lucide-react";
 import { CTA, ProductGrid } from "@/components/Sections";
 
 export default function Home() {
@@ -14,7 +14,7 @@ export default function Home() {
             <p className="lead">Quality healthcare products, trusted partnerships and practical health information for healthier families and stronger communities.</p>
             <div className="hero-actions">
               <Link className="button" href="/products">Shop our products</Link>
-              <Link className="button secondary" href="/about">Discover Bridgecare</Link>
+              <Link className="button secondary" href="/distributors">Become a distributor</Link>
             </div>
             <div className="hero-assurance">
               <span><CheckCircle2 size={16}/> Secure Paystack checkout</span>
@@ -91,6 +91,43 @@ export default function Home() {
             <p>Our inventory facility supports product availability, order preparation and distribution. The public image has been framed to keep attention on Bridgecare's operations rather than products outside the current online portfolio.</p>
             <Link className="button secondary" href="/quality-compliance">Our quality commitment</Link>
           </div>
+        </div>
+      </section>
+
+      <section className="section health-centre-home">
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow">Bridgecare Health Centre</span>
+              <h2>Clear health information for everyday decisions</h2>
+              <p>Practical, responsible guidance designed to help families understand wellness products, use medicines carefully and know when to speak with a healthcare professional.</p>
+            </div>
+            <Link className="section-link" href="/health-centre">Visit Health Centre <ArrowRight size={18}/></Link>
+          </div>
+          <div className="health-topic-grid">
+            <Link href="/health-centre" className="health-topic-card">
+              <span className="health-topic-icon"><BookOpenCheck size={28}/></span>
+              <span className="eyebrow">Product education</span>
+              <h3>Read labels with confidence</h3>
+              <p>Understand directions, ingredients, warnings, storage instructions and the difference between general information and professional advice.</p>
+              <strong>Explore guidance <ArrowRight size={17}/></strong>
+            </Link>
+            <Link href="/health-centre" className="health-topic-card">
+              <span className="health-topic-icon"><HeartPulse size={28}/></span>
+              <span className="eyebrow">Everyday wellness</span>
+              <h3>Build healthier daily routines</h3>
+              <p>Simple information on nutrition, responsible supplement use and practical habits that support long-term wellbeing.</p>
+              <strong>Read wellness topics <ArrowRight size={17}/></strong>
+            </Link>
+            <Link href="/faq" className="health-topic-card">
+              <span className="health-topic-icon"><Stethoscope size={28}/></span>
+              <span className="eyebrow">Responsible use</span>
+              <h3>Know when to ask for help</h3>
+              <p>Find answers to common questions and learn when a pharmacist, doctor or other qualified healthcare professional should guide your next step.</p>
+              <strong>View common questions <ArrowRight size={17}/></strong>
+            </Link>
+          </div>
+          <div className="health-centre-note"><ShieldCheck size={21}/><p><strong>Health information, not a diagnosis.</strong> Bridgecare educational content does not replace consultation with a qualified healthcare professional.</p></div>
         </div>
       </section>
 
