@@ -12,7 +12,7 @@ export async function POST(request:Request){
  let orderId:string|undefined;
  try{
   const secret=process.env.PAYSTACK_SECRET_KEY;
-  if(!secret)return publicError("Secure payment is temporarily unavailable. Please contact Bridgecare support.");
+  const fallbackPaymentUrl=process.env.PAYSTACK_CART_URL||"https://paystack.shop/pay/btzq7yqk7p";
 
   const payload=checkoutSchema.parse(await request.json());
   const items=payload.items.map(item=>{
@@ -28,6 +28,21 @@ export async function POST(request:Request){
   const generatedOrderNumber=orderNumber();
   const siteUrl=(process.env.NEXT_PUBLIC_SITE_URL||new URL(request.url).origin).replace(/\/$/,"");
   const databaseEnabled=Boolean(process.env.DATABASE_URL);
+
+  // A Paystack secret key is required for dynamic transaction initialization.
+  // Until it is configured, keep checkout usable by opening the approved
+  // Bridgecare Paystack cart page instead of showing a blocking error.
+  if(!secret){
+   console.warn("PAYSTACK_SECRET_KEY is not configured; using Paystack cart fallback.");
+   return NextResponse.json({
+    authorizationUrl:fallbackPaymentUrl,
+    reference:paystackReference,
+    orderNumber:generatedOrderNumber,
+    totalKobo,
+    databaseSaved:false,
+    fallback:true
+   });
+  }
 
   let savedOrderId:string|undefined;
   let savedOrderNumber=generatedOrderNumber;
@@ -81,8 +96,15 @@ export async function POST(request:Request){
   const result=await response.json();
   if(!response.ok||!result.status||!result.data?.authorization_url){
    if(orderId){await prisma.order.update({where:{id:orderId},data:{status:"CANCELLED"}});}
-   console.error("Paystack initialization failed",result);
-   return publicError("We could not open secure payment. Please try again.",502);
+   console.error("Paystack initialization failed; using Paystack cart fallback",result);
+   return NextResponse.json({
+    authorizationUrl:fallbackPaymentUrl,
+    reference:paystackReference,
+    orderNumber:savedOrderNumber,
+    totalKobo,
+    databaseSaved:false,
+    fallback:true
+   });
   }
   return NextResponse.json({authorizationUrl:result.data.authorization_url,reference:paystackReference,orderNumber:savedOrderNumber,totalKobo,databaseSaved:databaseEnabled});
  }catch(error){

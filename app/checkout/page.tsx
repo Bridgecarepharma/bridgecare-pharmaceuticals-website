@@ -28,9 +28,10 @@ export default function CheckoutPage(){
     items:items.map(i=>({slug:i.slug,quantity:i.quantity}))
    };
    const response=await fetch("/api/paystack/initialize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-   const result=await response.json();
+   const result=await response.json().catch(()=>({}));
    if(!response.ok)throw new Error(result.error||"Unable to start payment.");
-   window.location.href=result.authorizationUrl;
+   if(!result.authorizationUrl)throw new Error("Paystack did not return a payment page. Please try again.");
+   window.location.assign(result.authorizationUrl);
   }catch(e){setError(e instanceof Error?e.message:"Unable to continue.");setLoading(false)}
  }
 
