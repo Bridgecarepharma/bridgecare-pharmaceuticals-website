@@ -4,6 +4,7 @@ import { checkoutSchema } from "@/lib/checkout-schema";
 import { createOrderNumber, createPaystackReference } from "@/lib/order-reference";
 import { prisma } from "@/lib/prisma";
 import { shippingFeeForOrder, STORE_PRODUCTS } from "@/lib/store";
+import { assertStockAvailable, ensureInventoryProducts } from "@/lib/inventory";
 
 export const runtime = "nodejs";
 
@@ -32,6 +33,11 @@ export async function POST(request: Request) {
         lineTotalKobo: product.priceKobo * item.quantity,
       };
     });
+
+    if (databaseEnabled) {
+      await ensureInventoryProducts();
+      await assertStockAvailable(items.map((item) => ({ slug: item.slug, quantity: item.quantity })));
+    }
 
     const packCount = items.reduce((sum, item) => sum + item.quantity, 0);
     const subtotalKobo = items.reduce((sum, item) => sum + item.lineTotalKobo, 0);
@@ -198,6 +204,10 @@ export async function POST(request: Request) {
     }
     if (error instanceof Error && error.message === "INVALID_PRODUCT") {
       return publicError("One of the selected products is unavailable.", 400);
+    }
+    if (error instanceof Error && error.message.startsWith("INSUFFICIENT_STOCK:")) {
+      const [, productName, available] = error.message.split(":");
+      return publicError(`${productName} does not have enough stock. Available quantity: ${available}.`, 409);
     }
 
     return publicError("Checkout is temporarily unavailable. Please try again or contact Bridgecare support.");
