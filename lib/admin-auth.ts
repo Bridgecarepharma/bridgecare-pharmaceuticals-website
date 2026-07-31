@@ -12,9 +12,21 @@ type AdminSession = {
   version: 1;
 };
 
+/**
+ * Read private environment values dynamically at request time.
+ *
+ * Using process.env[name] rather than process.env.ADMIN_PASSWORD prevents the
+ * Next.js compiler from replacing the value during the build. This matters on
+ * Netlify, where private variables are injected into the server function at
+ * runtime.
+ */
+function runtimeEnv(name: "ADMIN_PASSWORD" | "ADMIN_SESSION_SECRET") {
+  return process.env[name]?.trim() || "";
+}
+
 export function getAdminConfiguration() {
-  const passwordConfigured = Boolean(process.env.ADMIN_PASSWORD?.trim());
-  const sessionSecretConfigured = Boolean(process.env.ADMIN_SESSION_SECRET?.trim());
+  const passwordConfigured = Boolean(runtimeEnv("ADMIN_PASSWORD"));
+  const sessionSecretConfigured = Boolean(runtimeEnv("ADMIN_SESSION_SECRET"));
   return {
     passwordConfigured,
     sessionSecretConfigured,
@@ -23,7 +35,7 @@ export function getAdminConfiguration() {
 }
 
 function getSecret() {
-  return process.env.ADMIN_SESSION_SECRET?.trim() || "";
+  return runtimeEnv("ADMIN_SESSION_SECRET");
 }
 
 function sign(value: string) {
@@ -33,10 +45,12 @@ function sign(value: string) {
 }
 
 export function safePasswordMatches(candidate: string) {
-  const configured = process.env.ADMIN_PASSWORD?.trim() || "";
+  const configured = runtimeEnv("ADMIN_PASSWORD");
   if (!configured || !candidate) return false;
+
   const candidateBuffer = Buffer.from(candidate, "utf8");
   const configuredBuffer = Buffer.from(configured, "utf8");
+
   return (
     candidateBuffer.length === configuredBuffer.length &&
     crypto.timingSafeEqual(candidateBuffer, configuredBuffer)
@@ -47,6 +61,7 @@ export function createAdminSessionToken() {
   if (!getAdminConfiguration().ready) {
     throw new Error("ADMIN_AUTH_NOT_CONFIGURED");
   }
+
   const now = Math.floor(Date.now() / 1000);
   const payload: AdminSession = {
     exp: now + SESSION_TTL_SECONDS,
@@ -54,6 +69,7 @@ export function createAdminSessionToken() {
     role: "admin",
     version: 1,
   };
+
   const encoded = Buffer.from(JSON.stringify(payload)).toString("base64url");
   return `${encoded}.${sign(encoded)}`;
 }
@@ -62,13 +78,16 @@ export const createAdminToken = createAdminSessionToken;
 
 export function verifyAdminSessionToken(token?: string) {
   if (!token || !getAdminConfiguration().ready) return false;
+
   const [encoded, signature, extra] = token.split(".");
   if (!encoded || !signature || extra) return false;
 
   const expected = sign(encoded);
   if (!expected) return false;
+
   const suppliedBuffer = Buffer.from(signature, "utf8");
   const expectedBuffer = Buffer.from(expected, "utf8");
+
   if (
     suppliedBuffer.length !== expectedBuffer.length ||
     !crypto.timingSafeEqual(suppliedBuffer, expectedBuffer)
@@ -81,6 +100,7 @@ export function verifyAdminSessionToken(token?: string) {
       Buffer.from(encoded, "base64url").toString("utf8"),
     ) as AdminSession;
     const now = Math.floor(Date.now() / 1000);
+
     return (
       payload.role === "admin" &&
       payload.version === 1 &&

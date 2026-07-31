@@ -31,3 +31,9 @@ The login now:
 - redirects authenticated admins away from the login page;
 - rate-limits repeated failed attempts on a best-effort basis;
 - gives a clear setup message instead of silently failing.
+
+## Netlify runtime note (v2.0.5.4)
+
+The authentication helper reads private variables dynamically at request time.
+This avoids build-time replacement by Next.js/Turbopack and allows Netlify
+Functions to receive the variables at runtime.
