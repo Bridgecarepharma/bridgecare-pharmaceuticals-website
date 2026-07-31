@@ -13,20 +13,24 @@ type AdminSession = {
 };
 
 /**
- * Read private environment values dynamically at request time.
+ * Read private environment values using static property access.
  *
- * Using process.env[name] rather than process.env.ADMIN_PASSWORD prevents the
- * Next.js compiler from replacing the value during the build. This matters on
- * Netlify, where private variables are injected into the server function at
- * runtime.
+ * Netlify/Next.js traces statically referenced server environment variables
+ * into the server function bundle. Dynamic access such as process.env[name]
+ * may not be included by the bundler, even when the variables exist in the
+ * Netlify UI.
  */
-function runtimeEnv(name: "ADMIN_PASSWORD" | "ADMIN_SESSION_SECRET") {
-  return process.env[name]?.trim() || "";
+function adminPassword() {
+  return process.env.ADMIN_PASSWORD?.trim() || "";
+}
+
+function adminSessionSecret() {
+  return process.env.ADMIN_SESSION_SECRET?.trim() || "";
 }
 
 export function getAdminConfiguration() {
-  const passwordConfigured = Boolean(runtimeEnv("ADMIN_PASSWORD"));
-  const sessionSecretConfigured = Boolean(runtimeEnv("ADMIN_SESSION_SECRET"));
+  const passwordConfigured = Boolean(adminPassword());
+  const sessionSecretConfigured = Boolean(adminSessionSecret());
   return {
     passwordConfigured,
     sessionSecretConfigured,
@@ -35,7 +39,7 @@ export function getAdminConfiguration() {
 }
 
 function getSecret() {
-  return runtimeEnv("ADMIN_SESSION_SECRET");
+  return adminSessionSecret();
 }
 
 function sign(value: string) {
@@ -45,7 +49,7 @@ function sign(value: string) {
 }
 
 export function safePasswordMatches(candidate: string) {
-  const configured = runtimeEnv("ADMIN_PASSWORD");
+  const configured = adminPassword();
   if (!configured || !candidate) return false;
 
   const candidateBuffer = Buffer.from(candidate, "utf8");
