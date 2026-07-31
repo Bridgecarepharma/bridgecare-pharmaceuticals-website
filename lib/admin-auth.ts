@@ -1,36 +1,73 @@
 import crypto from "crypto";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-const COOKIE_NAME = "bridgecare_admin_session";
-const MAX_AGE_SECONDS = 60 * 60 * 8;
+const COOKIE_NAME = "bridgecare_admin";
+const SESSION_TTL_SECONDS = 60 * 60 * 8;
 
-function secret() {
+type AdminSession = {
+  exp: number;
+  role: "admin";
+};
+
+function getSecret() {
   return process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || "";
 }
 
 function sign(value: string) {
-  return crypto.createHmac("sha256", secret()).update(value).digest("hex");
+  return crypto.createHmac("sha256", getSecret()).update(value).digest("base64url");
 }
 
-export function createAdminToken() {
-  const expires = Math.floor(Date.now() / 1000) + MAX_AGE_SECONDS;
-  const payload = String(expires);
-  return `${payload}.${sign(payload)}`;
+export function createAdminSessionToken() {
+  const payload: AdminSession = {
+    exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
+    role: "admin",
+  };
+  const encoded = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  return `${encoded}.${sign(encoded)}`;
 }
 
-export function verifyAdminToken(token?: string) {
-  if (!token || !secret()) return false;
-  const [expires, signature] = token.split(".");
-  if (!expires || !signature || Number(expires) < Math.floor(Date.now() / 1000)) return false;
-  const expected = sign(expires);
+// Backward-compatible name used by the inventory login route.
+export const createAdminToken = createAdminSessionToken;
+
+export function verifyAdminSessionToken(token?: string) {
+  if (!token || !getSecret()) return false;
+  const [encoded, signature] = token.split(".");
+  if (!encoded || !signature) return false;
+
+  const expected = sign(encoded);
   const suppliedBuffer = Buffer.from(signature);
   const expectedBuffer = Buffer.from(expected);
-  return suppliedBuffer.length === expectedBuffer.length && crypto.timingSafeEqual(suppliedBuffer, expectedBuffer);
+  if (
+    suppliedBuffer.length !== expectedBuffer.length ||
+    !crypto.timingSafeEqual(suppliedBuffer, expectedBuffer)
+  ) {
+    return false;
+  }
+
+  try {
+    const payload = JSON.parse(
+      Buffer.from(encoded, "base64url").toString(),
+    ) as AdminSession;
+    return payload.role === "admin" && payload.exp > Math.floor(Date.now() / 1000);
+  } catch {
+    return false;
+  }
 }
+
+// Backward-compatible name used by newer inventory routes.
+export const verifyAdminToken = verifyAdminSessionToken;
 
 export async function isAdminAuthenticated() {
-  const store = await cookies();
-  return verifyAdminToken(store.get(COOKIE_NAME)?.value);
+  const cookieStore = await cookies();
+  return verifyAdminSessionToken(cookieStore.get(COOKIE_NAME)?.value);
 }
 
-export const adminCookie = { name: COOKIE_NAME, maxAge: MAX_AGE_SECONDS };
+export async function requireAdmin() {
+  if (!(await isAdminAuthenticated())) redirect("/admin/login");
+}
+
+export const adminCookie = {
+  name: COOKIE_NAME,
+  maxAge: SESSION_TTL_SECONDS,
+};
