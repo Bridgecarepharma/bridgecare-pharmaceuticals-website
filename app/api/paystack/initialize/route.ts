@@ -1,126 +1,205 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { checkoutSchema } from "@/lib/checkout-schema";
+import { createOrderNumber, createPaystackReference } from "@/lib/order-reference";
 import { prisma } from "@/lib/prisma";
 import { shippingFeeForOrder, STORE_PRODUCTS } from "@/lib/store";
 
-function orderNumber(){return `BC-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`}
-function reference(){return `BC-${Date.now()}-${Math.random().toString(36).slice(2,10)}`}
-function publicError(message:string,status=500){return NextResponse.json({error:message},{status})}
+export const runtime = "nodejs";
 
-export async function POST(request:Request){
- let orderId:string|undefined;
- try{
-  const secret=process.env.PAYSTACK_SECRET_KEY;
-  const fallbackPaymentUrl=process.env.PAYSTACK_CART_URL||"https://paystack.shop/pay/btzq7yqk7p";
+function publicError(message: string, status = 500) {
+  return NextResponse.json({ error: message }, { status });
+}
 
-  const payload=checkoutSchema.parse(await request.json());
-  const items=payload.items.map(item=>{
-   const product=STORE_PRODUCTS[item.slug];
-   if(!product)throw new Error("INVALID_PRODUCT");
-   return {...product,quantity:item.quantity,lineTotalKobo:product.priceKobo*item.quantity};
-  });
-  const packCount=items.reduce((sum,item)=>sum+item.quantity,0);
-  const subtotalKobo=items.reduce((sum,item)=>sum+item.lineTotalKobo,0);
-  const shippingKobo=shippingFeeForOrder(payload.delivery.state,packCount);
-  const totalKobo=subtotalKobo+shippingKobo;
-  const paystackReference=reference();
-  const generatedOrderNumber=orderNumber();
-  const siteUrl=(process.env.NEXT_PUBLIC_SITE_URL||new URL(request.url).origin).replace(/\/$/,"");
-  const databaseEnabled=Boolean(process.env.DATABASE_URL);
+export async function POST(request: Request) {
+  let savedOrderId: string | undefined;
 
-  // A Paystack secret key is required for dynamic transaction initialization.
-  // Until it is configured, keep checkout usable by opening the approved
-  // Bridgecare Paystack cart page instead of showing a blocking error.
-  if(!secret){
-   console.warn("PAYSTACK_SECRET_KEY is not configured; using Paystack cart fallback.");
-   return NextResponse.json({
-    authorizationUrl:fallbackPaymentUrl,
-    reference:paystackReference,
-    orderNumber:generatedOrderNumber,
-    totalKobo,
-    databaseSaved:false,
-    fallback:true
-   });
-  }
+  try {
+    const payload = checkoutSchema.parse(await request.json());
+    const secret = process.env.PAYSTACK_SECRET_KEY;
+    const databaseEnabled = Boolean(process.env.DATABASE_URL);
+    const fallbackEnabled = process.env.ALLOW_PAYSTACK_FALLBACK !== "false";
+    const fallbackPaymentUrl =
+      process.env.PAYSTACK_CART_URL || "https://paystack.shop/pay/btzq7yqk7p";
 
-  let savedOrderId:string|undefined;
-  let savedOrderNumber=generatedOrderNumber;
+    const items = payload.items.map((item) => {
+      const product = STORE_PRODUCTS[item.slug];
+      if (!product) throw new Error("INVALID_PRODUCT");
 
-  if(databaseEnabled){
-   const order=await prisma.$transaction(async tx=>{
-    const customer=await tx.customer.upsert({
-     where:{email:payload.customer.email.toLowerCase()},
-     update:{name:payload.customer.fullName,phone:payload.customer.phone},
-     create:{name:payload.customer.fullName,email:payload.customer.email.toLowerCase(),phone:payload.customer.phone}
+      return {
+        ...product,
+        quantity: item.quantity,
+        lineTotalKobo: product.priceKobo * item.quantity,
+      };
     });
-    return tx.order.create({data:{
-     orderNumber:generatedOrderNumber,paystackReference,subtotalKobo,shippingKobo,totalKobo,
-     customerId:customer.id,
-     customerName:payload.customer.fullName,customerEmail:payload.customer.email.toLowerCase(),customerPhone:payload.customer.phone,
-     recipientName:payload.delivery.recipientName,recipientPhone:payload.delivery.recipientPhone,
-     addressLine1:payload.delivery.addressLine1,addressLine2:payload.delivery.addressLine2||null,
-     landmark:payload.delivery.landmark||null,city:payload.delivery.city,lga:payload.delivery.lga,state:payload.delivery.state,
-     postalCode:payload.delivery.postalCode||null,deliveryInstructions:payload.delivery.deliveryInstructions||null,
-     deliveryMethod:"standard",
-     items:{create:items.map(item=>({productSlug:item.slug,productName:item.name,quantity:item.quantity,unitPriceKobo:item.priceKobo,lineTotalKobo:item.lineTotalKobo}))},
-     payment:{create:{reference:paystackReference,amountKobo:totalKobo,currency:"NGN",status:"PENDING"}}
-    }});
-   });
-   orderId=order.id;
-   savedOrderId=order.id;
-   savedOrderNumber=order.orderNumber;
-  }
 
-  const response=await fetch("https://api.paystack.co/transaction/initialize",{
-   method:"POST",headers:{Authorization:`Bearer ${secret}`,"Content-Type":"application/json"},cache:"no-store",
-   body:JSON.stringify({
-    email:payload.customer.email,amount:totalKobo,currency:"NGN",reference:paystackReference,
-    callback_url:`${siteUrl}/order-success`,
-    metadata:{
-     order_id:savedOrderId||null,
-     order_number:savedOrderNumber,
-     database_saved:databaseEnabled,
-     subtotal_kobo:subtotalKobo,
-     shipping_kobo:shippingKobo,
-     total_kobo:totalKobo,
-     customer_name:payload.customer.fullName,
-     customer_phone:payload.customer.phone,
-     recipient_name:payload.delivery.recipientName,
-     recipient_phone:payload.delivery.recipientPhone,
-     address_line_1:payload.delivery.addressLine1,
-     address_line_2:payload.delivery.addressLine2||"",
-     city:payload.delivery.city,
-     lga:payload.delivery.lga,
-     state:payload.delivery.state,
-     items:items.map(item=>({productName:item.name,quantity:item.quantity,lineTotalKobo:item.lineTotalKobo})),
-     custom_fields:[
-      {display_name:"Order Number",variable_name:"order_number",value:savedOrderNumber},
-      {display_name:"Delivery State",variable_name:"delivery_state",value:payload.delivery.state},
-      {display_name:"Delivery Address",variable_name:"delivery_address",value:`${payload.delivery.addressLine1}, ${payload.delivery.city}, ${payload.delivery.state}`}
-     ]
+    const packCount = items.reduce((sum, item) => sum + item.quantity, 0);
+    const subtotalKobo = items.reduce((sum, item) => sum + item.lineTotalKobo, 0);
+    const shippingKobo = shippingFeeForOrder(payload.delivery.state, packCount);
+    const totalKobo = subtotalKobo + shippingKobo;
+    const paystackReference = createPaystackReference();
+    const generatedOrderNumber = createOrderNumber();
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin).replace(/\/$/, "");
+
+    // Keep the current shop-link fallback available until production secrets are configured.
+    if (!secret || !databaseEnabled) {
+      const missing = [!secret && "PAYSTACK_SECRET_KEY", !databaseEnabled && "DATABASE_URL"].filter(Boolean);
+      console.warn(`Integrated checkout is missing: ${missing.join(", ")}`);
+
+      if (!fallbackEnabled) {
+        return publicError(
+          "Secure checkout is not fully configured. Please contact Bridgecare support.",
+          503,
+        );
+      }
+
+      return NextResponse.json({
+        authorizationUrl: fallbackPaymentUrl,
+        reference: paystackReference,
+        orderNumber: generatedOrderNumber,
+        subtotalKobo,
+        shippingKobo,
+        totalKobo,
+        databaseSaved: false,
+        fallback: true,
+      });
     }
-   })
-  });
-  const result=await response.json();
-  if(!response.ok||!result.status||!result.data?.authorization_url){
-   if(orderId){await prisma.order.update({where:{id:orderId},data:{status:"CANCELLED"}});}
-   console.error("Paystack initialization failed; using Paystack cart fallback",result);
-   return NextResponse.json({
-    authorizationUrl:fallbackPaymentUrl,
-    reference:paystackReference,
-    orderNumber:savedOrderNumber,
-    totalKobo,
-    databaseSaved:false,
-    fallback:true
-   });
+
+    const order = await prisma.$transaction(async (tx) => {
+      const customer = await tx.customer.upsert({
+        where: { email: payload.customer.email.toLowerCase() },
+        update: {
+          name: payload.customer.fullName,
+          phone: payload.customer.phone,
+        },
+        create: {
+          name: payload.customer.fullName,
+          email: payload.customer.email.toLowerCase(),
+          phone: payload.customer.phone,
+        },
+      });
+
+      return tx.order.create({
+        data: {
+          orderNumber: generatedOrderNumber,
+          paystackReference,
+          subtotalKobo,
+          shippingKobo,
+          totalKobo,
+          customerId: customer.id,
+          customerName: payload.customer.fullName,
+          customerEmail: payload.customer.email.toLowerCase(),
+          customerPhone: payload.customer.phone,
+          recipientName: payload.delivery.recipientName,
+          recipientPhone: payload.delivery.recipientPhone,
+          addressLine1: payload.delivery.addressLine1,
+          addressLine2: payload.delivery.addressLine2 || null,
+          landmark: payload.delivery.landmark || null,
+          city: payload.delivery.city,
+          lga: payload.delivery.lga,
+          state: payload.delivery.state,
+          postalCode: payload.delivery.postalCode || null,
+          deliveryInstructions: payload.delivery.deliveryInstructions || null,
+          deliveryMethod: "standard",
+          items: {
+            create: items.map((item) => ({
+              productSlug: item.slug,
+              productName: item.name,
+              quantity: item.quantity,
+              unitPriceKobo: item.priceKobo,
+              lineTotalKobo: item.lineTotalKobo,
+            })),
+          },
+          payment: {
+            create: {
+              reference: paystackReference,
+              amountKobo: totalKobo,
+              currency: "NGN",
+              status: "PENDING",
+            },
+          },
+        },
+      });
+    });
+
+    savedOrderId = order.id;
+
+    const response = await fetch("https://api.paystack.co/transaction/initialize", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${secret}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+      body: JSON.stringify({
+        email: payload.customer.email,
+        amount: totalKobo,
+        currency: "NGN",
+        reference: paystackReference,
+        callback_url: `${siteUrl}/order-success`,
+        metadata: {
+          order_id: order.id,
+          order_number: order.orderNumber,
+          subtotal_kobo: subtotalKobo,
+          shipping_kobo: shippingKobo,
+          total_kobo: totalKobo,
+          custom_fields: [
+            { display_name: "Order Number", variable_name: "order_number", value: order.orderNumber },
+            { display_name: "Delivery State", variable_name: "delivery_state", value: payload.delivery.state },
+            {
+              display_name: "Delivery Address",
+              variable_name: "delivery_address",
+              value: `${payload.delivery.addressLine1}, ${payload.delivery.city}, ${payload.delivery.state}`,
+            },
+          ],
+        },
+      }),
+    });
+
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok || !result?.status || !result?.data?.authorization_url) {
+      await prisma.$transaction([
+        prisma.order.update({ where: { id: order.id }, data: { status: "CANCELLED" } }),
+        prisma.payment.update({
+          where: { reference: paystackReference },
+          data: { status: "FAILED", rawEvent: result ?? { error: "No Paystack response" } },
+        }),
+      ]);
+
+      console.error("Paystack initialization failed", result);
+      return publicError("Paystack could not start the payment. Please try again.", 502);
+    }
+
+    return NextResponse.json({
+      authorizationUrl: result.data.authorization_url,
+      accessCode: result.data.access_code,
+      reference: paystackReference,
+      orderNumber: order.orderNumber,
+      subtotalKobo,
+      shippingKobo,
+      totalKobo,
+      databaseSaved: true,
+      fallback: false,
+    });
+  } catch (error) {
+    if (savedOrderId) {
+      try {
+        await prisma.order.update({ where: { id: savedOrderId }, data: { status: "CANCELLED" } });
+      } catch (cleanupError) {
+        console.error("Unable to cancel failed checkout order", cleanupError);
+      }
+    }
+
+    console.error("Checkout initialization error", error);
+
+    if (error instanceof ZodError) {
+      return publicError("Please check the delivery form and try again.", 400);
+    }
+    if (error instanceof Error && error.message === "INVALID_PRODUCT") {
+      return publicError("One of the selected products is unavailable.", 400);
+    }
+
+    return publicError("Checkout is temporarily unavailable. Please try again or contact Bridgecare support.");
   }
-  return NextResponse.json({authorizationUrl:result.data.authorization_url,reference:paystackReference,orderNumber:savedOrderNumber,totalKobo,databaseSaved:databaseEnabled});
- }catch(error){
-  if(orderId){try{await prisma.order.update({where:{id:orderId},data:{status:"CANCELLED"}})}catch{}}
-  console.error("Checkout initialization error",error);
-  if(error instanceof ZodError)return publicError("Please check the delivery form and try again.",400);
-  if(error instanceof Error&&error.message==="INVALID_PRODUCT")return publicError("One of the selected products is unavailable.",400);
-  return publicError("Checkout is temporarily unavailable. Please try again or contact Bridgecare support.");
- }
 }
