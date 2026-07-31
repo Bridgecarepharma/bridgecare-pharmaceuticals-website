@@ -63,6 +63,8 @@ model Order {
   postalCode             String?
   deliveryInstructions   String?
   deliveryMethod         String
+  trackingNumber         String?
+  internalNotes          String?
   paymentChannel         String?
   paystackTransactionId  String?     @unique
   paidAt                 DateTime?
@@ -72,6 +74,7 @@ model Order {
   items                  OrderItem[]
   payment                Payment?
   webhookEvents          PaymentWebhookEvent[]
+  statusHistory          OrderStatusHistory[]
 
   @@index([status, createdAt])
   @@index([customerEmail])
@@ -127,4 +130,27 @@ model PaymentWebhookEvent {
   @@index([reference])
   @@index([status, createdAt])
   @@index([orderId])
+}
+
+model OrderStatusHistory {
+  id        String      @id @default(cuid())
+  orderId   String
+  status    OrderStatus
+  note      String?
+  createdAt DateTime    @default(now())
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+}
+
+model AdminAuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([createdAt])
 }

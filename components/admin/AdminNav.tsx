@@ -1,0 +1,14 @@
+import Link from "next/link";
+
+export function AdminNav() {
+  return (
+    <nav className="admin-nav" aria-label="Admin navigation">
+      <Link href="/admin">Dashboard</Link>
+      <Link href="/admin/orders">Orders</Link>
+      <Link href="/admin/customers">Customers</Link>
+      <form action="/api/admin/logout" method="post">
+        <button type="submit">Sign out</button>
+      </form>
+    </nav>
+  );
+}
