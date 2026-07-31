@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { AdminNav } from "@/components/admin/AdminNav";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { ensureInventoryProducts } from "@/lib/inventory";
 import { prisma } from "@/lib/prisma";
@@ -13,7 +12,7 @@ export default async function InventoryPage() {
   const inventory = await prisma.inventory.findMany({ orderBy: { productName: "asc" }, include: { movements: { orderBy: { createdAt: "desc" }, take: 5 } } });
   const totalUnits = inventory.reduce((sum, item) => sum + item.stock, 0);
   const lowStock = inventory.filter((item) => item.stock <= item.reorderLevel).length;
-  return <section className="admin-shell"><AdminNav /><header className="admin-topbar"><div><span className="eyebrow">Bridgecare operations</span><h1>Inventory</h1></div><form action="/api/admin/logout" method="post"><button className="button secondary" type="submit">Sign out</button></form></header>
+  return <section className="admin-shell"><header className="admin-topbar"><div><span className="eyebrow">Bridgecare operations</span><h1>Inventory</h1></div><form action="/api/admin/logout" method="post"><button className="button secondary" type="submit">Sign out</button></form></header>
     <div className="admin-kpis"><article><span>Products</span><strong>{inventory.length}</strong></article><article><span>Total units</span><strong>{totalUnits}</strong></article><article><span>Low stock</span><strong>{lowStock}</strong></article></div>
     <div className="inventory-grid">{inventory.map((item) => <article className="inventory-card" key={item.id}>
       <div className="inventory-card-head"><div><span className="eyebrow">{item.sku}</span><h2>{item.productName}</h2></div><span className={item.stock <= item.reorderLevel ? "stock-badge low" : "stock-badge"}>{item.stock} units</span></div>

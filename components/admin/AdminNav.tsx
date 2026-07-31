@@ -7,7 +7,6 @@ export function AdminNav() {
       <Link href="/admin/orders">Orders</Link>
       <Link href="/admin/customers">Customers</Link>
       <Link href="/admin/inventory">Inventory</Link>
-      <Link href="/admin/reports">Reports</Link>
       <form action="/api/admin/logout" method="post">
         <button type="submit">Sign out</button>
       </form>

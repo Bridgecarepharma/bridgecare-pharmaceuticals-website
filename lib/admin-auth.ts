@@ -7,37 +7,68 @@ const SESSION_TTL_SECONDS = 60 * 60 * 8;
 
 type AdminSession = {
   exp: number;
+  iat: number;
   role: "admin";
+  version: 1;
 };
 
+export function getAdminConfiguration() {
+  const passwordConfigured = Boolean(process.env.ADMIN_PASSWORD?.trim());
+  const sessionSecretConfigured = Boolean(process.env.ADMIN_SESSION_SECRET?.trim());
+  return {
+    passwordConfigured,
+    sessionSecretConfigured,
+    ready: passwordConfigured && sessionSecretConfigured,
+  };
+}
+
 function getSecret() {
-  return process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || "";
+  return process.env.ADMIN_SESSION_SECRET?.trim() || "";
 }
 
 function sign(value: string) {
-  return crypto.createHmac("sha256", getSecret()).update(value).digest("base64url");
+  const secret = getSecret();
+  if (!secret) return "";
+  return crypto.createHmac("sha256", secret).update(value).digest("base64url");
+}
+
+export function safePasswordMatches(candidate: string) {
+  const configured = process.env.ADMIN_PASSWORD?.trim() || "";
+  if (!configured || !candidate) return false;
+  const candidateBuffer = Buffer.from(candidate, "utf8");
+  const configuredBuffer = Buffer.from(configured, "utf8");
+  return (
+    candidateBuffer.length === configuredBuffer.length &&
+    crypto.timingSafeEqual(candidateBuffer, configuredBuffer)
+  );
 }
 
 export function createAdminSessionToken() {
+  if (!getAdminConfiguration().ready) {
+    throw new Error("ADMIN_AUTH_NOT_CONFIGURED");
+  }
+  const now = Math.floor(Date.now() / 1000);
   const payload: AdminSession = {
-    exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
+    exp: now + SESSION_TTL_SECONDS,
+    iat: now,
     role: "admin",
+    version: 1,
   };
   const encoded = Buffer.from(JSON.stringify(payload)).toString("base64url");
   return `${encoded}.${sign(encoded)}`;
 }
 
-// Backward-compatible name used by the inventory login route.
 export const createAdminToken = createAdminSessionToken;
 
 export function verifyAdminSessionToken(token?: string) {
-  if (!token || !getSecret()) return false;
-  const [encoded, signature] = token.split(".");
-  if (!encoded || !signature) return false;
+  if (!token || !getAdminConfiguration().ready) return false;
+  const [encoded, signature, extra] = token.split(".");
+  if (!encoded || !signature || extra) return false;
 
   const expected = sign(encoded);
-  const suppliedBuffer = Buffer.from(signature);
-  const expectedBuffer = Buffer.from(expected);
+  if (!expected) return false;
+  const suppliedBuffer = Buffer.from(signature, "utf8");
+  const expectedBuffer = Buffer.from(expected, "utf8");
   if (
     suppliedBuffer.length !== expectedBuffer.length ||
     !crypto.timingSafeEqual(suppliedBuffer, expectedBuffer)
@@ -47,15 +78,22 @@ export function verifyAdminSessionToken(token?: string) {
 
   try {
     const payload = JSON.parse(
-      Buffer.from(encoded, "base64url").toString(),
+      Buffer.from(encoded, "base64url").toString("utf8"),
     ) as AdminSession;
-    return payload.role === "admin" && payload.exp > Math.floor(Date.now() / 1000);
+    const now = Math.floor(Date.now() / 1000);
+    return (
+      payload.role === "admin" &&
+      payload.version === 1 &&
+      Number.isFinite(payload.iat) &&
+      Number.isFinite(payload.exp) &&
+      payload.iat <= now + 60 &&
+      payload.exp > now
+    );
   } catch {
     return false;
   }
 }
 
-// Backward-compatible name used by newer inventory routes.
 export const verifyAdminToken = verifyAdminSessionToken;
 
 export async function isAdminAuthenticated() {
