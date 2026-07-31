@@ -71,6 +71,7 @@ model Order {
   customer               Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
   items                  OrderItem[]
   payment                Payment?
+  webhookEvents          PaymentWebhookEvent[]
 
   @@index([status, createdAt])
   @@index([customerEmail])
@@ -108,4 +109,22 @@ model Payment {
   order                 Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([status, createdAt])
+}
+
+model PaymentWebhookEvent {
+  id                    String   @id @default(cuid())
+  eventKey              String   @unique
+  eventType             String
+  reference             String?
+  providerTransactionId String?
+  status                String
+  payload               Json
+  processedAt           DateTime?
+  createdAt             DateTime @default(now())
+  orderId               String?
+  order                 Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([reference])
+  @@index([status, createdAt])
+  @@index([orderId])
 }
