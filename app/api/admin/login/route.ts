@@ -38,7 +38,9 @@ export async function POST(request: Request) {
   const configuration = getAdminConfiguration();
   if (!configuration.ready) {
     console.error("Admin login is not configured. ADMIN_PASSWORD and ADMIN_SESSION_SECRET are required.");
-    return NextResponse.redirect(`${origin}/admin/login?error=config`, 303);
+    const response = NextResponse.redirect(`${origin}/admin/login?error=config`, 303);
+    response.headers.set("Cache-Control", "no-store");
+    return response;
   }
 
   const key = clientKey(request);
