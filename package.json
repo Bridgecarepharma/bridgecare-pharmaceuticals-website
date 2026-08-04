@@ -1,6 +1,6 @@
 {
   "name": "bridgecare-pharmaceuticals-website",
-  "version": "2.1.0-paylinks",
+  "version": "2.2.0-cart-paylinks",
   "private": true,
   "scripts": {
     "dev": "next dev",

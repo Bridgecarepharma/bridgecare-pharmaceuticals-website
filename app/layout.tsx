@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FloatingContact } from "@/components/FloatingContact";
 import { TawkToChat } from "@/components/TawkToChat";
+import { CartProvider } from "@/components/cart/CartProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.bridgecarepharma.com"),
@@ -26,11 +27,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <Header />
-        <main>{children}</main>
-        <FloatingContact />
-        <Footer />
-        <TawkToChat />
+        <CartProvider>
+          <Header />
+          <main>{children}</main>
+          <FloatingContact />
+          <Footer />
+          <TawkToChat />
+        </CartProvider>
       </body>
     </html>
   );

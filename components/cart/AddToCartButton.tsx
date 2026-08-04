@@ -1,17 +1,22 @@
-import { ExternalLink } from "lucide-react";
+"use client";
 
-const PAYMENT_LINKS: Record<string, string> = {
-  aspivit: "https://paystack.shop/pay/obsk4o4n5y",
-  asfenositol: "https://paystack.shop/pay/qz4b43usk0",
-  globivida: "https://paystack.shop/pay/wz9fl6zdw3",
-  "herbal-bitter-tea": "https://paystack.shop/pay/fvx50o-um4",
-};
+import { ShoppingCart } from "lucide-react";
+import { useState } from "react";
+import { useCart } from "./CartProvider";
 
-export function AddToCartButton({ slug, name }: { slug: string; name: string; priceKobo: number }) {
-  const href = PAYMENT_LINKS[slug] || "https://paystack.shop/pay/btzq7yqk7p";
+export function AddToCartButton({ slug, name, priceKobo }: { slug: string; name: string; priceKobo: number }) {
+  const { add } = useCart();
+  const [added, setAdded] = useState(false);
+
+  function handleAdd() {
+    add({ slug, name, priceKobo });
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1400);
+  }
+
   return (
-    <a className="button" href={href} target="_blank" rel="noopener noreferrer" aria-label={`Buy ${name} securely on Paystack`}>
-      Buy now <ExternalLink size={18} />
-    </a>
+    <button className="button" type="button" onClick={handleAdd} aria-label={`Add ${name} to cart`}>
+      <ShoppingCart size={18} /> {added ? "Added to cart" : "Add to cart"}
+    </button>
   );
 }

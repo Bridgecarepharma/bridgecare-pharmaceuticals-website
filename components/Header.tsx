@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, Search, X } from "lucide-react";
 import { useState } from "react";
 import { navItems } from "@/data/site";
+import { CartLink } from "@/components/cart/CartLink";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -21,7 +22,7 @@ export function Header() {
           {navItems.map((item) => <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>{item.label}</Link>)}
           <Link className="nav-search" href="/search" aria-label="Search"><Search size={19} /></Link>
           <Link className="button small distributor-button" href="/distributors">Become a Distributor</Link>
-          <a className="button small" href="https://paystack.shop/pay/btzq7yqk7p" target="_blank" rel="noopener noreferrer">Order Now</a>
+          <CartLink />
         </nav>
       </div>
     </header>
