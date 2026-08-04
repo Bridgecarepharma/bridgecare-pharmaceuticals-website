@@ -17,8 +17,8 @@ import {
   Truck,
 } from "lucide-react";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
-import { DirectPayButton } from "@/components/DirectPayButton";
 import { formatNaira } from "@/lib/store";
+import { getProductPrice } from "@/lib/product-prices";
 
 export const metadata = {
   title: "AsFenositol® | Bridgecare Pharmaceuticals",
@@ -26,7 +26,6 @@ export const metadata = {
     "Approved product information, active ingredients, directions, storage and safety guidance for AsFenositol®.",
 };
 
-const priceKobo = 600000;
 
 const ingredients = [
   {
@@ -73,7 +72,8 @@ const faqs = [
   },
 ];
 
-export default function AsFenositolPage() {
+export default async function AsFenositolPage() {
+  const priceKobo = await getProductPrice("asfenositol");
   return (
     <main className="asf-page">
       <section className="asf-hero">
@@ -114,7 +114,7 @@ export default function AsFenositolPage() {
 
             <div className="asf-actions">
               <AddToCartButton slug="asfenositol" name="AsFenositol®" priceKobo={priceKobo} />
-              <DirectPayButton href="https://paystack.shop/pay/qz4b43usk0" label="Buy instantly" />
+              
               <Link className="button secondary" href="/checkout">Checkout cart</Link>
             </div>
 
@@ -306,7 +306,7 @@ export default function AsFenositolPage() {
           <div className="asf-purchase-actions">
             <strong>{formatNaira(priceKobo)}</strong>
             <AddToCartButton slug="asfenositol" name="AsFenositol®" priceKobo={priceKobo} />
-            <DirectPayButton href="https://paystack.shop/pay/qz4b43usk0" label="Buy instantly" />
+            
             <Link className="button secondary" href="/products">View related products</Link>
           </div>
         </div>

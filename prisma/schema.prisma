@@ -170,6 +170,7 @@ model Inventory {
   productName  String
   sku          String   @unique
   stock        Int      @default(0)
+  priceKobo    Int      @default(0)
   reorderLevel Int      @default(10)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())

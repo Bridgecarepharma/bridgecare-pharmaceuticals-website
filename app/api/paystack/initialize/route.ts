@@ -4,6 +4,7 @@ import { checkoutSchema } from "@/lib/checkout-schema";
 import { createOrderNumber, createPaystackReference } from "@/lib/order-reference";
 import { prisma } from "@/lib/prisma";
 import { shippingFeeForOrder, STORE_PRODUCTS } from "@/lib/store";
+import { getProductPriceMap } from "@/lib/product-prices";
 import { assertStockAvailable, ensureInventoryProducts } from "@/lib/inventory";
 
 export const runtime = "nodejs";
@@ -23,14 +24,16 @@ export async function POST(request: Request) {
     const fallbackPaymentUrl =
       process.env.PAYSTACK_CART_URL || "https://paystack.shop/pay/btzq7yqk7p";
 
+    const priceMap = databaseEnabled ? await getProductPriceMap() : Object.fromEntries(Object.entries(STORE_PRODUCTS).map(([slug, product]) => [slug, product.priceKobo]));
     const items = payload.items.map((item) => {
       const product = STORE_PRODUCTS[item.slug];
       if (!product) throw new Error("INVALID_PRODUCT");
 
       return {
         ...product,
+        priceKobo: priceMap[item.slug] ?? product.priceKobo,
         quantity: item.quantity,
-        lineTotalKobo: product.priceKobo * item.quantity,
+        lineTotalKobo: (priceMap[item.slug] ?? product.priceKobo) * item.quantity,
       };
     });
 

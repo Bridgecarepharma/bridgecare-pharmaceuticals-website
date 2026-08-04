@@ -19,6 +19,7 @@ export async function ensureInventoryProducts() {
           productName: product.name,
           sku: SKU_BY_SLUG[product.slug] ?? `BC-${product.slug.toUpperCase()}`,
           stock: 0,
+          priceKobo: product.priceKobo,
           reorderLevel: 10,
         },
       }),

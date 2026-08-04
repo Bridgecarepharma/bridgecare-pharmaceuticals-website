@@ -19,8 +19,8 @@ import {
 } from "lucide-react";
 import { products } from "@/data/site";
 import { formatNaira } from "@/lib/store";
+import { getProductPriceMap } from "@/lib/product-prices";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
-import { DirectPayButton } from "@/components/DirectPayButton";
 
 const benefits = {
   aspivit: [
@@ -53,8 +53,10 @@ export function PageHero({eyebrow,title,text}:{eyebrow?:string;title:string;text
   return <section className="page-hero"><div className="container narrow">{eyebrow&&<span className="eyebrow">{eyebrow}</span>}<h1>{title}</h1><p>{text}</p></div></section>;
 }
 
-export function ProductGrid(){
+export async function ProductGrid(){
+  const prices = await getProductPriceMap();
   return <div className="product-grid">{products.map((p)=>{
+    const priceKobo = prices[p.slug] ?? p.priceKobo;
     const productBenefits = benefits[p.slug as keyof typeof benefits];
     return <article className={`product-card ${p.accent}`} key={p.slug}>
       <Link href={`/products/${p.slug}`} className="product-image-wrap">
@@ -66,8 +68,8 @@ export function ProductGrid(){
       <div className="product-benefits" aria-label={`${p.name} support areas`}>
         {productBenefits.map(([Icon,label])=><span className="product-benefit" key={label}><span className="product-benefit-icon"><Icon size={18}/></span><small>{label}</small></span>)}
       </div>
-      <strong className="product-price">{formatNaira(p.priceKobo)}</strong>
-      <div className="product-card-actions"><AddToCartButton slug={p.slug} name={p.name} priceKobo={p.priceKobo}/><DirectPayButton href={p.paymentLink} label="Buy now"/><Link className="text-link" href={`/products/${p.slug}`}>Details <ArrowRight size={17}/></Link></div>
+      <strong className="product-price">{formatNaira(priceKobo)}</strong>
+      <div className="product-card-actions"><AddToCartButton slug={p.slug} name={p.name} priceKobo={priceKobo}/><Link className="text-link" href={`/products/${p.slug}`}>Details <ArrowRight size={17}/></Link></div>
     </article>;
   })}</div>;
 }
