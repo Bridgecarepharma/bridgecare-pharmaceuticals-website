@@ -1,1 +1,34 @@
-import {PageHero,CTA} from "@/components/Sections";export const metadata={title:"Health Centre"};export default function Page(){return <><PageHero eyebrow="Education first" title="Health Centre" text="Accessible health and wellness information designed to support informed conversations with qualified healthcare professionals."/><section className="section"><div className="container prose"><h2>Daily nutrition</h2><p>Practical guidance on balanced nutrition, vitamins, minerals and healthy habits.</p><h2>Women’s health</h2><p>Educational information about women’s nutrition and general wellness.</p><h2>Sickle cell awareness</h2><p>General information for patients, families and caregivers.</p><h2>Herbal wellness</h2><p>Responsible use of herbal products and traditional wellness practices.</p></div></section><CTA/></>}
+import type { Metadata } from "next";
+import Link from "next/link";
+import { PageHero, CTA } from "@/components/Sections";
+import { healthArticles } from "@/lib/healthArticles";
+
+export const metadata: Metadata = {
+  title: "Health Education Centre",
+  description: "Practical, responsible health and wellness education from Bridgecare Pharmaceuticals.",
+  alternates: { canonical: "/health-centre" },
+};
+
+export default function HealthCentrePage() {
+  return (
+    <>
+      <PageHero eyebrow="Education first" title="Health Education Centre" text="Responsible health and wellness information designed to support informed conversations with qualified healthcare professionals." />
+      <section className="section">
+        <div className="container">
+          <div className="article-grid">
+            {healthArticles.map((article) => (
+              <article className="article-card" key={article.slug}>
+                <div className="article-card__meta"><span>{article.category}</span><span>{article.readTime}</span></div>
+                <h2>{article.title}</h2>
+                <p>{article.description}</p>
+                <Link href={`/health-centre/${article.slug}`} className="btn btn-secondary">Read article</Link>
+              </article>
+            ))}
+          </div>
+          <p className="health-disclaimer"><strong>Medical disclaimer:</strong> This content is for general education only and is not a diagnosis or substitute for advice from a doctor, pharmacist or other qualified healthcare professional.</p>
+        </div>
+      </section>
+      <CTA />
+    </>
+  );
+}
