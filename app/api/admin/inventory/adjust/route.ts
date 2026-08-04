@@ -11,7 +11,9 @@ export async function POST(request: Request) {
   const quantity = Number(form.get("quantity") || 0);
   const reorderLevel = Number(form.get("reorderLevel") || 0);
   const note = String(form.get("note") || "").slice(0, 300);
-  if (!productSlug || !Number.isInteger(quantity) || quantity < 0) return NextResponse.redirect(`${origin}/admin/inventory?error=invalid`, 303);
+  const requestedReturnTo = String(form.get("returnTo") || "/admin/inventory");
+  const returnTo = requestedReturnTo.startsWith("/admin/") ? requestedReturnTo : "/admin/inventory";
+  if (!productSlug || !Number.isInteger(quantity) || quantity < 0) return NextResponse.redirect(`${origin}${returnTo}?error=invalid`, 303);
 
   await prisma.$transaction(async (tx) => {
     const current = await tx.inventory.findUniqueOrThrow({ where: { productSlug } });
@@ -31,5 +33,5 @@ export async function POST(request: Request) {
       data: { inventoryId: current.id, type: movementType, quantity: delta, balanceAfter: updated.stock, note: note || null, createdBy: "admin" },
     });
   });
-  return NextResponse.redirect(`${origin}/admin/inventory?updated=1`, 303);
+  return NextResponse.redirect(`${origin}${returnTo}?updated=1`, 303);
 }
