@@ -1,24 +1,44 @@
 "use client";
 import Image from "next/image";
-import { FormEvent,useMemo,useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
-import { FREE_SHIPPING_PACK_COUNT,formatNaira,shippingFeeForOrder } from "@/lib/store";
+import { formatNaira } from "@/lib/store";
+import {
+  calculateShippingKobo,
+  DEFAULT_FREE_SHIPPING_PACK_COUNT,
+  DEFAULT_SHIPPING_ZONES,
+  type ShippingZoneView,
+} from "@/lib/shipping-rates";
 
 const STATES=["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara","Abuja"];
+
+type ShippingConfiguration = { zones: ShippingZoneView[]; freeShippingPackCount: number };
 
 export default function CheckoutPage(){
  const {items,subtotalKobo}=useCart();
  const [state,setState]=useState("Lagos");
  const [loading,setLoading]=useState(false);
  const [error,setError]=useState("");
+ const [shipping,setShipping]=useState<ShippingConfiguration>({zones:DEFAULT_SHIPPING_ZONES,freeShippingPackCount:DEFAULT_FREE_SHIPPING_PACK_COUNT});
  const packCount=useMemo(()=>items.reduce((sum,item)=>sum+item.quantity,0),[items]);
- const shippingKobo=useMemo(()=>shippingFeeForOrder(state,packCount),[state,packCount]);
+ const shippingKobo=useMemo(()=>calculateShippingKobo(state,packCount,shipping.zones,shipping.freeShippingPackCount),[state,packCount,shipping]);
+ const selectedZone=useMemo(()=>shipping.zones.find(zone=>zone.isActive&&zone.states.includes(state)),[shipping.zones,state]);
  const totalKobo=subtotalKobo+shippingKobo;
+
+ useEffect(()=>{
+  let active=true;
+  fetch("/api/shipping/rates",{cache:"no-store"})
+   .then(response=>response.ok?response.json():Promise.reject(new Error("Unable to load delivery charges")))
+   .then((data:ShippingConfiguration)=>{if(active&&Array.isArray(data.zones))setShipping(data)})
+   .catch(()=>{});
+  return()=>{active=false};
+ },[]);
 
  async function submit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();setError("");
   if(!items.length){setError("Your cart is empty.");return}
+  if(!selectedZone){setError("Delivery is not currently available for the selected state. Please contact Bridgecare support.");return}
   setLoading(true);
   try{
    const data=new FormData(event.currentTarget);
@@ -45,9 +65,9 @@ export default function CheckoutPage(){
  <div className="form-row"><label>Landmark<input name="landmark"/></label><label>City<input name="city" required autoComplete="address-level2"/></label></div>
  <div className="form-row"><label>Local Government Area<input name="lga" required/></label><label>State<select name="state" value={state} onChange={e=>setState(e.target.value)} required>{STATES.map(x=><option key={x}>{x}</option>)}</select></label></div>
  <label>Postal code (optional)<input name="postalCode" autoComplete="postal-code"/></label><label>Delivery instructions (optional)<textarea name="deliveryInstructions" placeholder="Gate code, preferred contact method, or directions for the rider."/></label>
- <h2>Delivery method</h2><input type="hidden" name="deliveryMethod" value="standard"/><div className="radio-card"><span aria-hidden="true">●</span><span><strong>Standard delivery</strong><small>{shippingKobo===0?`Free delivery for ${FREE_SHIPPING_PACK_COUNT}+ packs`:formatNaira(shippingKobo)}</small></span></div>
- {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading}>{loading?"Opening Paystack…":`Pay ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
+ <h2>Delivery method</h2><input type="hidden" name="deliveryMethod" value="standard"/><div className="radio-card"><span aria-hidden="true">●</span><span><strong>Standard delivery{selectedZone?` — ${selectedZone.name}`:""}</strong><small>{shippingKobo===0&&shipping.freeShippingPackCount>0?`Free delivery for ${shipping.freeShippingPackCount}+ packs`:selectedZone?formatNaira(shippingKobo):"Unavailable for this state"}</small></span></div>
+ {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone}>{loading?"Opening Paystack…":`Pay ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
  </form>
- <aside className="order-summary"><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{formatNaira(shippingKobo)}</strong></div><div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div></aside>
+ <aside className="order-summary"><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{selectedZone?formatNaira(shippingKobo):"Unavailable"}</strong></div><div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div></aside>
  </div></section></>
 }

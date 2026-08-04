@@ -3,7 +3,8 @@ import { ZodError } from "zod";
 import { checkoutSchema } from "@/lib/checkout-schema";
 import { createOrderNumber, createPaystackReference } from "@/lib/order-reference";
 import { prisma } from "@/lib/prisma";
-import { shippingFeeForOrder, STORE_PRODUCTS } from "@/lib/store";
+import { STORE_PRODUCTS } from "@/lib/store";
+import { shippingFeeForDatabaseOrder } from "@/lib/shipping";
 import { getProductPriceMap } from "@/lib/product-prices";
 import { assertStockAvailable, ensureInventoryProducts } from "@/lib/inventory";
 
@@ -44,7 +45,9 @@ export async function POST(request: Request) {
 
     const packCount = items.reduce((sum, item) => sum + item.quantity, 0);
     const subtotalKobo = items.reduce((sum, item) => sum + item.lineTotalKobo, 0);
-    const shippingKobo = shippingFeeForOrder(payload.delivery.state, packCount);
+    const shippingKobo = databaseEnabled
+      ? await shippingFeeForDatabaseOrder(payload.delivery.state, packCount)
+      : 0;
     const totalKobo = subtotalKobo + shippingKobo;
     const paystackReference = createPaystackReference();
     const generatedOrderNumber = createOrderNumber();

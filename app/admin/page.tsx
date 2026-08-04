@@ -46,6 +46,7 @@ export default async function AdminDashboard() {
 
       <div className="admin-quick-grid">
         <Link href="/admin/products"><span>Products & stock</span><strong>Update quantities and availability</strong></Link>
+        <Link href="/admin/shipping"><span>Shipping</span><strong>Manage zones, charges and free delivery</strong></Link>
         <Link href="/admin/prices"><span>Product prices</span><strong>Change live selling prices</strong></Link>
         <Link href="/admin/orders"><span>Orders</span><strong>Process and dispatch orders</strong></Link>
         <Link href="/admin/customers"><span>Customers</span><strong>Review contact and order history</strong></Link>

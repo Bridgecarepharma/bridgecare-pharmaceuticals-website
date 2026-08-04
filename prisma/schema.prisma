@@ -196,3 +196,24 @@ model InventoryMovement {
   @@index([inventoryId, createdAt])
   @@index([reference])
 }
+
+model ShippingZone {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  priceKobo Int
+  states    Json
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model ShippingSetting {
+  id                    String   @id
+  freeShippingPackCount Int      @default(3)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
