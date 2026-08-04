@@ -6,5 +6,4 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--include=dev"
 
-# Required Netlify environment variables:
-# DATABASE_URL, PAYSTACK_SECRET_KEY, NEXT_PUBLIC_SITE_URL
+# Payment-link launch: no DATABASE_URL or PAYSTACK_SECRET_KEY required.

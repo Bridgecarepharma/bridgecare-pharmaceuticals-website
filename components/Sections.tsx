@@ -20,7 +20,6 @@ import {
 import { products } from "@/data/site";
 import { formatNaira } from "@/lib/store";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
-import { DirectPayButton } from "@/components/DirectPayButton";
 
 const benefits = {
   aspivit: [
@@ -67,7 +66,7 @@ export function ProductGrid(){
         {productBenefits.map(([Icon,label])=><span className="product-benefit" key={label}><span className="product-benefit-icon"><Icon size={18}/></span><small>{label}</small></span>)}
       </div>
       <strong className="product-price">{formatNaira(p.priceKobo)}</strong>
-      <div className="product-card-actions"><AddToCartButton slug={p.slug} name={p.name} priceKobo={p.priceKobo}/><DirectPayButton href={p.paymentLink} label="Buy now"/><Link className="text-link" href={`/products/${p.slug}`}>Details <ArrowRight size={17}/></Link></div>
+      <div className="product-card-actions"><AddToCartButton slug={p.slug} name={p.name} priceKobo={p.priceKobo}/><Link className="text-link" href={`/products/${p.slug}`}>Details <ArrowRight size={17}/></Link></div>
     </article>;
   })}</div>;
 }
