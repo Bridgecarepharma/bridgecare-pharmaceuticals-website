@@ -12,13 +12,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const status = String(form.get("status") || "");
   if (!ALLOWED.has(status)) return NextResponse.json({ error: "Invalid order status" }, { status: 400 });
   const trackingNumber = String(form.get("trackingNumber") || "").trim().slice(0, 120) || null;
+  const statusNote = String(form.get("statusNote") || "").trim().slice(0, 500) || null;
   const internalNotes = String(form.get("internalNotes") || "").trim().slice(0, 4000) || null;
-  const current = await prisma.order.findUnique({ where: { id }, select: { status: true } });
+  const current = await prisma.order.findUnique({ where: { id }, select: { status: true, trackingNumber: true } });
   if (!current) return NextResponse.json({ error: "Order not found" }, { status: 404 });
   await prisma.$transaction(async tx => {
     await tx.order.update({ where: { id }, data: { status: status as never, trackingNumber, internalNotes } });
-    if (current.status !== status) await tx.orderStatusHistory.create({ data: { orderId: id, status: status as never, note: internalNotes } });
-    await tx.adminAuditLog.create({ data: { action: "ORDER_UPDATED", entity: "Order", entityId: id, details: { previousStatus: current.status, status, trackingNumber } } });
+    if (current.status !== status || statusNote) await tx.orderStatusHistory.create({ data: { orderId: id, status: status as never, note: statusNote } });
+    await tx.adminAuditLog.create({ data: { action: "ORDER_UPDATED", entity: "Order", entityId: id, details: { previousStatus: current.status, status, previousTrackingNumber: current.trackingNumber, trackingNumber, statusNote } } });
   });
   return NextResponse.redirect(new URL(`/admin/orders/${id}?saved=1`, request.url), 303);
 }
