@@ -13,5 +13,5 @@ export function BuyNowButton({slug,name,priceKobo}:{slug:string;name:string;pric
     router.push("/checkout");
   }
 
-  return <button type="button" className="button secondary" onClick={handleBuyNow}>Buy now <ExternalLink size={17}/></button>;
+  return <button type="button" className="button buy-now-button" onClick={handleBuyNow}>Buy now <ExternalLink size={17}/></button>;
 }
