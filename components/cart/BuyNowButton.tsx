@@ -1,17 +1,28 @@
 "use client";
 
-import { ExternalLink } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useCart } from "./CartProvider";
+import { Zap } from "lucide-react";
 
-export function BuyNowButton({slug,name,priceKobo}:{slug:string;name:string;priceKobo:number}){
-  const router=useRouter();
-  const {buyNow}=useCart();
+type BuyNowButtonProps = {
+  slug: string;
+  name: string;
+  priceKobo: number;
+};
 
-  function handleBuyNow(){
-    buyNow({slug,name,priceKobo});
-    router.push("/checkout");
+/**
+ * Starts a one-product checkout without using any Paystack shop link.
+ * The cart is written synchronously before navigation so checkout always
+ * has the customer's selected product available on first render.
+ */
+export function BuyNowButton({ slug, name, priceKobo }: BuyNowButtonProps) {
+  function handleBuyNow() {
+    const item = [{ slug, name, priceKobo, quantity: 1 }];
+    window.localStorage.setItem("bridgecare-cart", JSON.stringify(item));
+    window.location.assign("/checkout");
   }
 
-  return <button type="button" className="button buy-now-button" onClick={handleBuyNow}>Buy now <ExternalLink size={17}/></button>;
+  return (
+    <button type="button" className="button buy-now-button" onClick={handleBuyNow}>
+      Buy now <Zap size={17} aria-hidden="true" />
+    </button>
+  );
 }
