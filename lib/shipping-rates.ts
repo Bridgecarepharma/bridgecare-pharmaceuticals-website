@@ -20,6 +20,23 @@ export function zoneForState(state: string, zones: ShippingZoneView[] = DEFAULT_
   return zones.find((zone) => zone.isActive && zone.states.includes(state));
 }
 
+export function zoneForCode(code: string, zones: ShippingZoneView[] = DEFAULT_SHIPPING_ZONES) {
+  return zones.find((zone) => zone.isActive && zone.code === code);
+}
+
+export function calculateShippingForZoneKobo(
+  zoneCode: string,
+  state: string,
+  packCount: number,
+  zones: ShippingZoneView[] = DEFAULT_SHIPPING_ZONES,
+  freeShippingPackCount = DEFAULT_FREE_SHIPPING_PACK_COUNT,
+) {
+  const zone = zoneForCode(zoneCode, zones);
+  if (!zone || !zone.states.includes(state)) return null;
+  if (freeShippingPackCount > 0 && packCount >= freeShippingPackCount) return 0;
+  return zone.priceKobo;
+}
+
 export function calculateShippingKobo(
   state: string,
   packCount: number,

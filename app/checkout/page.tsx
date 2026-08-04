@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatNaira } from "@/lib/store";
 import {
-  calculateShippingKobo,
+  calculateShippingForZoneKobo,
   DEFAULT_FREE_SHIPPING_PACK_COUNT,
   DEFAULT_SHIPPING_ZONES,
   type ShippingZoneView,
@@ -18,19 +18,28 @@ type ShippingConfiguration = { zones: ShippingZoneView[]; freeShippingPackCount:
 export default function CheckoutPage(){
  const {items,subtotalKobo}=useCart();
  const [state,setState]=useState("Lagos");
+ const [shippingZoneCode,setShippingZoneCode]=useState("LAGOS");
  const [loading,setLoading]=useState(false);
  const [error,setError]=useState("");
  const [shipping,setShipping]=useState<ShippingConfiguration>({zones:DEFAULT_SHIPPING_ZONES,freeShippingPackCount:DEFAULT_FREE_SHIPPING_PACK_COUNT});
  const packCount=useMemo(()=>items.reduce((sum,item)=>sum+item.quantity,0),[items]);
- const shippingKobo=useMemo(()=>calculateShippingKobo(state,packCount,shipping.zones,shipping.freeShippingPackCount),[state,packCount,shipping]);
- const selectedZone=useMemo(()=>shipping.zones.find(zone=>zone.isActive&&zone.states.includes(state)),[shipping.zones,state]);
+ const activeZones=useMemo(()=>shipping.zones.filter(zone=>zone.isActive).sort((a,b)=>a.sortOrder-b.sortOrder),[shipping.zones]);
+ const selectedZone=useMemo(()=>activeZones.find(zone=>zone.code===shippingZoneCode),[activeZones,shippingZoneCode]);
+ const shippingKobo=useMemo(()=>calculateShippingForZoneKobo(shippingZoneCode,state,packCount,shipping.zones,shipping.freeShippingPackCount)??0,[shippingZoneCode,state,packCount,shipping]);
+ const zoneMatchesState=Boolean(selectedZone?.states.includes(state));
  const totalKobo=subtotalKobo+shippingKobo;
 
  useEffect(()=>{
   let active=true;
   fetch("/api/shipping/rates",{cache:"no-store"})
    .then(response=>response.ok?response.json():Promise.reject(new Error("Unable to load delivery charges")))
-   .then((data:ShippingConfiguration)=>{if(active&&Array.isArray(data.zones))setShipping(data)})
+   .then((data:ShippingConfiguration)=>{
+    if(active&&Array.isArray(data.zones)){
+     setShipping(data);
+     const matching=data.zones.find(zone=>zone.isActive&&zone.states.includes(state));
+     if(matching)setShippingZoneCode(matching.code);
+    }
+   })
    .catch(()=>{});
   return()=>{active=false};
  },[]);
@@ -38,13 +47,13 @@ export default function CheckoutPage(){
  async function submit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();setError("");
   if(!items.length){setError("Your cart is empty.");return}
-  if(!selectedZone){setError("Delivery is not currently available for the selected state. Please contact Bridgecare support.");return}
+  if(!selectedZone||!zoneMatchesState){setError("Please select the delivery zone that matches your delivery state.");return}
   setLoading(true);
   try{
    const data=new FormData(event.currentTarget);
    const payload={
     customer:{fullName:data.get("fullName"),email:data.get("email"),phone:data.get("phone")},
-    delivery:{recipientName:data.get("recipientName"),recipientPhone:data.get("recipientPhone"),addressLine1:data.get("addressLine1"),addressLine2:data.get("addressLine2"),landmark:data.get("landmark"),city:data.get("city"),lga:data.get("lga"),state:data.get("state"),postalCode:data.get("postalCode"),deliveryInstructions:data.get("deliveryInstructions"),deliveryMethod:"standard"},
+    delivery:{recipientName:data.get("recipientName"),recipientPhone:data.get("recipientPhone"),addressLine1:data.get("addressLine1"),addressLine2:data.get("addressLine2"),landmark:data.get("landmark"),city:data.get("city"),lga:data.get("lga"),state:data.get("state"),postalCode:data.get("postalCode"),deliveryInstructions:data.get("deliveryInstructions"),deliveryMethod:"standard",shippingZoneCode:data.get("shippingZoneCode")},
     items:items.map(i=>({slug:i.slug,quantity:i.quantity}))
    };
    const response=await fetch("/api/paystack/initialize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
@@ -63,10 +72,10 @@ export default function CheckoutPage(){
  <h2>Delivery address</h2><div className="form-row"><label>Recipient name<input name="recipientName" required/></label><label>Recipient phone<input name="recipientPhone" required/></label></div>
  <label>House number and street address<input name="addressLine1" required autoComplete="address-line1"/></label><label>Apartment, estate or additional address<input name="addressLine2" autoComplete="address-line2"/></label>
  <div className="form-row"><label>Landmark<input name="landmark"/></label><label>City<input name="city" required autoComplete="address-level2"/></label></div>
- <div className="form-row"><label>Local Government Area<input name="lga" required/></label><label>State<select name="state" value={state} onChange={e=>setState(e.target.value)} required>{STATES.map(x=><option key={x}>{x}</option>)}</select></label></div>
+ <div className="form-row"><label>Local Government Area<input name="lga" required/></label><label>State<select name="state" value={state} onChange={e=>{const nextState=e.target.value;setState(nextState);const matching=activeZones.find(zone=>zone.states.includes(nextState));if(matching)setShippingZoneCode(matching.code)}} required>{STATES.map(x=><option key={x}>{x}</option>)}</select></label></div>
  <label>Postal code (optional)<input name="postalCode" autoComplete="postal-code"/></label><label>Delivery instructions (optional)<textarea name="deliveryInstructions" placeholder="Gate code, preferred contact method, or directions for the rider."/></label>
- <h2>Delivery method</h2><input type="hidden" name="deliveryMethod" value="standard"/><div className="radio-card"><span aria-hidden="true">●</span><span><strong>Standard delivery{selectedZone?` — ${selectedZone.name}`:""}</strong><small>{shippingKobo===0&&shipping.freeShippingPackCount>0?`Free delivery for ${shipping.freeShippingPackCount}+ packs`:selectedZone?formatNaira(shippingKobo):"Unavailable for this state"}</small></span></div>
- {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone}>{loading?"Opening Paystack…":`Pay ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
+ <h2>Delivery method</h2><input type="hidden" name="deliveryMethod" value="standard"/><div className="shipping-zone-list">{activeZones.map(zone=>{const free=shipping.freeShippingPackCount>0&&packCount>=shipping.freeShippingPackCount;return <label className={`radio-card shipping-zone-option${shippingZoneCode===zone.code?" selected":""}`} key={zone.code}><input type="radio" name="shippingZoneCode" value={zone.code} checked={shippingZoneCode===zone.code} onChange={()=>{setShippingZoneCode(zone.code);if(!zone.states.includes(state))setState(zone.states[0]||state)}}/><span><strong>{zone.name}</strong><small>{free?"Free delivery":formatNaira(zone.priceKobo)}</small></span></label>})}</div>{shipping.freeShippingPackCount>0&&<p className="shipping-threshold-note">Free delivery applies automatically when the cart contains {shipping.freeShippingPackCount} or more packs.</p>}
+ {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone||!zoneMatchesState}>{loading?"Opening Paystack…":`Pay ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
  </form>
  <aside className="order-summary"><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{selectedZone?formatNaira(shippingKobo):"Unavailable"}</strong></div><div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div></aside>
  </div></section></>

@@ -1,12 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import {
   calculateShippingKobo,
+  calculateShippingForZoneKobo,
   DEFAULT_FREE_SHIPPING_PACK_COUNT,
   DEFAULT_SHIPPING_ZONES,
   type ShippingZoneView,
 } from "@/lib/shipping-rates";
 
-export { DEFAULT_FREE_SHIPPING_PACK_COUNT, DEFAULT_SHIPPING_ZONES, calculateShippingKobo } from "@/lib/shipping-rates";
+export { DEFAULT_FREE_SHIPPING_PACK_COUNT, DEFAULT_SHIPPING_ZONES, calculateShippingKobo, calculateShippingForZoneKobo } from "@/lib/shipping-rates";
 export type { ShippingZoneView } from "@/lib/shipping-rates";
 
 export async function ensureShippingConfiguration() {
@@ -55,4 +56,15 @@ export async function getShippingConfiguration() {
 export async function shippingFeeForDatabaseOrder(state: string, packCount: number) {
   const configuration = await getShippingConfiguration();
   return calculateShippingKobo(state, packCount, configuration.zones, configuration.freeShippingPackCount);
+}
+
+export async function shippingFeeForSelectedZone(zoneCode: string, state: string, packCount: number) {
+  const configuration = await getShippingConfiguration();
+  return calculateShippingForZoneKobo(
+    zoneCode,
+    state,
+    packCount,
+    configuration.zones,
+    configuration.freeShippingPackCount,
+  );
 }

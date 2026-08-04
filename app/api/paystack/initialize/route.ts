@@ -4,7 +4,7 @@ import { checkoutSchema } from "@/lib/checkout-schema";
 import { createOrderNumber, createPaystackReference } from "@/lib/order-reference";
 import { prisma } from "@/lib/prisma";
 import { STORE_PRODUCTS } from "@/lib/store";
-import { shippingFeeForDatabaseOrder } from "@/lib/shipping";
+import { shippingFeeForSelectedZone } from "@/lib/shipping";
 import { getProductPriceMap } from "@/lib/product-prices";
 import { assertStockAvailable, ensureInventoryProducts } from "@/lib/inventory";
 
@@ -45,9 +45,13 @@ export async function POST(request: Request) {
 
     const packCount = items.reduce((sum, item) => sum + item.quantity, 0);
     const subtotalKobo = items.reduce((sum, item) => sum + item.lineTotalKobo, 0);
-    const shippingKobo = databaseEnabled
-      ? await shippingFeeForDatabaseOrder(payload.delivery.state, packCount)
+    const selectedShippingKobo = databaseEnabled
+      ? await shippingFeeForSelectedZone(payload.delivery.shippingZoneCode, payload.delivery.state, packCount)
       : 0;
+    if (databaseEnabled && selectedShippingKobo === null) {
+      return publicError("The selected delivery zone does not match the delivery state. Please review your selection.", 400);
+    }
+    const shippingKobo = selectedShippingKobo ?? 0;
     const totalKobo = subtotalKobo + shippingKobo;
     const paystackReference = createPaystackReference();
     const generatedOrderNumber = createOrderNumber();
@@ -158,6 +162,7 @@ export async function POST(request: Request) {
           custom_fields: [
             { display_name: "Order Number", variable_name: "order_number", value: order.orderNumber },
             { display_name: "Delivery State", variable_name: "delivery_state", value: payload.delivery.state },
+            { display_name: "Delivery Zone", variable_name: "delivery_zone", value: payload.delivery.shippingZoneCode },
             {
               display_name: "Delivery Address",
               variable_name: "delivery_address",

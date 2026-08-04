@@ -7,7 +7,8 @@ export const checkoutSchema=z.object({
   landmark:z.string().max(180).optional().default(""),city:z.string().min(2).max(100),
   lga:z.string().min(2).max(100),state:z.string().min(2).max(100),
   postalCode:z.string().max(20).optional().default(""),deliveryInstructions:z.string().max(500).optional().default(""),
-  deliveryMethod:z.enum(["standard","express"])
+  deliveryMethod:z.enum(["standard","express"]),
+  shippingZoneCode:z.string().min(1).max(50)
  }),
  items:z.array(z.object({slug:z.string().min(1),quantity:z.number().int().min(1).max(20)})).min(1)
 });
