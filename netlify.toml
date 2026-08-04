@@ -1,9 +1,12 @@
 [build]
-  command = "npm run build"
+  command = "npm run db:deploy && npm run build"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--include=dev"
 
-# Payment-link launch: no DATABASE_URL or PAYSTACK_SECRET_KEY required.
+# Required Netlify environment variables:
+# DATABASE_URL, PAYSTACK_SECRET_KEY, NEXT_PUBLIC_SITE_URL,
+# ADMIN_PASSWORD, ADMIN_SESSION_SECRET
+# Set ALLOW_PAYSTACK_FALLBACK=false for integrated checkout only.
