@@ -10,5 +10,6 @@ export const checkoutSchema=z.object({
   deliveryMethod:z.enum(["standard","express"]),
   shippingZoneCode:z.string().min(1).max(50)
  }),
+ couponCode:z.string().max(50).optional().default(""),
  items:z.array(z.object({slug:z.string().min(1),quantity:z.number().int().min(1).max(20)})).min(1)
 });

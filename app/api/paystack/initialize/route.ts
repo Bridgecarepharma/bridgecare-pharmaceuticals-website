@@ -7,6 +7,7 @@ import { STORE_PRODUCTS } from "@/lib/store";
 import { shippingFeeForSelectedZone } from "@/lib/shipping";
 import { getProductPriceMap } from "@/lib/product-prices";
 import { assertStockAvailable, ensureInventoryProducts } from "@/lib/inventory";
+import { cancelCouponReservation, CouponError, evaluateCoupon } from "@/lib/coupons";
 
 export const runtime = "nodejs";
 
@@ -52,7 +53,17 @@ export async function POST(request: Request) {
       return publicError("The selected delivery zone does not match the delivery state. Please review your selection.", 400);
     }
     const shippingKobo = selectedShippingKobo ?? 0;
-    const totalKobo = subtotalKobo + shippingKobo;
+    const appliedCoupon = databaseEnabled
+      ? await evaluateCoupon({
+          code: payload.couponCode,
+          customerEmail: payload.customer.email,
+          subtotalKobo,
+          shippingKobo,
+          items: items.map((item) => ({ slug: item.slug, quantity: item.quantity, unitPriceKobo: item.priceKobo })),
+        })
+      : null;
+    const discountKobo = appliedCoupon?.totalDiscountKobo ?? 0;
+    const totalKobo = Math.max(100, subtotalKobo + shippingKobo - discountKobo);
     const paystackReference = createPaystackReference();
     const generatedOrderNumber = createOrderNumber();
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin).replace(/\/$/, "");
@@ -95,12 +106,14 @@ export async function POST(request: Request) {
         },
       });
 
-      return tx.order.create({
+      const createdOrder = await tx.order.create({
         data: {
           orderNumber: generatedOrderNumber,
           paystackReference,
           subtotalKobo,
           shippingKobo,
+          discountKobo,
+          couponCode: appliedCoupon?.coupon.code ?? null,
           totalKobo,
           customerId: customer.id,
           customerName: payload.customer.fullName,
@@ -136,6 +149,20 @@ export async function POST(request: Request) {
           },
         },
       });
+
+      if (appliedCoupon) {
+        await tx.couponRedemption.create({
+          data: {
+            couponId: appliedCoupon.coupon.id,
+            orderId: createdOrder.id,
+            customerEmail: payload.customer.email.toLowerCase(),
+            discountKobo: appliedCoupon.discountKobo,
+            shippingDiscountKobo: appliedCoupon.shippingDiscountKobo,
+          },
+        });
+      }
+
+      return createdOrder;
     });
 
     savedOrderId = order.id;
@@ -158,11 +185,14 @@ export async function POST(request: Request) {
           order_number: order.orderNumber,
           subtotal_kobo: subtotalKobo,
           shipping_kobo: shippingKobo,
+          discount_kobo: discountKobo,
+          coupon_code: appliedCoupon?.coupon.code ?? null,
           total_kobo: totalKobo,
           custom_fields: [
             { display_name: "Order Number", variable_name: "order_number", value: order.orderNumber },
             { display_name: "Delivery State", variable_name: "delivery_state", value: payload.delivery.state },
             { display_name: "Delivery Zone", variable_name: "delivery_zone", value: payload.delivery.shippingZoneCode },
+            ...(appliedCoupon ? [{ display_name: "Coupon", variable_name: "coupon_code", value: appliedCoupon.coupon.code }] : []),
             {
               display_name: "Delivery Address",
               variable_name: "delivery_address",
@@ -182,6 +212,7 @@ export async function POST(request: Request) {
           where: { reference: paystackReference },
           data: { status: "FAILED", rawEvent: result ?? { error: "No Paystack response" } },
         }),
+        prisma.couponRedemption.updateMany({ where: { orderId: order.id, status: "PENDING" }, data: { status: "CANCELLED" } }),
       ]);
 
       console.error("Paystack initialization failed", result);
@@ -195,6 +226,8 @@ export async function POST(request: Request) {
       orderNumber: order.orderNumber,
       subtotalKobo,
       shippingKobo,
+      discountKobo,
+      couponCode: appliedCoupon?.coupon.code ?? null,
       totalKobo,
       databaseSaved: true,
       fallback: false,
@@ -203,6 +236,7 @@ export async function POST(request: Request) {
     if (savedOrderId) {
       try {
         await prisma.order.update({ where: { id: savedOrderId }, data: { status: "CANCELLED" } });
+        await cancelCouponReservation(savedOrderId);
       } catch (cleanupError) {
         console.error("Unable to cancel failed checkout order", cleanupError);
       }
@@ -212,6 +246,9 @@ export async function POST(request: Request) {
 
     if (error instanceof ZodError) {
       return publicError("Please check the delivery form and try again.", 400);
+    }
+    if (error instanceof CouponError) {
+      return publicError(error.message, 400);
     }
     if (error instanceof Error && error.message === "INVALID_PRODUCT") {
       return publicError("One of the selected products is unavailable.", 400);

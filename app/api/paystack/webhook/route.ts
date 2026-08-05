@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { redeemCouponForOrder } from "@/lib/coupons";
 
 export async function POST(request:Request){
  const secret=process.env.PAYSTACK_SECRET_KEY;
@@ -35,6 +36,7 @@ export async function POST(request:Request){
       update:{status:"SUCCESS",channel:tx.channel||null,providerTransactionId:String(tx.id),paidAt,rawEvent:event},
       create:{orderId:order.id,reference:tx.reference,amountKobo:tx.amount,currency:tx.currency,status:"SUCCESS",channel:tx.channel||null,providerTransactionId:String(tx.id),paidAt,rawEvent:event}
      });
+     await redeemCouponForOrder(db, order.id);
     });
    }else if(order){
     console.error("Webhook amount/currency mismatch",{reference:tx.reference,receivedAmount:tx.amount,expectedAmount:order.totalKobo,receivedCurrency:tx.currency});

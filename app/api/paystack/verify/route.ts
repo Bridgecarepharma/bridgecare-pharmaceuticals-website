@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { redeemCouponForOrder } from "@/lib/coupons";
 
 export async function GET(request:Request){
  try{
@@ -18,14 +19,15 @@ export async function GET(request:Request){
    const paid=result.data.status==="success"&&result.data.amount===order.totalKobo&&result.data.currency===order.currency;
    if(paid){
     const paidAt=new Date(result.data.paid_at||Date.now());
-    await prisma.$transaction([
-     prisma.order.update({where:{id:order.id},data:{status:"PAID",paidAt,paymentChannel:result.data.channel||null,paystackTransactionId:String(result.data.id)}}),
-     prisma.payment.upsert({
+    await prisma.$transaction(async (tx) => {
+     await tx.order.update({where:{id:order.id},data:{status:"PAID",paidAt,paymentChannel:result.data.channel||null,paystackTransactionId:String(result.data.id)}});
+     await tx.payment.upsert({
       where:{reference},
       update:{status:"SUCCESS",channel:result.data.channel||null,providerTransactionId:String(result.data.id),paidAt,rawEvent:result.data},
       create:{orderId:order.id,reference,amountKobo:result.data.amount,currency:result.data.currency,status:"SUCCESS",channel:result.data.channel||null,providerTransactionId:String(result.data.id),paidAt,rawEvent:result.data}
-     })
-    ]);
+     });
+     await redeemCouponForOrder(tx, order.id);
+    });
    }
    const refreshed=await prisma.order.findUnique({where:{id:order.id},include:{items:true,payment:true,customer:true}});
    return NextResponse.json({paid,order:refreshed});
