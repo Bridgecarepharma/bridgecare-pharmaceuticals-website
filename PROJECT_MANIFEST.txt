@@ -1,36 +1,211 @@
-Bridgecare Pharmaceuticals Milestone 1
-
-Homepage
-- Family background hero
-- Floating glass product stage
-- Four official product pack images
-- Premium lighting and motion
-- Shop Products and distributor CTA
-- Trust strip
-- Reception and warehouse photography
-- Featured products
-- Health Centre cards
-- Corporate footer
-
-AsFenositol product page
-- Premium hero and purchase controls
-- Overview and why-this-product cards
-- Expandable active ingredients
-- Approved benefits
-- Dosage cards
-- Storage
-- Warning panel
-- FAQs
-- Resources
-- Related products
-- Closing purchase panel
-
-System
-- Dynamic product routing via /products/[slug]
-- Central product model in data/products.ts
-- Reusable pharmaceutical components
-- Cart and checkout
-- Delivery-address collection
-- Lagos/outside-Lagos shipping
-- Free shipping for any 3+ packs
-- Paystack initialize, verify and webhook routes
+./.env.example
+./.gitignore
+./.nvmrc
+./ADMIN_LOGIN_SETUP.md
+./CHECKOUT_SETUP.md
+./DIRECT_URL_NETLIFY_FIX.md
+./GROWTH_INTEGRATIONS_SETUP.md
+./HEALTH_CENTRE_CMS_GUIDE.md
+./NETLIFY_DEPLOYMENT.md
+./PROJECT_MANIFEST.txt
+./README.md
+./RELEASE_NOTES.md
+./RELEASE_NOTES_BUILD_FIX_V1.3.5.md
+./RELEASE_NOTES_CHECKOUT_V1.3.3.md
+./RELEASE_NOTES_CHECKOUT_V1.3.6.md
+./RELEASE_NOTES_CHECKOUT_V1.3.7.md
+./RELEASE_NOTES_HOMEPAGE_V1.3.8.md
+./RELEASE_NOTES_MILESTONE_1.md
+./RELEASE_NOTES_PAYSTACK_LINK_LAUNCH.md
+./RELEASE_NOTES_V2.0.1.md
+./RELEASE_NOTES_V2.0.2.md
+./RELEASE_NOTES_V2.0.3.md
+./RELEASE_NOTES_V2.0.4.md
+./RELEASE_NOTES_V2.0.5.1.md
+./RELEASE_NOTES_V2.0.5.2_ADMIN_LOGIN.md
+./RELEASE_NOTES_V2.0.5.4_ADMIN_RUNTIME_ENV.md
+./RELEASE_NOTES_V2.0.5.5_ADMIN_ENV_FIX.md
+./RELEASE_NOTES_V2.0.5.6_ADMIN_DIAGNOSTICS.md
+./RELEASE_NOTES_V2.0.5.md
+./RELEASE_NOTES_V2.0.6.md
+./RELEASE_NOTES_V2.1.0_INTEGRATED_CHECKOUT.md
+./RELEASE_NOTES_V2.1.2_ADMIN_PRODUCTS.md
+./RELEASE_NOTES_V2.1.3_ADMIN_PRICES.md
+./RELEASE_NOTES_V2.1.4_BUY_NOW_CHECKOUT.md
+./RELEASE_NOTES_V2.1.5_BUY_NOW_STYLE.md
+./RELEASE_NOTES_V2.1.6_BUY_NOW_ROUTING.md
+./RELEASE_NOTES_V2.2.0_CART.md
+./RELEASE_NOTES_V2.2.0_UNIFIED_ADMIN.md
+./RELEASE_NOTES_V3.1.0_ORDER_MANAGEMENT.md
+./RELEASE_NOTES_V3.2.0_SHIPPING_MANAGEMENT.md
+./RELEASE_NOTES_V3.2.1_SELECTABLE_SHIPPING.md
+./RELEASE_NOTES_V3.3.0_GROWTH_SEO.md
+./RELEASE_NOTES_V4.1.0_EXECUTIVE_DASHBOARD.md
+./RELEASE_NOTES_V5.0_UI_REDESIGN.md
+./RELEASE_NOTES_V6.1.0_HEALTH_CENTRE_CMS.md
+./SUPABASE_PAYSTACK_LAUNCH.md
+./_next/static/chunks/247eb132b7f7b574.js
+./_next/static/chunks/2acc3e6a64178a27.js
+./_next/static/chunks/672f37f0f4789434.js
+./_next/static/chunks/6740f161f60c6ab5.js
+./_next/static/chunks/6bd2b4078a6a828f.js
+./_next/static/chunks/726db59beed5a248.css
+./_next/static/chunks/8008d994f91f0fb6.js
+./_next/static/chunks/a6dad97d9634a72d.js
+./_next/static/chunks/a70591558c073ea5.js
+./_next/static/chunks/bba035711c7e37a2.js
+./_next/static/chunks/da0057ab14ed2b16.js
+./_next/static/chunks/ee73c111e49b10f3.js
+./_next/static/chunks/ff1a16fafef87110.js
+./_next/static/chunks/turbopack-5f65860d2412292c.js
+./_next/static/ktr23sldic8w4sq4r4bb5/_buildmanifest.js
+./_next/static/ktr23sldic8w4sq4r4bb5/_clientmiddlewaremanifest.json
+./_next/static/ktr23sldic8w4sq4r4bb5/_ssgmanifest.js
+./app/about/page.tsx
+./app/admin/customers/[id]/page.tsx
+./app/admin/customers/page.tsx
+./app/admin/health-centre/[id]/edit/page.tsx
+./app/admin/health-centre/categories/page.tsx
+./app/admin/health-centre/new/page.tsx
+./app/admin/health-centre/page.tsx
+./app/admin/inventory/page.tsx
+./app/admin/login/page.tsx
+./app/admin/orders/[id]/invoice/page.tsx
+./app/admin/orders/[id]/packing-slip/page.tsx
+./app/admin/orders/[id]/page.tsx
+./app/admin/orders/page.tsx
+./app/admin/page.tsx
+./app/admin/prices/page.tsx
+./app/admin/products/page.tsx
+./app/admin/reports/page.tsx
+./app/admin/shipping/page.tsx
+./app/api/admin/health-centre/articles/delete/route.ts
+./app/api/admin/health-centre/articles/route.ts
+./app/api/admin/health-centre/categories/route.ts
+./app/api/admin/inventory/adjust/route.ts
+./app/api/admin/login/route.ts
+./app/api/admin/logout/route.ts
+./app/api/admin/orders/[id]/route.ts
+./app/api/admin/products/price/route.ts
+./app/api/admin/reports/export/route.ts
+./app/api/admin/shipping/update/route.ts
+./app/api/admin/status/route.ts
+./app/api/orders/[reference]/route.ts
+./app/api/paystack/initialize/route.ts
+./app/api/paystack/verify/route.ts
+./app/api/paystack/webhook/route.ts
+./app/api/products/prices/route.ts
+./app/api/shipping/rates/route.ts
+./app/careers/page.tsx
+./app/cart/page.tsx
+./app/checkout/page.tsx
+./app/contact/page.tsx
+./app/cookie-policy/page.tsx
+./app/csr/page.tsx
+./app/distributors/page.tsx
+./app/downloads/page.tsx
+./app/faq/page.tsx
+./app/globals.css
+./app/health-centre/[slug]/page.tsx
+./app/health-centre/page.tsx
+./app/layout.tsx
+./app/news/page.tsx
+./app/newsletter/success/page.tsx
+./app/not-found.tsx
+./app/order-failed/page.tsx
+./app/order-success/page.tsx
+./app/page.tsx
+./app/privacy-policy/page.tsx
+./app/products/[slug]/page.tsx
+./app/products/asfenositol/page.tsx
+./app/products/aspivit/page.tsx
+./app/products/globivida/page.tsx
+./app/products/herbal-bitter-tea/page.tsx
+./app/products/page.tsx
+./app/quality-compliance/page.tsx
+./app/robots.ts
+./app/search/page.tsx
+./app/sitemap.ts
+./app/terms/page.tsx
+./apple-touch-icon.png
+./brand/logo-mark.svg
+./components/DirectPayButton.tsx
+./components/FloatingContact.tsx
+./components/Footer.tsx
+./components/Header.tsx
+./components/Sections.tsx
+./components/StructuredData.tsx
+./components/TawkToChat.tsx
+./components/admin/AdminNav.tsx
+./components/admin/PrintButton.tsx
+./components/admin/SalesTrendChart.tsx
+./components/analytics/MarketingAnalytics.tsx
+./components/cart/AddToCartButton.tsx
+./components/cart/BuyNowButton.tsx
+./components/cart/CartLink.tsx
+./components/cart/CartProvider.tsx
+./components/cart/OrderSuccessClient.tsx
+./components/health/ArticleEditor.tsx
+./components/product/BrandIcon.tsx
+./components/product/PremiumProductPage.tsx
+./components/product/ProductPageSections.tsx
+./data/products.ts
+./data/site.ts
+./eslint.config.mjs
+./favicon.ico
+./icon.png
+./images/brand/bridgecare-logo.png
+./images/brand/bridgecare-mark.png
+./images/facilities/reception.jpg
+./images/facilities/warehouse.jpg
+./images/hero/family-hero.jpg
+./images/products/asfenositol.png
+./images/products/aspivit.png
+./images/products/globivida.png
+./images/products/herbal-bitter-tea.png
+./lib/admin-auth.ts
+./lib/admin-format.ts
+./lib/checkout-schema.ts
+./lib/health-cms.ts
+./lib/healthArticles.ts
+./lib/inventory.ts
+./lib/order-reference.ts
+./lib/prisma.ts
+./lib/product-prices.ts
+./lib/reporting.ts
+./lib/shipping-rates.ts
+./lib/shipping.ts
+./lib/store.ts
+./netlify.toml
+./next-env.d.ts
+./next.config.ts
+./package.json
+./postcss.config.mjs
+./prisma/migrations/20260728000100_initial/migration.sql
+./prisma/migrations/20260729000100_add_paystack_transaction_id/migration.sql
+./prisma/migrations/20260730000100_checkout_v2_foundation/migration.sql
+./prisma/migrations/20260731000100_inventory_foundation/migration.sql
+./prisma/migrations/20260731003000_v203_webhook_events/migration.sql
+./prisma/migrations/20260731083000_admin_dashboard_v204/migration.sql
+./prisma/migrations/20260804000100_inventory_prices/migration.sql
+./prisma/migrations/20260804000100_shipping_management/migration.sql
+./prisma/migrations/20260805000100_health_centre_cms/migration.sql
+./prisma/migrations/migration_lock.toml
+./prisma/schema.prisma
+./public/apple-touch-icon.png
+./public/brand/logo-mark.svg
+./public/favicon.ico
+./public/google3f95ebcb21b21a5d.html
+./public/icon.png
+./public/images/brand/bridgecare-logo.png
+./public/images/brand/bridgecare-mark.png
+./public/images/facilities/reception.jpg
+./public/images/facilities/warehouse.jpg
+./public/images/hero/family-hero.jpg
+./public/images/products/asfenositol.png
+./public/images/products/aspivit.png
+./public/images/products/globivida.png
+./public/images/products/herbal-bitter-tea.png
+./thank-you.html
+./tsconfig.json
+./tsconfig.tsbuildinfo

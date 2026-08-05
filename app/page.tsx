@@ -6,6 +6,7 @@ import {
   Stethoscope, Truck, UsersRound
 } from "lucide-react";
 import { CTA, ProductGrid } from "@/components/Sections";
+import { getPublishedHealthArticles } from "@/lib/health-cms";
 
 const faqs = [
   ["Do you deliver across Nigeria?", "Yes. Select your delivery zone at checkout. Delivery charges are displayed before payment."],
@@ -14,7 +15,8 @@ const faqs = [
   ["Can I speak with someone before ordering?", "Yes. Use the WhatsApp or call buttons for help with product information and ordering."],
 ];
 
-export default function Home() {
+export default async function Home() {
+  const latestHealthArticles = (await getPublishedHealthArticles()).slice(0, 3);
   return (
     <>
       <section className="hero hero-v3">
@@ -101,9 +103,15 @@ export default function Home() {
         <div className="container">
           <div className="section-head"><div><span className="eyebrow">Bridgecare Health Centre</span><h2>Responsible health education for everyday decisions</h2><p>Read clear guidance while remembering that educational content does not replace professional medical advice.</p></div><Link className="section-link" href="/health-centre">Visit Health Centre <ArrowRight size={18}/></Link></div>
           <div className="health-topic-grid">
-            <Link href="/health-centre" className="health-topic-card"><span className="health-topic-icon"><BookOpenCheck size={28}/></span><span className="eyebrow">Product education</span><h3>Read labels with confidence</h3><p>Understand directions, ingredients, storage instructions and warnings.</p><strong>Explore guidance <ArrowRight size={17}/></strong></Link>
-            <Link href="/health-centre" className="health-topic-card"><span className="health-topic-icon"><HeartPulse size={28}/></span><span className="eyebrow">Everyday wellness</span><h3>Build healthier routines</h3><p>Practical information on nutrition, supplements and wellbeing.</p><strong>Read wellness topics <ArrowRight size={17}/></strong></Link>
-            <Link href="/faq" className="health-topic-card"><span className="health-topic-icon"><Stethoscope size={28}/></span><span className="eyebrow">Responsible use</span><h3>Know when to seek help</h3><p>Find common answers and learn when to consult a qualified professional.</p><strong>View common questions <ArrowRight size={17}/></strong></Link>
+            {latestHealthArticles.map((article, index) => (
+              <Link href={`/health-centre/${article.slug}`} className="health-topic-card" key={article.slug}>
+                <span className="health-topic-icon">{index === 0 ? <BookOpenCheck size={28}/> : index === 1 ? <HeartPulse size={28}/> : <Stethoscope size={28}/>}</span>
+                <span className="eyebrow">{article.category}</span>
+                <h3>{article.title}</h3>
+                <p>{article.description}</p>
+                <strong>Read article <ArrowRight size={17}/></strong>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

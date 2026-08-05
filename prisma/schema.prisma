@@ -217,3 +217,66 @@ model ShippingSetting {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 }
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model HealthCategory {
+  id          String          @id @default(cuid())
+  name        String          @unique
+  slug        String          @unique
+  description String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  articles    HealthArticle[]
+
+  @@index([name])
+}
+
+model HealthTag {
+  id        String             @id @default(cuid())
+  name      String             @unique
+  slug      String             @unique
+  createdAt DateTime           @default(now())
+  articles  HealthArticleTag[]
+
+  @@index([name])
+}
+
+model HealthArticle {
+  id               String             @id @default(cuid())
+  title            String
+  slug             String             @unique
+  excerpt          String
+  contentHtml      String
+  featuredImageUrl String?
+  featuredImageAlt String?
+  authorName       String             @default("Bridgecare Health Team")
+  status           ArticleStatus      @default(DRAFT)
+  isFeatured       Boolean            @default(false)
+  seoTitle         String?
+  metaDescription  String?
+  publishedAt      DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  categoryId       String?
+  category         HealthCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags             HealthArticleTag[]
+
+  @@index([status, publishedAt])
+  @@index([categoryId, status])
+  @@index([isFeatured, status])
+}
+
+model HealthArticleTag {
+  articleId String
+  tagId     String
+  article   HealthArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       HealthTag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+}

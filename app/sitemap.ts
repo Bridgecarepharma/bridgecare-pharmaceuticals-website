@@ -1,4 +1,12 @@
-import type {MetadataRoute} from "next";
-import { healthArticles } from "@/lib/healthArticles";
-const p=["","/about","/products","/products/aspivit","/products/asfenositol","/products/globivida","/products/herbal-bitter-tea","/cart","/checkout","/health-centre","/quality-compliance","/csr","/news","/contact","/distributors","/careers","/faq","/downloads","/privacy-policy","/terms","/cookie-policy"];
-export default function sitemap():MetadataRoute.Sitemap{const b=process.env.NEXT_PUBLIC_SITE_URL||"https://bridgecarepharmang.com";const pages=p.map(x=>({url:`${b}${x}`,lastModified:new Date(),changeFrequency:"monthly" as const,priority:x===""?1:.7}));const articles=healthArticles.map(a=>({url:`${b}/health-centre/${a.slug}`,lastModified:new Date(a.updatedAt),changeFrequency:"monthly" as const,priority:.75}));return [...pages,...articles]}
+import type { MetadataRoute } from "next";
+import { getPublishedHealthArticles } from "@/lib/health-cms";
+
+const pages = ["", "/about", "/products", "/products/aspivit", "/products/asfenositol", "/products/globivida", "/products/herbal-bitter-tea", "/cart", "/checkout", "/health-centre", "/quality-compliance", "/csr", "/news", "/contact", "/distributors", "/careers", "/faq", "/downloads", "/privacy-policy", "/terms", "/cookie-policy"];
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const base = process.env.NEXT_PUBLIC_SITE_URL || "https://bridgecarepharmang.com";
+  const staticPages = pages.map((path) => ({ url: `${base}${path}`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: path === "" ? 1 : .7 }));
+  const healthArticles = await getPublishedHealthArticles();
+  const articles = healthArticles.map((article) => ({ url: `${base}/health-centre/${article.slug}`, lastModified: new Date(article.updatedAt), changeFrequency: "monthly" as const, priority: .75 }));
+  return [...staticPages, ...articles];
+}
