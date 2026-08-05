@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { CheckCircle2, LockKeyhole, ShieldCheck, Truck } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatNaira } from "@/lib/store";
 import {
@@ -66,8 +67,8 @@ export default function CheckoutPage(){
 
  if(!items.length)return <section className="page-hero"><div className="container narrow"><h1>Your cart is empty</h1><p>Add products before checking out.</p><Link className="button" href="/products">Shop products</Link></div></section>;
 
- return <><section className="page-hero"><div className="container narrow"><span className="eyebrow">Secure checkout</span><h1>Delivery & Payment</h1><p>Enter the delivery address before continuing to Paystack.</p></div></section>
- <section className="section"><div className="container checkout-grid"><form className="form checkout-form" onSubmit={submit}>
+ return <><section className="checkout-hero-v3"><div className="container"><div><span className="eyebrow">Secure checkout</span><h1>Complete your order</h1><p>Enter your contact and delivery information, review your order, then continue securely to Paystack.</p></div><div className="checkout-steps"><span className="active"><b>1</b>Details</span><i/><span><b>2</b>Payment</span><i/><span><b>3</b>Confirmation</span></div></div></section>
+ <section className="section checkout-section-v3"><div className="container checkout-grid"><form className="form checkout-form checkout-form-v3" onSubmit={submit}>
  <h2>Customer information</h2><div className="form-row"><label>Full name<input name="fullName" required autoComplete="name"/></label><label>Email<input name="email" type="email" required autoComplete="email"/></label></div><label>Phone number<input name="phone" required autoComplete="tel"/></label>
  <h2>Delivery address</h2><div className="form-row"><label>Recipient name<input name="recipientName" required/></label><label>Recipient phone<input name="recipientPhone" required/></label></div>
  <label>House number and street address<input name="addressLine1" required autoComplete="address-line1"/></label><label>Apartment, estate or additional address<input name="addressLine2" autoComplete="address-line2"/></label>
@@ -77,6 +78,6 @@ export default function CheckoutPage(){
  <h2>Delivery method</h2><input type="hidden" name="deliveryMethod" value="standard"/><div className="shipping-zone-list">{activeZones.map(zone=>{const free=shipping.freeShippingPackCount>0&&packCount>=shipping.freeShippingPackCount;return <label className={`radio-card shipping-zone-option${shippingZoneCode===zone.code?" selected":""}`} key={zone.code}><input type="radio" name="shippingZoneCode" value={zone.code} checked={shippingZoneCode===zone.code} onChange={()=>{setShippingZoneCode(zone.code);if(!zone.states.includes(state))setState(zone.states[0]||state)}}/><span><strong>{zone.name}</strong><small>{free?"Free delivery":formatNaira(zone.priceKobo)}</small></span></label>})}</div>{shipping.freeShippingPackCount>0&&<p className="shipping-threshold-note">Free delivery applies automatically when the cart contains {shipping.freeShippingPackCount} or more packs.</p>}
  {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone||!zoneMatchesState}>{loading?"Opening Paystack…":`Pay ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
  </form>
- <aside className="order-summary"><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{selectedZone?formatNaira(shippingKobo):"Unavailable"}</strong></div><div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div></aside>
+ <aside className="order-summary order-summary-v3"><div className="summary-secure"><ShieldCheck size={22}/><span><strong>Secure checkout</strong><small>Your payment is processed by Paystack.</small></span></div><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{selectedZone?formatNaira(shippingKobo):"Unavailable"}</strong></div><div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div><div className="checkout-confidence"><span><LockKeyhole size={17}/> Encrypted payment</span><span><Truck size={17}/> Delivery details confirmed</span><span><CheckCircle2 size={17}/> Order saved before payment</span></div></aside>
  </div></section></>
 }
