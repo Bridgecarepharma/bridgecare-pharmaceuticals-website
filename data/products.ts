@@ -3,7 +3,7 @@ export type ProductFaq = { question: string; answer: string };
 export type ProductSpec = { label: string; value: string };
 export type Product = {
   slug: string; name: string; category: string; summary: string; indication: string;
-  image: string; priceKobo: number; packSize: string; theme: string;
+  image: string; detailsImage: string; priceKobo: number; packSize: string; theme: string;
   overview: string; description: string[]; specifications: ProductSpec[];
   reasons: { title: string; text: string; symbol: string }[];
   ingredients: Ingredient[]; benefits: { title: string; text: string; symbol: string }[];
@@ -19,7 +19,7 @@ export const PRODUCTS: Product[] = [
     slug: "aspivit", name: "Aspivit Tablet", category: "Daily nutrition",
     summary: "A comprehensive Omega-3, multivitamin and multimineral supplement for everyday nutritional support.",
     indication: "Complete nutrition for a healthier, stronger you.",
-    image: "/images/products/aspivit.png", priceKobo: 800000, packSize: "30 tablets", theme: "gold",
+    image: "/images/products/aspivit.png", detailsImage: "/images/product-details/aspivit.png", priceKobo: 800000, packSize: "30 tablets", theme: "gold",
     overview: "Aspivit Tablet is a comprehensive nutritional supplement formulated with Omega-3 fatty acids, essential vitamins and trace minerals to support overall health and wellbeing.",
     description: [
       "Aspivit Tablet is an advanced daily multivitamin and Omega-3 supplement designed to provide essential nutrients required for optimal health. Each film-coated tablet combines EPA, DHA, vitamins and essential minerals to help bridge nutritional gaps and promote overall wellness.",
@@ -85,7 +85,7 @@ export const PRODUCTS: Product[] = [
     slug: "asfenositol", name: "AsFenositol Tablet", category: "Fertility and women’s reproductive wellness",
     summary: "A premium fertility-support formulation with Myo-Inositol, active folate, active Vitamin B6 and Vitamin D3.",
     indication: "Scientifically formulated nutritional support for female reproductive wellness.",
-    image: "/images/products/asfenositol.png", priceKobo: 600000, packSize: "1 × 10 tablets", theme: "teal",
+    image: "/images/products/asfenositol.png", detailsImage: "/images/product-details/asfenositol.png", priceKobo: 600000, packSize: "1 × 10 tablets", theme: "teal",
     overview: "AsFenositol Tablet is a scientifically formulated fertility support supplement containing Myo-Inositol, L-Methylfolate, Pyridoxal-5-Phosphate and Vitamin D3 to support female reproductive health and ovulatory function.",
     description: [
       "AsFenositol Tablet is a premium fertility-support formulation developed to provide essential reproductive nutrients for women trying to conceive. The combination of Myo-Inositol, L-Methylfolate, Pyridoxal-5-Phosphate and Vitamin D3 works together to support ovarian function, menstrual regularity, hormonal balance and overall reproductive wellness.",
@@ -143,7 +143,7 @@ export const PRODUCTS: Product[] = [
     slug: "globivida", name: "Globivida Capsules", category: "Advanced sickle cell wellness formula",
     summary: "A premium nutritional formulation for antioxidant, blood-health, immune and daily wellness support.",
     indication: "Supporting wellness in individuals living with sickle cell disease.",
-    image: "/images/products/globivida.png", priceKobo: 1500000, packSize: "30 capsules", theme: "red",
+    image: "/images/products/globivida.png", detailsImage: "/images/product-details/globivida.png", priceKobo: 1500000, packSize: "30 capsules", theme: "red",
     overview: "Globivida Capsules is an advanced nutritional formulation developed to support individuals living with sickle cell disorder. Its selected ingredients support healthy red blood cell function, antioxidant defence, immune function and overall wellbeing.",
     description: [
       "Globivida Capsules is a premium nutritional supplement specially formulated to support individuals living with sickle cell disorder. The advanced formula combines botanical extracts, amino acids, vitamins, minerals and antioxidants that work together to support healthy red blood cells, immune health and cellular protection from oxidative stress.",
@@ -212,7 +212,7 @@ export const PRODUCTS: Product[] = [
     slug: "herbal-bitter-tea", name: "Bridgecare Herbal Bitter Tea", category: "100% natural herbal wellness tea",
     summary: "A herbal infusion made from 100% Hunteria umbellata (Abere seed) for metabolic and general wellness support.",
     indication: "Naturally supporting healthy blood sugar metabolism and everyday wellness.",
-    image: "/images/products/herbal-bitter-tea.png", priceKobo: 550000, packSize: "25 tea bags", theme: "green",
+    image: "/images/products/herbal-bitter-tea.png", detailsImage: "/images/product-details/herbal-bitter-tea.png", priceKobo: 550000, packSize: "25 tea bags", theme: "green",
     overview: "Bridgecare Herbal Bitter Tea is a carefully formulated herbal infusion made from 100% Hunteria umbellata (Abere seed), traditionally recognized for supporting healthy blood sugar metabolism and overall wellness.",
     description: [
       "Bridgecare Herbal Bitter Tea provides a convenient and natural way to enjoy the traditional wellness-supporting properties of Hunteria umbellata. Each tea bag delivers premium-quality herbal material for use as part of a healthy lifestyle.",
