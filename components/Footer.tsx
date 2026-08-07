@@ -21,7 +21,7 @@ export function Footer() {
         </div>
         <div><h3>Company</h3><Link href="/about">About us</Link><Link href="/quality-compliance">Quality & Compliance</Link><Link href="/csr">Corporate responsibility</Link><Link href="/careers">Careers</Link></div>
         <div><h3>Explore</h3><Link href="/products">Products</Link><Link href="/health-centre">Health Centre</Link><Link href="/news">News</Link><Link href="/downloads">Downloads</Link></div>
-        <div><h3>Support</h3><Link href="/faq">Frequently asked questions</Link><Link href="/distributors">Become a distributor</Link><Link href="/contact">Contact us</Link><Link href="/privacy-policy">Privacy policy</Link></div>
+        <div className="footer-support-column"><h3>Support</h3><Link href="/faq">Frequently asked questions</Link><Link href="/distributors">Become a distributor</Link><Link href="/contact">Contact us</Link><Link href="/privacy-policy">Privacy policy</Link><Link href="/admin/login" className="footer-admin-button">Admin Login</Link></div>
       </div>
       <div className="container footer-bottom"><span>© {new Date().getFullYear()} Bridgecare Pharmaceuticals Limited.</span><span>Advancing Health. Inspiring Life.</span></div>
     </footer>
