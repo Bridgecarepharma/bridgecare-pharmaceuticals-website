@@ -12,7 +12,8 @@
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
     "db:deploy": "prisma generate",
-    "db:migrate:deploy": "prisma migrate deploy"
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:recover:qna": "node scripts/recover-prisma-qna.mjs"
   },
   "dependencies": {
     "next": "16.0.10",
