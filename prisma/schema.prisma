@@ -341,19 +341,45 @@ model CouponRedemption {
 }
 
 
-model ProductReview {
-  id           String   @id @default(cuid())
-  productSlug  String
-  productName  String
-  customerName String
-  rating       Int
-  title        String?
-  review       String
-  isApproved   Boolean  @default(false)
-  isFeatured   Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ARCHIVED
+}
 
-  @@index([productSlug, isApproved, createdAt])
-  @@index([isFeatured, isApproved])
+model ProductReview {
+  id               String               @id @default(cuid())
+  productSlug      String
+  productName      String
+  customerName     String
+  customerEmail    String
+  city             String?
+  orderNumber      String?
+  rating           Int
+  title            String?
+  body             String
+  status           ReviewStatus         @default(PENDING)
+  verifiedPurchase Boolean              @default(false)
+  isFeatured       Boolean              @default(false)
+  adminReply       String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  images           ProductReviewImage[]
+
+  @@index([productSlug, status, createdAt])
+  @@index([isFeatured, status])
+  @@index([customerEmail, productSlug, createdAt])
+}
+
+model ProductReviewImage {
+  id        String        @id @default(cuid())
+  reviewId  String
+  imageUrl  String
+  altText   String?
+  sortOrder Int           @default(0)
+  createdAt DateTime      @default(now())
+  review    ProductReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId, sortOrder])
 }
