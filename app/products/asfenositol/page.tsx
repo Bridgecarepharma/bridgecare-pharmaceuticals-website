@@ -19,7 +19,6 @@ import {
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { formatNaira } from "@/lib/store";
 import { getProductPrice } from "@/lib/product-prices";
-import { ProductReviews } from "@/components/reviews/ProductReviews";
 
 export const metadata = {
   title: "AsFenositol® | Bridgecare Pharmaceuticals",
@@ -312,7 +311,6 @@ export default async function AsFenositolPage() {
           </div>
         </div>
       </section>
-      <ProductReviews productSlug="asfenositol" productName="AsFenositol®" />
     </main>
   );
 }
