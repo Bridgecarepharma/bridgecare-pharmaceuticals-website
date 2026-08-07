@@ -13,9 +13,15 @@ export function Header() {
     <header className="site-header">
       <div className="header-accent" />
       <div className="container nav-wrap">
-        <Link href="/" className="brand" aria-label="Bridgecare Pharmaceuticals home">
-          <Image src="/images/brand/bridgecare-mark.png" alt="" width={62} height={52} priority />
-          <span><strong>Bridgecare</strong><small>Pharmaceuticals Limited</small></span>
+        <Link href="/" className="brand brand-official" aria-label="Bridgecare Pharmaceuticals Limited home">
+          <Image
+            src="/images/brand/bridgecare-logo.png"
+            alt="Bridgecare Pharmaceuticals Limited"
+            width={260}
+            height={158}
+            className="official-header-logo"
+            priority
+          />
         </Link>
         <button className="menu-button" onClick={() => setOpen(!open)} aria-label="Toggle navigation" aria-expanded={open}>{open ? <X /> : <Menu />}</button>
         <nav className={open ? "nav open" : "nav"} aria-label="Main navigation">
