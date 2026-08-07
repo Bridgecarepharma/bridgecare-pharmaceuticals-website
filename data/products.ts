@@ -144,6 +144,7 @@ export const PRODUCTS: Product[] = [
       {question:"How many tablets are in one pack?", answer:"Each pack contains 10 tablets."}
     ], nafdac:"A7-102870"
   },
+<<<<<<< HEAD
   {
     slug: "globivida", name: "Globivida Capsules", category: "Advanced sickle cell wellness formula",
     summary: "A premium nutritional formulation for antioxidant, blood-health, immune and daily wellness support.",
@@ -268,6 +269,17 @@ export const PRODUCTS: Product[] = [
       {question:"Can I use it with diabetes medication?", answer:"Consult your healthcare provider before use because blood sugar should be monitored and medication may require professional review."}
     ], nafdac:"Approved"
   }
+=======
+  ...[
+    ["aspivit","Aspivit®","Daily nutrition","Omega-3 fatty acids, essential vitamins and trace minerals to support overall health and wellbeing.","/images/products/aspivit.png",800000,"gold"],
+    ["globivida","Globivida®","Specialized support","A blend of botanical extracts, amino acids, vitamins and minerals.","/images/products/globivida.png",1500000,"red"],
+    ["herbal-bitter-tea","Bridgecare Herbal Bitter Tea®","Herbal wellness","Herbal tea prepared from 100% Hunteria umbellata.","/images/products/herbal-bitter-tea.png",550000,"green"]
+  ].map(([slug,name,category,summary,image,priceKobo,theme]) => ({
+    slug: slug as string, name: name as string, category: category as string, summary: summary as string,
+    indication: summary as string, image: image as string, priceKobo: priceKobo as number, packSize:"See pack", theme:theme as string,
+    overview:"Detailed approved product information is being structured from the supplied pack artwork.", reasons:[], ingredients:[], benefits:[], directions:[], storage:[], warnings:["Read the physical pack before use and consult a healthcare professional where appropriate."], faqs:[]
+  }))
+>>>>>>> 4de5209434a8553b39e5c653159c4090b31bb20c
 ];
 
 export const PRODUCT_BY_SLUG = Object.fromEntries(PRODUCTS.map(product => [product.slug, product]));
