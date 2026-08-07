@@ -3,9 +3,36 @@
 import { FormEvent, useState } from "react";
 
 function Stars({ value, onChange }: { value: number; onChange: (value: number) => void }) {
-  return <div className="rating-input" role="radiogroup" aria-label="Choose a star rating">
-    {[1,2,3,4,5].map(star => <button key={star} type="button" onClick={() => onChange(star)} aria-label={`${star} star${star === 1 ? "" : "s"}`} className={star <= value ? "active" : ""}>★</button>)}
-  </div>;
+  const [hovered, setHovered] = useState(0);
+  const visualValue = hovered || value;
+
+  return (
+    <div className="rating-input-wrap">
+      <div className="rating-input" role="radiogroup" aria-label="Choose a star rating">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            role="radio"
+            aria-checked={value === star}
+            aria-label={`${star} star${star === 1 ? "" : "s"}`}
+            title={`${star} star${star === 1 ? "" : "s"}`}
+            className={star <= visualValue ? "active" : ""}
+            onClick={() => onChange(star)}
+            onMouseEnter={() => setHovered(star)}
+            onMouseLeave={() => setHovered(0)}
+            onFocus={() => setHovered(star)}
+            onBlur={() => setHovered(0)}
+          >
+            ★
+          </button>
+        ))}
+      </div>
+      <span className="rating-selected-text" aria-live="polite">
+        {value} out of 5 stars selected
+      </span>
+    </div>
+  );
 }
 
 export function ReviewForm({ productSlug, productName }: { productSlug: string; productName: string }) {
@@ -21,7 +48,7 @@ export function ReviewForm({ productSlug, productName }: { productSlug: string; 
     })});
     const data = await response.json().catch(() => ({}));
     setMessage(response.ok ? "Thank you. Your review has been submitted for approval." : (data.error || "We could not submit your review."));
-    if (response.ok) event.currentTarget.reset();
+    if (response.ok) { event.currentTarget.reset(); setRating(5); }
     setBusy(false);
   }
   return <form className="community-form" onSubmit={submit}>
