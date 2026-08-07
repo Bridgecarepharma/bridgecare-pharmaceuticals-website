@@ -12,8 +12,8 @@ import { ProductReviews } from "@/components/reviews/ProductReviews";
 
 export async function PremiumProductPage({ product }: { product: Product }) {
   const related = PRODUCTS.filter((entry) => entry.slug !== product.slug).slice(0, 3);
-  const imageVersion = `6.3.4-pack-${product.slug}`;
-  const detailsImageVersion = `6.3.4-details-${product.slug}`;
+  const imageVersion = `6.3.5-pack-${product.slug}`;
+  const detailsImageVersion = `6.3.5-details-${product.slug}`;
 
   return <main key={product.slug} className={`product-page ${product.theme}-theme`}>
     <section className="premium-product-hero"><div className="container premium-product-grid">
@@ -27,7 +27,7 @@ export async function PremiumProductPage({ product }: { product: Product }) {
 
     <section className="section product-tint" id="specifications"><div className="container product-content-narrow"><SectionTitle eyebrow="Product specifications" title="At-a-glance product information"/><dl className="product-spec-grid">{product.specifications.map((spec) => <div key={spec.label}><dt>{spec.label}</dt><dd>{spec.value}</dd></div>)}</dl></div></section>
 
-    <section className="section" id="ingredients"><div className="container"><SectionTitle eyebrow="Composition" title="What the formulation contains" intro="Ingredient strengths and concise descriptions are presented from the supplied product information."/><div className="ingredient-grid">{product.ingredients.map((ingredient) => <IngredientCard key={ingredient.name} icon={<BrandIcon symbol={ingredient.symbol}/>} name={ingredient.name} strength={ingredient.strength}>{ingredient.summary}</IngredientCard>)}</div></div></section>
+    <section className="section" id="ingredients"><div className="container"><SectionTitle eyebrow="Composition" title="What the formulation contains" intro="Ingredient strengths and concise descriptions are presented from the supplied product information."/><div className="ingredient-grid">{product.ingredients.map((ingredient) => <IngredientCard key={ingredient.name} icon={<BrandIcon symbol={ingredient.symbol}/>} name={ingredient.name} strength={ingredient.strength}>{ingredient.summary || null}</IngredientCard>)}</div></div></section>
 
     <section className="section product-tint"><div className="container"><SectionTitle eyebrow="Key benefits" title="Nutritional and wellness support"/><div className="benefit-grid">{product.benefits.map((benefit) => <article className="product-info-card" key={benefit.title}><BrandIcon symbol={benefit.symbol}/><h3>{benefit.title}</h3><p>{benefit.text}</p></article>)}</div></div></section>
 
@@ -41,7 +41,7 @@ export async function PremiumProductPage({ product }: { product: Product }) {
 
     <section className="section" id="safety"><div className="container product-content-narrow"><SafetyPanel><h2>Warnings and safety information</h2><ul>{product.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></SafetyPanel>{product.nafdac ? <p className="regulatory-note">Pack reference supplied by Bridgecare: NAFDAC {product.nafdac}. Check the physical pack for current batch, manufacturing and expiry information.</p> : null}</div></section>
 
-    <section className="section product-tint" id="faq"><div className="container product-content-narrow"><SectionTitle eyebrow="Frequently asked questions" title="Helpful answers before purchase"/><div className="faq-list">{product.faqs.map((faq) => <details key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}</div></div></section>
+    {product.faqs.length ? <section className="section product-tint" id="faq"><div className="container product-content-narrow"><SectionTitle eyebrow="Frequently asked questions" title="Helpful answers before purchase"/><div className="faq-list">{product.faqs.map((faq) => <details key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}</div></div></section> : null}
 
     <section className="section product-detail-artwork-section" aria-labelledby={`product-artwork-${product.slug}`}><div className="container product-content-narrow"><SectionTitle eyebrow="Complete product guide" title={`${product.name} information artwork`} intro="Review the supplied product information artwork after reading the structured product details above."/><div className="product-detail-artwork"><Image src={`${product.detailsImage}?v=${detailsImageVersion}`} alt={`${product.name} complete product information guide`} width={1024} height={1536} unoptimized sizes="(max-width: 900px) 94vw, 900px"/></div></div></section>
 
@@ -49,7 +49,7 @@ export async function PremiumProductPage({ product }: { product: Product }) {
 
     <section className="section"><div className="container"><SectionTitle eyebrow="Resources" title="Product support and information"/><div className="resource-grid"><Link href="/downloads" className="resource-card"><BrandIcon symbol="PDF"/><h3>Product resources</h3><p>Access available product and corporate downloads.</p></Link><Link href="/contact" className="resource-card"><BrandIcon symbol="?"/><h3>Need more information?</h3><p>Speak with Bridgecare customer support.</p></Link></div></div></section>
 
-    <section className="section product-tint"><div className="container"><SectionTitle eyebrow="Related products" title="Explore more from Bridgecare"/><div className="related-grid">{related.map((entry) => <Link href={`/products/${entry.slug}`} className="related-product" key={entry.slug}><span className="related-image"><Image key={`related-${entry.slug}`} src={`${entry.image}?v=6.3.4-pack-${entry.slug}`} alt={`${entry.name} product pack`} fill unoptimized sizes="180px"/></span><strong>{entry.name}</strong><small>{formatNaira(entry.priceKobo)}</small></Link>)}</div></div></section>
+    <section className="section product-tint"><div className="container"><SectionTitle eyebrow="Related products" title="Explore more from Bridgecare"/><div className="related-grid">{related.map((entry) => <Link href={`/products/${entry.slug}`} className="related-product" key={entry.slug}><span className="related-image"><Image key={`related-${entry.slug}`} src={`${entry.image}?v=6.3.5-pack-${entry.slug}`} alt={`${entry.name} product pack`} fill unoptimized sizes="180px"/></span><strong>{entry.name}</strong><small>{formatNaira(entry.priceKobo)}</small></Link>)}</div></div></section>
 
     <section className="product-closing-cta"><div className="container product-closing-grid"><div><span className="eyebrow">Shop directly from Bridgecare</span><h2>Order {product.name} securely</h2><p>Clear delivery fees and free shipping when your basket contains any three packs or more.</p></div><div className="closing-purchase"><strong>{formatNaira(product.priceKobo)}</strong><AddToCartButton slug={product.slug} name={product.name} priceKobo={product.priceKobo}/><Link className="button secondary" href="/products">Explore all products</Link></div></div></section>
   </main>;
