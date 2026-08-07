@@ -349,7 +349,7 @@ enum ReviewStatus {
 }
 
 model ProductReview {
-  id               String               @id @default(cuid())
+  id               String        @id @default(cuid())
   productSlug      String
   productName      String
   customerName     String
@@ -359,31 +359,30 @@ model ProductReview {
   rating           Int
   title            String?
   body             String
-  status           ReviewStatus         @default(PENDING)
-  verifiedPurchase Boolean              @default(false)
-  isFeatured       Boolean              @default(false)
+  verifiedPurchase Boolean       @default(false)
+  status           ReviewStatus  @default(PENDING)
   adminReply       String?
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
-  images           ProductReviewImage[]
+  isFeatured       Boolean       @default(false)
+  helpfulCount     Int           @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  images           ReviewImage[]
 
   @@index([productSlug, status, createdAt])
-  @@index([isFeatured, status])
-  @@index([customerEmail, productSlug, createdAt])
+  @@index([status, createdAt])
+  @@index([customerEmail, productSlug])
 }
 
-model ProductReviewImage {
+model ReviewImage {
   id        String        @id @default(cuid())
   reviewId  String
   imageUrl  String
   altText   String?
-  sortOrder Int           @default(0)
   createdAt DateTime      @default(now())
   review    ProductReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 
-  @@index([reviewId, sortOrder])
+  @@index([reviewId])
 }
-
 
 enum QuestionStatus {
   PENDING
