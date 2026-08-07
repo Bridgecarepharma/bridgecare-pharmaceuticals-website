@@ -339,3 +339,21 @@ model CouponRedemption {
   @@index([couponId, status, createdAt])
   @@index([customerEmail, couponId, status])
 }
+
+
+model ProductReview {
+  id           String   @id @default(cuid())
+  productSlug  String
+  productName  String
+  customerName String
+  rating       Int
+  title        String?
+  review       String
+  isApproved   Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([productSlug, isApproved, createdAt])
+  @@index([isFeatured, isApproved])
+}
