@@ -1,9 +1,11 @@
+import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { ReviewForm, QuestionForm } from "./ProductCommunityForms";
 
 function Stars({ rating }: { rating: number }) { return <span className="stars" aria-label={`${rating} out of 5 stars`}>{[1,2,3,4,5].map(v => <span key={v} className={v <= Math.round(rating) ? "on" : ""}>★</span>)}</span>; }
 
 export async function ProductCommunitySection({ productSlug, productName }: { productSlug: string; productName: string }) {
+  noStore();
   const configured = Boolean(process.env.DATABASE_URL);
   let reviews: any[] = []; let questions: any[] = [];
   if (configured) {
