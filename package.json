@@ -12,8 +12,7 @@
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
     "db:deploy": "prisma generate",
-    "db:migrate:deploy": "prisma migrate deploy",
-    "db:recover:reviews": "node scripts/recover-prisma-reviews.mjs"
+    "db:migrate:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "next": "16.0.10",
