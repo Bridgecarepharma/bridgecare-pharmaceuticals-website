@@ -3,7 +3,7 @@ export type ProductFaq = { question: string; answer: string };
 export type ProductSpec = { label: string; value: string };
 export type Product = {
   slug: string; name: string; category: string; summary: string; indication: string;
-  image: string; detailImage?: string; priceKobo: number; packSize: string; theme: string;
+  image: string; priceKobo: number; packSize: string; theme: string;
   overview: string; description: string[]; specifications: ProductSpec[];
   reasons: { title: string; text: string; symbol: string }[];
   ingredients: Ingredient[]; benefits: { title: string; text: string; symbol: string }[];
@@ -16,81 +16,76 @@ export type Product = {
 
 export const PRODUCTS: Product[] = [
   {
-    slug: "aspivit", name: "ASPIVIT TABLET", category: "Daily nutrition",
-    summary: "A comprehensive nutritional supplement formulated with Omega-3 fatty acids, essential vitamins, and trace minerals to support overall health and wellbeing.",
-    indication: "Comprehensive Omega-3, vitamin, and mineral support for overall health and wellbeing.",
-    image: "/images/products/aspivit.jpg", detailImage: "/images/product-details/aspivit.jpg", priceKobo: 800000, packSize: "Bottle", theme: "gold",
-    overview: "Aspivit Tablet is a comprehensive nutritional supplement formulated with Omega-3 fatty acids, essential vitamins, and trace minerals to support overall health and wellbeing.",
+    slug: "aspivit", name: "Aspivit Tablet", category: "Daily nutrition",
+    summary: "A comprehensive Omega-3, multivitamin and multimineral supplement for everyday nutritional support.",
+    indication: "Complete nutrition for a healthier, stronger you.",
+    image: "/images/products/aspivit.png", priceKobo: 800000, packSize: "30 tablets", theme: "gold",
+    overview: "Aspivit Tablet is a comprehensive nutritional supplement formulated with Omega-3 fatty acids, essential vitamins and trace minerals to support overall health and wellbeing.",
     description: [
-      "Aspivit Tablet is an advanced daily multivitamin and Omega-3 supplement designed to provide essential nutrients required for optimal health. Each film-coated tablet combines EPA, DHA, vitamins, and essential minerals to help bridge nutritional gaps and promote overall wellness.",
+      "Aspivit Tablet is an advanced daily multivitamin and Omega-3 supplement designed to provide essential nutrients required for optimal health. Each film-coated tablet combines EPA, DHA, vitamins and essential minerals to help bridge nutritional gaps and promote overall wellness.",
       "Manufactured in India under stringent pharmaceutical quality standards, Aspivit Tablet delivers high-quality nutrients with excellent stability and bioavailability, making it suitable for daily nutritional supplementation."
     ],
     specifications: [
-      {label:"Product Name", value:"Aspivit Tablet"},
-      {label:"Dosage Form", value:"Film-Coated Tablet"},
+      {label:"Product name", value:"Aspivit Tablet"},
+      {label:"Dosage form", value:"Film-coated tablet"},
       {label:"Packaging", value:"Bottle"},
-      {label:"Shelf Life", value:"2 Years"},
-      {label:"Country of Origin", value:"India"},
-      {label:"Manufacturer", value:"Manufactured in India under GMP-certified pharmaceutical standards."}
+      {label:"Pack size", value:"30 tablets"},
+      {label:"Shelf life", value:"2 years"},
+      {label:"Country of origin", value:"India"},
+      {label:"Manufacturer", value:"Manufactured in India under GMP-certified pharmaceutical standards"}
     ],
-    reasons: [],
+    reasons: [
+      {symbol:"Ω3", title:"Premium Omega-3 support", text:"Provides EPA and DHA together with essential vitamins and minerals."},
+      {symbol:"13", title:"Broad nutritional coverage", text:"Combines multiple vitamins and trace minerals in one daily tablet."},
+      {symbol:"GMP", title:"Quality manufacturing", text:"Manufactured in India under GMP-certified pharmaceutical standards."}
+    ],
     ingredients: [
-      {symbol:"EPA", name:"EPA", strength:"90 mg", summary:""},
-      {symbol:"DHA", name:"DHA", strength:"60 mg", summary:""},
-      {symbol:"A", name:"Vitamin A", strength:"900 mcg", summary:""},
-      {symbol:"B6", name:"Vitamin B6", strength:"1 mg", summary:""},
-      {symbol:"C", name:"Vitamin C", strength:"40 mg", summary:""},
-      {symbol:"D3", name:"Vitamin D3", strength:"400 IU", summary:""},
-      {symbol:"E", name:"Vitamin E", strength:"15 mg", summary:""},
-      {symbol:"F", name:"Folic Acid", strength:"400 mcg", summary:""},
-      {symbol:"Se", name:"Selenium", strength:"40 mcg", summary:""},
-      {symbol:"Mg", name:"Magnesium", strength:"2 mg", summary:""},
-      {symbol:"Cr", name:"Chromium", strength:"35 mcg", summary:""},
-      {symbol:"Cu", name:"Copper", strength:"1 mg", summary:""},
-      {symbol:"Zn", name:"Zinc Sulphate", strength:"7.5 mg", summary:""}
+      {symbol:"EPA", name:"EPA", strength:"90 mg", summary:"An Omega-3 fatty acid included for everyday nutritional support."},
+      {symbol:"DHA", name:"DHA", strength:"60 mg", summary:"An Omega-3 fatty acid that supports normal brain and vision function."},
+      {symbol:"A", name:"Vitamin A", strength:"900 mcg", summary:"Supports normal vision, immune function and skin health."},
+      {symbol:"B6", name:"Vitamin B6", strength:"1 mg", summary:"Supports normal energy metabolism and nervous-system function."},
+      {symbol:"C", name:"Vitamin C", strength:"40 mg", summary:"Provides antioxidant support and contributes to normal immune function."},
+      {symbol:"D3", name:"Vitamin D3", strength:"400 IU", summary:"Supports normal bones, muscles and immune function."},
+      {symbol:"E", name:"Vitamin E", strength:"15 mg", summary:"An antioxidant nutrient that helps protect cells from oxidative stress."},
+      {symbol:"F", name:"Folic Acid", strength:"400 mcg", summary:"Supports normal red blood cell formation and maternal tissue growth."},
+      {symbol:"Se", name:"Selenium", strength:"40 mcg", summary:"Contributes to antioxidant defence and normal immune function."},
+      {symbol:"Mg", name:"Magnesium", strength:"2 mg", summary:"Supports normal muscle and nerve function."},
+      {symbol:"Cr", name:"Chromium", strength:"35 mcg", summary:"Contributes to normal macronutrient metabolism."},
+      {symbol:"Cu", name:"Copper", strength:"1 mg", summary:"Supports normal connective tissue, iron transport and antioxidant defence."},
+      {symbol:"Zn", name:"Zinc Sulphate", strength:"7.5 mg", summary:"Supports normal immune function, skin health and cell protection."}
     ],
     benefits: [
-      {symbol:"🧠", title:"Healthy brain function", text:"Supports healthy brain function and cognitive performance."},
-      {symbol:"👁", title:"Vision and eye health", text:"Promotes normal vision and helps maintain eye health."},
-      {symbol:"🛡", title:"Immune system", text:"Strengthens the immune system."},
-      {symbol:"AO", title:"Antioxidant protection", text:"Provides antioxidant protection against free radical damage."},
-      {symbol:"♥", title:"Cardiovascular health", text:"Supports cardiovascular health."},
-      {symbol:"SK", title:"Skin and hair", text:"Helps maintain healthy skin and hair."},
-      {symbol:"BM", title:"Bones and muscles", text:"Promotes healthy bones and muscles."},
-      {symbol:"⚡", title:"Energy metabolism", text:"Supports normal energy metabolism and reduces nutritional deficiencies."},
-      {symbol:"N", title:"Nerve function", text:"Helps maintain healthy nerve function."},
-      {symbol:"RBC", title:"Red blood cell formation", text:"Supports red blood cell formation and overall vitality."}
+      {symbol:"🧠", title:"Brain and nerve support", text:"Supports healthy brain function, cognitive performance and normal nerve function."},
+      {symbol:"👁", title:"Vision support", text:"Promotes normal vision and helps maintain eye health."},
+      {symbol:"🛡", title:"Immune and antioxidant support", text:"Supports immune function and antioxidant protection against free radical damage."},
+      {symbol:"♥", title:"Cardiovascular wellness", text:"Supports heart health and healthy blood circulation."},
+      {symbol:"⚡", title:"Energy and vitality", text:"Supports normal energy metabolism, red blood cell formation and overall vitality."},
+      {symbol:"🦴", title:"Bones and muscles", text:"Supports healthy bones, muscles, skin and hair."}
     ],
     directions: [
-      {label:"Adults", value:"One (1) tablet daily after meals", text:"Take one (1) tablet daily after meals, or as directed by your healthcare professional."}
+      {label:"Adults", value:"1 tablet daily", text:"Take one tablet daily after meals, or as directed by your healthcare professional."},
+      {label:"Dosage form", value:"Film-coated tablet", text:"Designed for convenient daily use and easy swallowing."},
+      {label:"Responsible use", value:"Follow professional advice", text:"Do not exceed the recommended daily dose."}
     ],
     storage: [
-      {symbol:"30°", title:"Cool, dry place", text:"Store in a cool, dry place below 30°C."},
-      {symbol:"☀", title:"Protect from sunlight and moisture", text:"Protect from direct sunlight and moisture."},
+      {symbol:"30°", title:"Cool, dry storage", text:"Store in a cool, dry place below 30°C."},
+      {symbol:"☀", title:"Protect from sunlight", text:"Protect from direct sunlight and moisture."},
       {symbol:"🔒", title:"Keep tightly closed", text:"Keep the bottle tightly closed after use."}
     ],
-    highlights: [
-      "Premium Omega-3 (EPA & DHA) formulation.",
-      "Comprehensive multivitamin and multimineral supplement.",
-      "Manufactured in India under GMP-certified facilities.",
-      "Film-coated tablet for easy swallowing.",
-      "High-quality ingredients for maximum nutritional support.",
-      "Suitable for everyday wellness and nutritional maintenance."
-    ],
-    warnings: [
-      "Do not exceed the recommended daily dose.",
-      "Food supplements should not be used as a substitute for a varied and balanced diet.",
-      "Keep out of reach of children.",
-      "Consult your physician before use if you are pregnant, nursing, taking medication, or have any medical condition.",
-      "Do not use if the seal is broken or missing."
-    ],
-    faqs: []
+    highlights: ["Premium Omega-3 (EPA and DHA) formulation","Comprehensive multivitamin and multimineral support","GMP-certified manufacturing","Film-coated tablet for easy swallowing","High-quality ingredients","Suitable for everyday wellness"],
+    warnings: ["Do not exceed the recommended daily dose.","Food supplements should not be used as a substitute for a varied and balanced diet.","Keep out of reach of children.","Consult your physician before use if you are pregnant, nursing, taking medication or have any medical condition.","Do not use if the seal is broken or missing."],
+    faqs: [
+      {question:"What is Aspivit Tablet?", answer:"Aspivit is a daily Omega-3, multivitamin and multimineral supplement formulated to support overall health and wellbeing."},
+      {question:"How should I take Aspivit?", answer:"Adults should take one tablet daily after meals, or as directed by a healthcare professional."},
+      {question:"How many tablets are in one pack?", answer:"Each bottle contains 30 film-coated tablets."},
+      {question:"Can pregnant or breastfeeding women use it?", answer:"Consult a healthcare professional before use during pregnancy or breastfeeding."}
+    ]
   },
   {
     slug: "asfenositol", name: "AsFenositol Tablet", category: "Fertility and women’s reproductive wellness",
     summary: "A premium fertility-support formulation with Myo-Inositol, active folate, active Vitamin B6 and Vitamin D3.",
     indication: "Scientifically formulated nutritional support for female reproductive wellness.",
-    image: "/images/products/asfenositol.png", detailImage: "/images/product-details/asfenositol.jpg", priceKobo: 600000, packSize: "1 × 10 tablets", theme: "teal",
+    image: "/images/products/asfenositol.png", priceKobo: 600000, packSize: "1 × 10 tablets", theme: "teal",
     overview: "AsFenositol Tablet is a scientifically formulated fertility support supplement containing Myo-Inositol, L-Methylfolate, Pyridoxal-5-Phosphate and Vitamin D3 to support female reproductive health and ovulatory function.",
     description: [
       "AsFenositol Tablet is a premium fertility-support formulation developed to provide essential reproductive nutrients for women trying to conceive. The combination of Myo-Inositol, L-Methylfolate, Pyridoxal-5-Phosphate and Vitamin D3 works together to support ovarian function, menstrual regularity, hormonal balance and overall reproductive wellness.",
@@ -144,12 +139,11 @@ export const PRODUCTS: Product[] = [
       {question:"How many tablets are in one pack?", answer:"Each pack contains 10 tablets."}
     ], nafdac:"A7-102870"
   },
-<<<<<<< HEAD
   {
     slug: "globivida", name: "Globivida Capsules", category: "Advanced sickle cell wellness formula",
     summary: "A premium nutritional formulation for antioxidant, blood-health, immune and daily wellness support.",
     indication: "Supporting wellness in individuals living with sickle cell disease.",
-    image: "/images/products/globivida.png", detailImage: "/images/product-details/globivida.jpg", priceKobo: 1500000, packSize: "30 capsules", theme: "red",
+    image: "/images/products/globivida.png", priceKobo: 1500000, packSize: "30 capsules", theme: "red",
     overview: "Globivida Capsules is an advanced nutritional formulation developed to support individuals living with sickle cell disorder. Its selected ingredients support healthy red blood cell function, antioxidant defence, immune function and overall wellbeing.",
     description: [
       "Globivida Capsules is a premium nutritional supplement specially formulated to support individuals living with sickle cell disorder. The advanced formula combines botanical extracts, amino acids, vitamins, minerals and antioxidants that work together to support healthy red blood cells, immune health and cellular protection from oxidative stress.",
@@ -218,7 +212,7 @@ export const PRODUCTS: Product[] = [
     slug: "herbal-bitter-tea", name: "Bridgecare Herbal Bitter Tea", category: "100% natural herbal wellness tea",
     summary: "A herbal infusion made from 100% Hunteria umbellata (Abere seed) for metabolic and general wellness support.",
     indication: "Naturally supporting healthy blood sugar metabolism and everyday wellness.",
-    image: "/images/products/herbal-bitter-tea.png", detailImage: "/images/product-details/herbal-bitter-tea.jpg", priceKobo: 550000, packSize: "25 tea bags", theme: "green",
+    image: "/images/products/herbal-bitter-tea.png", priceKobo: 550000, packSize: "25 tea bags", theme: "green",
     overview: "Bridgecare Herbal Bitter Tea is a carefully formulated herbal infusion made from 100% Hunteria umbellata (Abere seed), traditionally recognized for supporting healthy blood sugar metabolism and overall wellness.",
     description: [
       "Bridgecare Herbal Bitter Tea provides a convenient and natural way to enjoy the traditional wellness-supporting properties of Hunteria umbellata. Each tea bag delivers premium-quality herbal material for use as part of a healthy lifestyle.",
@@ -269,17 +263,6 @@ export const PRODUCTS: Product[] = [
       {question:"Can I use it with diabetes medication?", answer:"Consult your healthcare provider before use because blood sugar should be monitored and medication may require professional review."}
     ], nafdac:"Approved"
   }
-=======
-  ...[
-    ["aspivit","Aspivit®","Daily nutrition","Omega-3 fatty acids, essential vitamins and trace minerals to support overall health and wellbeing.","/images/products/aspivit.png",800000,"gold"],
-    ["globivida","Globivida®","Specialized support","A blend of botanical extracts, amino acids, vitamins and minerals.","/images/products/globivida.png",1500000,"red"],
-    ["herbal-bitter-tea","Bridgecare Herbal Bitter Tea®","Herbal wellness","Herbal tea prepared from 100% Hunteria umbellata.","/images/products/herbal-bitter-tea.png",550000,"green"]
-  ].map(([slug,name,category,summary,image,priceKobo,theme]) => ({
-    slug: slug as string, name: name as string, category: category as string, summary: summary as string,
-    indication: summary as string, image: image as string, priceKobo: priceKobo as number, packSize:"See pack", theme:theme as string,
-    overview:"Detailed approved product information is being structured from the supplied pack artwork.", reasons:[], ingredients:[], benefits:[], directions:[], storage:[], warnings:["Read the physical pack before use and consult a healthcare professional where appropriate."], faqs:[]
-  }))
->>>>>>> 4de5209434a8553b39e5c653159c4090b31bb20c
 ];
 
 export const PRODUCT_BY_SLUG = Object.fromEntries(PRODUCTS.map(product => [product.slug, product]));
