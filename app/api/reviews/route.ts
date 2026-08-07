@@ -1,71 +1,24 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { PRODUCT_BY_SLUG } from "@/data/products";
 
-const schema = z.object({
-  productSlug: z.string().min(1),
-  customerName: z.string().trim().min(2).max(80),
-  customerEmail: z.string().trim().email().max(160),
-  city: z.string().trim().max(80).optional().or(z.literal("")),
-  orderNumber: z.string().trim().max(80).optional().or(z.literal("")),
-  rating: z.coerce.number().int().min(1).max(5),
-  title: z.string().trim().max(120).optional().or(z.literal("")),
-  body: z.string().trim().min(12).max(2000),
-  imageUrls: z.array(z.string().url()).max(3).default([]),
-});
+const paidStatuses = ["PAID","PROCESSING","PACKED","DISPATCHED","DELIVERED"] as const;
+const clean = (value: unknown, max: number) => String(value ?? "").trim().slice(0, max);
 
 export async function POST(request: Request) {
-  try {
-    const input = schema.parse(await request.json());
-    const product = PRODUCT_BY_SLUG[input.productSlug];
-    if (!product) return NextResponse.json({ error: "Product not found." }, { status: 404 });
-
-    const email = input.customerEmail.toLowerCase();
-    let verifiedPurchase = false;
-    if (input.orderNumber) {
-      const order = await prisma.order.findFirst({
-        where: {
-          orderNumber: input.orderNumber,
-          customerEmail: { equals: email, mode: "insensitive" },
-          status: { in: ["PAID", "PROCESSING", "PACKED", "DISPATCHED", "DELIVERED"] },
-          items: { some: { productSlug: input.productSlug } },
-        },
-        select: { id: true },
-      });
-      verifiedPurchase = Boolean(order);
-    }
-
-    const recentDuplicate = await prisma.productReview.findFirst({
-      where: {
-        customerEmail: { equals: email, mode: "insensitive" },
-        productSlug: input.productSlug,
-        createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
-      },
-      select: { id: true },
-    });
-    if (recentDuplicate) return NextResponse.json({ error: "A review for this product was already submitted recently." }, { status: 409 });
-
-    await prisma.productReview.create({
-      data: {
-        productSlug: input.productSlug,
-        productName: product.name,
-        customerName: input.customerName,
-        customerEmail: email,
-        city: input.city || null,
-        orderNumber: input.orderNumber || null,
-        rating: input.rating,
-        title: input.title || null,
-        body: input.body,
-        verifiedPurchase,
-        images: { create: input.imageUrls.map((imageUrl) => ({ imageUrl, altText: `${product.name} customer review image` })) },
-      },
-    });
-
-    return NextResponse.json({ ok: true, verifiedPurchase, message: "Thank you. Your review is awaiting approval." });
-  } catch (error) {
-    if (error instanceof z.ZodError) return NextResponse.json({ error: error.issues[0]?.message || "Please check the form." }, { status: 400 });
-    console.error("review submission failed", error);
-    return NextResponse.json({ error: "Unable to submit your review right now." }, { status: 500 });
+  if (!process.env.DATABASE_URL) return NextResponse.json({ error: "Reviews are temporarily unavailable." }, { status: 503 });
+  const body = await request.json().catch(() => null); if (!body) return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  const productSlug = clean(body.productSlug, 80); const product = PRODUCT_BY_SLUG[productSlug];
+  const customerName = clean(body.customerName, 80); const customerEmail = clean(body.customerEmail, 160).toLowerCase(); const reviewBody = clean(body.body, 2000); const rating = Number(body.rating);
+  if (!product || !customerName || !customerEmail.includes("@") || reviewBody.length < 10 || !Number.isInteger(rating) || rating < 1 || rating > 5) return NextResponse.json({ error: "Please complete all required review fields." }, { status: 400 });
+  const orderNumber = clean(body.orderNumber, 80);
+  let verifiedPurchase = false;
+  if (orderNumber) {
+    const order = await prisma.order.findFirst({ where: { orderNumber: { equals: orderNumber, mode: "insensitive" }, customerEmail: { equals: customerEmail, mode: "insensitive" }, status: { in: [...paidStatuses] }, items: { some: { productSlug } } }, select: { id: true } });
+    verifiedPurchase = Boolean(order);
   }
+  const recent = await prisma.productReview.count({ where: { customerEmail, productSlug, createdAt: { gte: new Date(Date.now() - 24*60*60*1000) } } });
+  if (recent >= 2) return NextResponse.json({ error: "You have already submitted a recent review for this product." }, { status: 429 });
+  await prisma.productReview.create({ data: { productSlug, productName: product.name, customerName, customerEmail, city: clean(body.city,80) || null, orderNumber: orderNumber || null, rating, title: clean(body.title,120) || null, body: reviewBody, verifiedPurchase } });
+  return NextResponse.json({ ok: true });
 }

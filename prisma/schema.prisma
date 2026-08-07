@@ -383,3 +383,28 @@ model ProductReviewImage {
 
   @@index([reviewId, sortOrder])
 }
+
+
+enum QuestionStatus {
+  PENDING
+  ANSWERED
+  ARCHIVED
+}
+
+model ProductQuestion {
+  id            String         @id @default(cuid())
+  productSlug   String
+  productName   String
+  customerName  String
+  customerEmail String
+  question      String
+  status        QuestionStatus @default(PENDING)
+  answer        String?
+  answeredAt    DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([productSlug, status, createdAt])
+  @@index([status, createdAt])
+  @@index([customerEmail, createdAt])
+}

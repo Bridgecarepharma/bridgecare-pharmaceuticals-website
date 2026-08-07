@@ -8,6 +8,7 @@ import { formatNaira } from "@/lib/store";
 import { BadgeCheck, Headphones, LockKeyhole, Truck } from "lucide-react";
 import type { Product } from "@/data/products";
 import { PRODUCTS } from "@/data/products";
+import { ProductCommunitySection } from "./ProductCommunitySection";
 
 export function PremiumProductPage({ product }: { product: Product }) {
   const complete = product.ingredients.length > 0;
@@ -27,6 +28,7 @@ export function PremiumProductPage({ product }: { product: Product }) {
     <section className="section" id="faq"><div className="container product-content-narrow"><SectionTitle eyebrow="Frequently asked questions" title="Helpful answers before purchase"/><div className="faq-list">{product.faqs.length ? product.faqs.map(f=><details key={f.question}><summary>{f.question}</summary><p>{f.answer}</p></details>) : <details><summary>Where can I find the complete approved information?</summary><p>Read the physical product pack or contact Bridgecare customer support.</p></details>}</div></div></section>
     <section className="section product-tint"><div className="container"><SectionTitle eyebrow="Resources" title="Product support and information"/><div className="resource-grid"><Link href="/downloads" className="resource-card"><BrandIcon symbol="PDF"/><h3>Product resources</h3><p>Access available product and corporate downloads.</p></Link><Link href="/contact" className="resource-card"><BrandIcon symbol="?"/><h3>Need more information?</h3><p>Speak with Bridgecare customer support.</p></Link></div></div></section>
     <section className="section"><div className="container"><SectionTitle eyebrow="Related products" title="Explore more from Bridgecare"/><div className="related-grid">{related.map(p=><Link href={`/products/${p.slug}`} className="related-product" key={p.slug}><span className="related-image"><Image src={p.image} alt="" fill sizes="180px"/></span><strong>{p.name}</strong><small>{formatNaira(p.priceKobo)}</small></Link>)}</div></div></section>
+    <ProductCommunitySection productSlug={product.slug} productName={product.name} />
     <section className="product-closing-cta"><div className="container product-closing-grid"><div><span className="eyebrow">Shop directly from Bridgecare</span><h2>Order {product.name} securely</h2><p>Clear delivery fees and free shipping when your basket contains any three packs or more.</p></div><div className="closing-purchase"><strong>{formatNaira(product.priceKobo)}</strong><AddToCartButton slug={product.slug} name={product.name} priceKobo={product.priceKobo}/><Link className="button secondary" href="/products">Explore all products</Link></div></div></section>
   </main>;
 }
