@@ -1,0 +1,385 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PROCESSING
+  PACKED
+  DISPATCHED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  ABANDONED
+  REFUNDED
+}
+
+enum InventoryMovementType {
+  OPENING_STOCK
+  RESTOCK
+  SALE
+  ADJUSTMENT
+  RETURN
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+
+  @@index([phone])
+  @@index([createdAt])
+}
+
+model Order {
+  id                     String      @id @default(cuid())
+  orderNumber            String      @unique
+  paystackReference      String      @unique
+  status                 OrderStatus @default(PENDING_PAYMENT)
+  currency               String      @default("NGN")
+  subtotalKobo           Int
+  shippingKobo           Int
+  discountKobo           Int         @default(0)
+  couponCode             String?
+  totalKobo              Int
+  customerId             String?
+  customerName           String
+  customerEmail          String
+  customerPhone          String
+  recipientName          String
+  recipientPhone         String
+  addressLine1           String
+  addressLine2           String?
+  landmark               String?
+  city                   String
+  lga                    String
+  state                  String
+  postalCode             String?
+  deliveryInstructions   String?
+  deliveryMethod         String
+  trackingNumber         String?
+  internalNotes          String?
+  paymentChannel         String?
+  paystackTransactionId  String?     @unique
+  paidAt                 DateTime?
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+  customer               Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items                  OrderItem[]
+  payment                Payment?
+  webhookEvents          PaymentWebhookEvent[]
+  statusHistory          OrderStatusHistory[]
+  couponRedemption       CouponRedemption?
+
+  @@index([status, createdAt])
+  @@index([customerEmail])
+  @@index([customerId])
+}
+
+model OrderItem {
+  id             String @id @default(cuid())
+  orderId        String
+  productSlug    String
+  productName    String
+  quantity       Int
+  unitPriceKobo  Int
+  lineTotalKobo  Int
+  order          Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([productSlug])
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  orderId               String        @unique
+  provider              String        @default("paystack")
+  reference             String        @unique
+  amountKobo            Int
+  currency              String        @default("NGN")
+  status                PaymentStatus @default(PENDING)
+  channel               String?
+  providerTransactionId String?       @unique
+  paidAt                DateTime?
+  rawEvent              Json?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  order                 Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+}
+
+model PaymentWebhookEvent {
+  id                    String   @id @default(cuid())
+  eventKey              String   @unique
+  eventType             String
+  reference             String?
+  providerTransactionId String?
+  status                String
+  payload               Json
+  processedAt           DateTime?
+  createdAt             DateTime @default(now())
+  orderId               String?
+  order                 Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([reference])
+  @@index([status, createdAt])
+  @@index([orderId])
+}
+
+model OrderStatusHistory {
+  id        String      @id @default(cuid())
+  orderId   String
+  status    OrderStatus
+  note      String?
+  createdAt DateTime    @default(now())
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+}
+
+model AdminAuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+model Inventory {
+  id           String   @id @default(cuid())
+  productSlug  String   @unique
+  productName  String
+  sku          String   @unique
+  stock        Int      @default(0)
+  priceKobo    Int      @default(0)
+  reorderLevel Int      @default(10)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  movements    InventoryMovement[]
+
+  @@index([stock])
+  @@index([isActive])
+}
+
+model InventoryMovement {
+  id           String                @id @default(cuid())
+  inventoryId  String
+  type         InventoryMovementType
+  quantity     Int
+  balanceAfter Int
+  reference    String?
+  note         String?
+  createdBy    String                @default("system")
+  createdAt    DateTime              @default(now())
+  inventory    Inventory             @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+
+  @@index([inventoryId, createdAt])
+  @@index([reference])
+}
+
+model ShippingZone {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  priceKobo Int
+  states    Json
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model ShippingSetting {
+  id                    String   @id
+  freeShippingPackCount Int      @default(3)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model HealthCategory {
+  id          String          @id @default(cuid())
+  name        String          @unique
+  slug        String          @unique
+  description String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  articles    HealthArticle[]
+
+  @@index([name])
+}
+
+model HealthTag {
+  id        String             @id @default(cuid())
+  name      String             @unique
+  slug      String             @unique
+  createdAt DateTime           @default(now())
+  articles  HealthArticleTag[]
+
+  @@index([name])
+}
+
+model HealthArticle {
+  id               String             @id @default(cuid())
+  title            String
+  slug             String             @unique
+  excerpt          String
+  contentHtml      String
+  featuredImageUrl String?
+  featuredImageAlt String?
+  authorName       String             @default("Bridgecare Health Team")
+  status           ArticleStatus      @default(DRAFT)
+  isFeatured       Boolean            @default(false)
+  seoTitle         String?
+  metaDescription  String?
+  publishedAt      DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  categoryId       String?
+  category         HealthCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags             HealthArticleTag[]
+
+  @@index([status, publishedAt])
+  @@index([categoryId, status])
+  @@index([isFeatured, status])
+}
+
+model HealthArticleTag {
+  articleId String
+  tagId     String
+  article   HealthArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       HealthTag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+}
+
+
+enum CouponType {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FREE_SHIPPING
+}
+
+enum CouponRedemptionStatus {
+  PENDING
+  REDEEMED
+  CANCELLED
+}
+
+model Coupon {
+  id                       String             @id @default(cuid())
+  code                     String             @unique
+  name                     String
+  description              String?
+  type                     CouponType
+  percentageBasisPoints    Int                @default(0)
+  valueKobo                Int                @default(0)
+  minimumSubtotalKobo      Int                @default(0)
+  maximumDiscountKobo      Int?
+  startsAt                 DateTime?
+  expiresAt                DateTime?
+  usageLimit               Int?
+  usesCount                Int                @default(0)
+  perCustomerLimit         Int                @default(1)
+  firstOrderOnly           Boolean            @default(false)
+  applicableProductSlugs   Json?
+  isActive                 Boolean            @default(true)
+  createdAt                DateTime           @default(now())
+  updatedAt                DateTime           @updatedAt
+  redemptions              CouponRedemption[]
+
+  @@index([isActive, startsAt, expiresAt])
+  @@index([createdAt])
+}
+
+model CouponRedemption {
+  id                    String                   @id @default(cuid())
+  couponId              String
+  orderId               String                   @unique
+  customerEmail         String
+  discountKobo          Int
+  shippingDiscountKobo  Int                      @default(0)
+  status                CouponRedemptionStatus   @default(PENDING)
+  createdAt             DateTime                 @default(now())
+  redeemedAt            DateTime?
+  coupon                 Coupon                   @relation(fields: [couponId], references: [id], onDelete: Restrict)
+  order                  Order                    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([couponId, status, createdAt])
+  @@index([customerEmail, couponId, status])
+}
+
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ARCHIVED
+}
+
+model ProductReview {
+  id               String               @id @default(cuid())
+  productSlug      String
+  productName      String
+  customerName     String
+  customerEmail    String
+  city             String?
+  orderNumber      String?
+  rating           Int
+  title            String?
+  body             String
+  status           ReviewStatus         @default(PENDING)
+  verifiedPurchase Boolean              @default(false)
+  isFeatured       Boolean              @default(false)
+  adminReply       String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  images           ProductReviewImage[]
+
+  @@index([productSlug, status, createdAt])
+  @@index([isFeatured, status])
+  @@index([customerEmail, productSlug, createdAt])
+}
+
+model ProductReviewImage {
+  id        String        @id @default(cuid())
+  reviewId  String
+  imageUrl  String
+  altText   String?
+  sortOrder Int           @default(0)
+  createdAt DateTime      @default(now())
+  review    ProductReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId, sortOrder])
+}

@@ -1,0 +1,1 @@
+import type {MetadataRoute} from "next";export default function robots():MetadataRoute.Robots{const b=process.env.NEXT_PUBLIC_SITE_URL||"https://www.bridgecarepharma.com";return{rules:{userAgent:"*",allow:"/"},sitemap:`${b}/sitemap.xml`}}

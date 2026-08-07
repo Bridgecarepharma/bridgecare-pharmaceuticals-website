@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Payment Successful | Bridgecare Pharmaceuticals</title>
+  <style>
+    :root {
+      --brand: #0b7a53;
+      --brand-dark: #07583d;
+      --accent: #eaf8f2;
+      --text: #1d2a25;
+      --muted: #66736d;
+      --white: #ffffff;
+      --border: #dfe9e4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #f8fbfa, #edf7f3);
+      color: var(--text);
+    }
+    .card {
+      width: 100%;
+      max-width: 620px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 38px 28px;
+      text-align: center;
+      box-shadow: 0 18px 50px rgba(16, 76, 57, 0.12);
+    }
+    .brand { color: var(--brand); font-weight: 700; margin-bottom: 24px; }
+    .icon {
+      width: 82px; height: 82px; border-radius: 50%;
+      margin: 0 auto 22px; display: grid; place-items: center;
+      background: var(--accent); color: var(--brand);
+      font-size: 44px; font-weight: 700; border: 2px solid #cfeee1;
+    }
+    h1 { margin: 0 0 12px; font-size: clamp(28px, 5vw, 40px); }
+    p { color: var(--muted); font-size: 17px; line-height: 1.65; }
+    .reference {
+      display: none; margin: 18px auto 24px; padding: 14px 16px;
+      background: #f7faf8; border: 1px solid var(--border); border-radius: 12px;
+      word-break: break-word;
+    }
+    .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 50px; padding: 0 22px; border-radius: 12px;
+      text-decoration: none; font-weight: 700;
+    }
+    .primary { background: var(--brand); color: white; }
+    .secondary { color: var(--brand-dark); border: 1px solid var(--border); }
+    .note { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--border); font-size: 14px; }
+    @media (max-width: 520px) {
+      .card { padding: 30px 20px; }
+      .actions { flex-direction: column; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="brand">Bridgecare Pharmaceuticals Limited</div>
+    <div class="icon">✓</div>
+    <h1>Payment successful</h1>
+    <p>Thank you for your purchase. Your order has been received successfully.</p>
+    <div class="reference" id="referenceBox">
+      Payment reference: <strong id="paymentReference"></strong>
+    </div>
+    <div class="actions">
+      <a class="btn primary" href="https://bridgecarepharmang.com/">Return to homepage</a>
+      <a class="btn secondary" href="https://wa.link/bridgecarepharmaltd" target="_blank" rel="noopener noreferrer">
+        Contact us on WhatsApp
+      </a>
+    </div>
+    <p class="note">
+      Customer support: +234 807 773 3373 · info@bridgecarepharmang.com
+    </p>
+  </main>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const reference = params.get('reference') || params.get('trxref') || params.get('transaction_id');
+    if (reference) {
+      document.getElementById('paymentReference').textContent = reference;
+      document.getElementById('referenceBox').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

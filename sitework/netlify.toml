@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--include=dev"
+
+# Required Netlify environment variables:
+# DATABASE_URL, DIRECT_URL, PAYSTACK_SECRET_KEY, NEXT_PUBLIC_SITE_URL,
+# ADMIN_PASSWORD, ADMIN_SESSION_SECRET
+# Set ALLOW_PAYSTACK_FALLBACK=false for integrated checkout only.
