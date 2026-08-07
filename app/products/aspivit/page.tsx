@@ -82,6 +82,19 @@ export default async function Page() {
 
       <h2>Warnings</h2>
       <ul><li>Do not exceed the recommended daily dose.</li><li>Food supplements should not be used as a substitute for a varied and balanced diet.</li><li>Keep out of reach of children.</li><li>Consult your physician before use if you are pregnant, nursing, taking medication, or have any medical condition.</li><li>Do not use if the seal is broken or missing.</li></ul>
+      <div style={{ marginTop: "3rem" }}>
+        <h2>Aspivit product flyer</h2>
+        <div style={{ position: "relative", width: "100%", maxWidth: "900px", margin: "1.25rem auto 0" }}>
+          <Image
+            src="/images/products/aspivit-flyer.png"
+            alt="Aspivit Tablet product information flyer"
+            width={1024}
+            height={1536}
+            sizes="(max-width: 900px) 100vw, 900px"
+            style={{ width: "100%", height: "auto", borderRadius: "18px" }}
+          />
+        </div>
+      </div>
     </div></section>
   </>;
 }
