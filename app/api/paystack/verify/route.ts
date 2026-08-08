@@ -123,8 +123,25 @@ export async function GET(request: Request) {
         expectedCurrency,
         providerStatus,
       });
+      // Safe production diagnostic: exposes only transaction/order comparison
+      // values, never the Paystack secret, customer data, or card information.
       return NextResponse.json(
-        { paid: false, retryable: false, error: "Payment details did not match this order. Please contact support." },
+        {
+          paid: false,
+          retryable: false,
+          error: "Payment details did not match this order. Please contact support.",
+          diagnostic: {
+            referenceMatches: String(result.data.reference || "") === reference,
+            providerStatus,
+            receivedAmountKobo: receivedAmount,
+            expectedOrderAmountKobo: expectedAmount,
+            expectedPaymentAmountKobo: Number(order.payment?.amountKobo ?? expectedAmount),
+            receivedCurrency,
+            expectedCurrency,
+            metadataOrderIdMatches: String(result.data.metadata?.order_id || "") === order.id,
+            metadataTotalKobo: Number(result.data.metadata?.total_kobo || 0),
+          },
+        },
         { status: 409 },
       );
     }
