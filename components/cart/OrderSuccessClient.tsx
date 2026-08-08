@@ -50,22 +50,40 @@ export function OrderSuccessClient(){
  const {clear}=useCart();const[order,setOrder]=useState<Order|null>(null);const[error,setError]=useState("");const[loading,setLoading]=useState(true);
  useEffect(()=>{
   if(!reference){setError("The payment reference is missing.");setLoading(false);return}
+  let cancelled=false;
   let cancelPurchaseRetry:(()=>void)|undefined;
-  fetch(`/api/paystack/verify?reference=${encodeURIComponent(reference)}`,{cache:"no-store"})
-   .then(r=>r.json().then(x=>({ok:r.ok,x})))
-   .then(({ok,x})=>{
-    if(!ok||!x.paid)throw new Error(x.error||"Payment has not been confirmed.");
-    const verifiedOrder=x.order as Order;
-    if(!verifiedOrder?.paystackReference||!verifiedOrder?.totalKobo)throw new Error("The verified order is incomplete.");
-    // Fire Meta Purchase at the exact point server-side Paystack verification has
-    // returned paid:true. Do this before cart/context changes can trigger re-renders.
-    cancelPurchaseRetry=fireVerifiedPurchase(verifiedOrder);
-    setOrder(verifiedOrder);
-    clear();
-   })
-   .catch(e=>setError(e.message))
-   .finally(()=>setLoading(false));
-  return()=>{cancelPurchaseRetry?.()};
+  const verify=async()=>{
+   const maxAttempts=10;
+   for(let attempt=1;attempt<=maxAttempts&&!cancelled;attempt+=1){
+    try{
+     const r=await fetch(`/api/paystack/verify?reference=${encodeURIComponent(reference)}`,{cache:"no-store"});
+     const x=await r.json();
+     if(r.ok&&x.paid){
+      const verifiedOrder=x.order as Order;
+      if(!verifiedOrder?.paystackReference||!verifiedOrder?.totalKobo)throw new Error("The verified order is incomplete.");
+      cancelPurchaseRetry=fireVerifiedPurchase(verifiedOrder);
+      if(cancelled)return;
+      setOrder(verifiedOrder);
+      clear();
+      setLoading(false);
+      return;
+     }
+     if(x.retryable&&attempt<maxAttempts){
+      await new Promise(resolve=>window.setTimeout(resolve,1500));
+      continue;
+     }
+     throw new Error(x.error||"Payment has not been confirmed.");
+    }catch(e){
+     if(attempt<maxAttempts){
+      await new Promise(resolve=>window.setTimeout(resolve,1500));
+      continue;
+     }
+     if(!cancelled){setError(e instanceof Error?e.message:"Unable to verify payment.");setLoading(false)}
+    }
+   }
+  };
+  void verify();
+  return()=>{cancelled=true;cancelPurchaseRetry?.()};
  // clear is intentionally omitted so clearing the cart does not trigger repeated verification.
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[reference]);
