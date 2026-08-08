@@ -58,7 +58,19 @@ export async function GET(request: Request) {
       const expectedAmount = Number(order.totalKobo);
       const receivedCurrency = normalizedCurrency(result.data.currency);
       const expectedCurrency = normalizedCurrency(order.currency || "NGN");
-      const amountMatches = Number.isFinite(receivedAmount) && receivedAmount === expectedAmount;
+      const metadataOrderId = String(result.data.metadata?.order_id || "");
+      const metadataTotalKobo = Number(result.data.metadata?.total_kobo);
+      const metadataMatchesOrder =
+        metadataOrderId === order.id &&
+        Number.isFinite(metadataTotalKobo) &&
+        metadataTotalKobo === expectedAmount;
+      // Paystack may add a customer-borne transaction fee to the final charge.
+      // Keep the Bridgecare DB total + signed Paystack metadata as the canonical
+      // merchant order amount, while allowing the provider charge to be higher.
+      const amountMatches =
+        Number.isFinite(receivedAmount) &&
+        receivedAmount >= expectedAmount &&
+        metadataMatchesOrder;
       const currencyMatches = receivedCurrency === expectedCurrency;
       const providerSucceeded = providerStatus === "success";
       const paid = providerSucceeded && amountMatches && currencyMatches;
@@ -138,8 +150,8 @@ export async function GET(request: Request) {
             expectedPaymentAmountKobo: Number(order.payment?.amountKobo ?? expectedAmount),
             receivedCurrency,
             expectedCurrency,
-            metadataOrderIdMatches: String(result.data.metadata?.order_id || "") === order.id,
-            metadataTotalKobo: Number(result.data.metadata?.total_kobo || 0),
+            metadataOrderIdMatches: metadataOrderId === order.id,
+            metadataTotalKobo,
           },
         },
         { status: 409 },
