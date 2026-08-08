@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { MetaProductView } from "@/components/analytics/MetaCommerceEvents";
 import Link from "next/link";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { formatNaira } from "@/lib/store";

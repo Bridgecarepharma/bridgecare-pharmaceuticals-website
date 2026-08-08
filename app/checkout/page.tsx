@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CheckCircle2, LockKeyhole, ShieldCheck, Truck } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatNaira } from "@/lib/store";
+import { MetaInitiateCheckout } from "@/components/analytics/MetaCommerceEvents";
 import {
   calculateShippingForZoneKobo,
   DEFAULT_FREE_SHIPPING_PACK_COUNT,
@@ -91,7 +92,7 @@ export default function CheckoutPage(){
 
  if(!items.length)return <section className="page-hero"><div className="container narrow"><h1>Your cart is empty</h1><p>Add products before checking out.</p><Link className="button" href="/products">Shop products</Link></div></section>;
 
- return <><section className="checkout-hero-v3"><div className="container"><div><span className="eyebrow">Secure checkout</span><h1>Complete your order</h1><p>Enter your contact and delivery information, review your order, then continue securely to Paystack.</p></div><div className="checkout-steps"><span className="active"><b>1</b>Details</span><i/><span><b>2</b>Payment</span><i/><span><b>3</b>Confirmation</span></div></div></section>
+ return <><MetaInitiateCheckout items={items} subtotalKobo={subtotalKobo}/><section className="checkout-hero-v3"><div className="container"><div><span className="eyebrow">Secure checkout</span><h1>Complete your order</h1><p>Enter your contact and delivery information, review your order, then continue securely to Paystack.</p></div><div className="checkout-steps"><span className="active"><b>1</b>Details</span><i/><span><b>2</b>Payment</span><i/><span><b>3</b>Confirmation</span></div></div></section>
  <section className="section checkout-section-v3"><div className="container checkout-grid"><form className="form checkout-form checkout-form-v3" onSubmit={submit}>
  <h2>Customer information</h2><div className="form-row"><label>Full name<input name="fullName" required autoComplete="name"/></label><label>Email<input name="email" type="email" required autoComplete="email" value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)}/></label></div><label>Phone number<input name="phone" required autoComplete="tel"/></label>
  <h2>Delivery address</h2><div className="form-row"><label>Recipient name<input name="recipientName" required/></label><label>Recipient phone<input name="recipientPhone" required/></label></div>

@@ -1,8 +1,10 @@
 import Image from "next/image";
+import { MetaProductView } from "@/components/analytics/MetaCommerceEvents";
 import Link from "next/link";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { formatNaira } from "@/lib/store";
 import { getProductPrice } from "@/lib/product-prices";
+import { ProductCommunitySection } from "@/components/product/ProductCommunitySection";
 
 export const metadata = {
   title: "Aspivit® | Omega-3, Vitamins & Minerals",
@@ -96,5 +98,6 @@ export default async function Page() {
         </div>
       </div>
     </div></section>
+    <ProductCommunitySection productSlug="aspivit" productName="Aspivit® Tablet" />
   </>;
 }

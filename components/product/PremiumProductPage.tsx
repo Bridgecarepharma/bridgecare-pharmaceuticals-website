@@ -9,11 +9,12 @@ import { BadgeCheck, Headphones, LockKeyhole, Truck } from "lucide-react";
 import type { Product } from "@/data/products";
 import { PRODUCTS } from "@/data/products";
 import { ProductCommunitySection } from "./ProductCommunitySection";
+import { MetaProductView } from "@/components/analytics/MetaCommerceEvents";
 
 export function PremiumProductPage({ product }: { product: Product }) {
   const complete = product.ingredients.length > 0;
   const related = PRODUCTS.filter(p => p.slug !== product.slug).slice(0,3);
-  return <main className={`product-page ${product.theme}-theme`}>
+  return <main className={`product-page ${product.theme}-theme`}><MetaProductView slug={product.slug} name={product.name} priceKobo={product.priceKobo}/>
     <section className="premium-product-hero"><div className="container premium-product-grid">
       <div className="premium-pack-stage"><div className="pack-halo"/><div className="premium-pack-image"><Image src={product.image} alt={`${product.name} product pack`} fill priority sizes="(max-width: 900px) 90vw, 46vw"/></div><div className="glass-pedestal"><span/></div></div>
       <div className="premium-product-copy"><span className="eyebrow">{product.category}</span><h1>{product.name}</h1><p className="approved-indication">Approved indication</p><h2>{product.indication}</h2><p className="lead">{product.summary}</p><div className="purchase-line"><strong>{formatNaira(product.priceKobo)}</strong><span>{product.packSize} per pack</span></div><div className="hero-actions"><AddToCartButton slug={product.slug} name={product.name} priceKobo={product.priceKobo}/><BuyNowButton slug={product.slug} name={product.name} priceKobo={product.priceKobo}/></div><div className="product-trust-badges"><span><LockKeyhole size={17}/><b>Secure Paystack</b><small>Protected payment</small></span><span><Truck size={17}/><b>Nationwide delivery</b><small>Rates shown at checkout</small></span><span><Headphones size={17}/><b>Customer support</b><small>Help when you need it</small></span><span><BadgeCheck size={17}/><b>Bridgecare direct</b><small>Order from the source</small></span></div></div>
