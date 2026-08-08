@@ -1,7 +1,6 @@
 "use client";
 
 import { Zap } from "lucide-react";
-import { trackMetaAddToCart } from "@/components/analytics/MetaCommerceEvents";
 
 type BuyNowButtonProps = {
   slug: string;
@@ -18,7 +17,6 @@ export function BuyNowButton({ slug, name, priceKobo }: BuyNowButtonProps) {
   function handleBuyNow() {
     const item = [{ slug, name, priceKobo, quantity: 1 }];
     window.localStorage.setItem("bridgecare-cart", JSON.stringify(item));
-    trackMetaAddToCart({ slug, name, priceKobo });
     window.location.assign("/checkout");
   }
 
