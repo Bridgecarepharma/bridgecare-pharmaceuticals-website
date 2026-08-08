@@ -4,7 +4,7 @@ import Script from "next/script";
 
 const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const clarityId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
-const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || "2746017509129064";
 
 export function MarketingAnalytics() {
   return (
