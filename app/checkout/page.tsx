@@ -2,10 +2,12 @@
 import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, LockKeyhole, ShieldCheck, Truck } from "lucide-react";
+import { CheckCircle2, LockKeyhole, Minus, Plus, ShieldCheck, ShoppingBag, Trash2, Truck } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatNaira } from "@/lib/store";
-import { MetaInitiateCheckout } from "@/components/analytics/MetaCommerceEvents";
+import { MetaInitiateCheckout, trackMetaAddToCart } from "@/components/analytics/MetaCommerceEvents";
+import { TikTokInitiateCheckout, trackTikTokAddToCart } from "@/components/analytics/TikTokCommerceEvents";
+import { PRODUCTS } from "@/data/products";
 import {
   calculateShippingForZoneKobo,
   DEFAULT_FREE_SHIPPING_PACK_COUNT,
@@ -19,7 +21,7 @@ type ShippingConfiguration = { zones: ShippingZoneView[]; freeShippingPackCount:
 type AppliedCouponView = { code: string; message: string; discountKobo: number; shippingDiscountKobo: number; totalDiscountKobo: number; totalKobo: number };
 
 export default function CheckoutPage(){
- const {items,subtotalKobo}=useCart();
+ const {items,subtotalKobo,add,remove,setQuantity}=useCart();
  const [state,setState]=useState("Lagos");
  const [shippingZoneCode,setShippingZoneCode]=useState("LAGOS");
  const [loading,setLoading]=useState(false);
@@ -30,6 +32,7 @@ export default function CheckoutPage(){
  const [couponError,setCouponError]=useState("");
  const [appliedCoupon,setAppliedCoupon]=useState<AppliedCouponView|null>(null);
  const [shipping,setShipping]=useState<ShippingConfiguration>({zones:DEFAULT_SHIPPING_ZONES,freeShippingPackCount:DEFAULT_FREE_SHIPPING_PACK_COUNT});
+ const [catalogPrices,setCatalogPrices]=useState<Record<string,number>>(()=>Object.fromEntries(PRODUCTS.map(product=>[product.slug,product.priceKobo])));
  const packCount=useMemo(()=>items.reduce((sum,item)=>sum+item.quantity,0),[items]);
  const activeZones=useMemo(()=>shipping.zones.filter(zone=>zone.isActive).sort((a,b)=>a.sortOrder-b.sortOrder),[shipping.zones]);
  const selectedZone=useMemo(()=>activeZones.find(zone=>zone.code===shippingZoneCode),[activeZones,shippingZoneCode]);
@@ -53,6 +56,15 @@ export default function CheckoutPage(){
   return()=>{active=false};
  },[]);
 
+ useEffect(()=>{
+  let active=true;
+  fetch("/api/products/prices",{cache:"no-store"})
+   .then(response=>response.ok?response.json():Promise.reject(new Error("Unable to load product prices")))
+   .then(data=>{if(active&&data?.prices)setCatalogPrices(current=>({...current,...data.prices}))})
+   .catch(()=>{});
+  return()=>{active=false};
+ },[]);
+
  useEffect(()=>{setAppliedCoupon(null);setCouponError("")},[subtotalKobo,shippingKobo,customerEmail]);
 
  async function applyCoupon(){
@@ -67,6 +79,12 @@ export default function CheckoutPage(){
    setAppliedCoupon(result);setCouponCode(result.code);
   }catch(e){setAppliedCoupon(null);setCouponError(e instanceof Error?e.message:"Unable to apply coupon.")}
   finally{setCouponLoading(false)}
+ }
+
+ function addExtraProduct(product:{slug:string;name:string;priceKobo:number}){
+  add(product);
+  trackMetaAddToCart(product);
+  trackTikTokAddToCart(product);
  }
 
  async function submit(event:FormEvent<HTMLFormElement>){
@@ -92,8 +110,11 @@ export default function CheckoutPage(){
 
  if(!items.length)return <section className="page-hero"><div className="container narrow"><h1>Your cart is empty</h1><p>Add products before checking out.</p><Link className="button" href="/products">Shop products</Link></div></section>;
 
- return <><MetaInitiateCheckout items={items} subtotalKobo={subtotalKobo}/><section className="checkout-hero-v3"><div className="container"><div><span className="eyebrow">Secure checkout</span><h1>Complete your order</h1><p>Enter your contact and delivery information, review your order, then continue securely to Paystack.</p></div><div className="checkout-steps"><span className="active"><b>1</b>Details</span><i/><span><b>2</b>Payment</span><i/><span><b>3</b>Confirmation</span></div></div></section>
+ return <><MetaInitiateCheckout items={items} subtotalKobo={subtotalKobo}/><TikTokInitiateCheckout items={items} subtotalKobo={subtotalKobo}/><section className="checkout-hero-v3"><div className="container"><div><span className="eyebrow">Secure checkout</span><h1>Complete your order</h1><p>Enter your contact and delivery information, review your order, then continue securely to Paystack.</p></div><div className="checkout-steps"><span className="active"><b>1</b>Details</span><i/><span><b>2</b>Payment</span><i/><span><b>3</b>Confirmation</span></div></div></section>
  <section className="section checkout-section-v3"><div className="container checkout-grid"><form className="form checkout-form checkout-form-v3" onSubmit={submit}>
+ <div className="checkout-order-editor"><div className="checkout-section-heading"><div><span className="eyebrow">Your order</span><h2>Choose products and quantity</h2><p>The product you selected is already here. Adjust the number of packs or add another Bridgecare product before entering your details.</p></div><ShoppingBag size={26}/></div>
+ <div className="checkout-order-items">{items.map(item=><article className="checkout-order-item" key={item.slug}><Image src={`/images/products/${item.slug}.png`} alt={`${item.name} product pack`} width={72} height={62}/><div className="checkout-order-item-copy"><strong>{item.name}</strong><small>{formatNaira(item.priceKobo)} per pack</small></div><div className="quantity-stepper" aria-label={`Quantity for ${item.name}`}><button type="button" aria-label={`Reduce ${item.name} quantity`} onClick={()=>item.quantity<=1?remove(item.slug):setQuantity(item.slug,item.quantity-1)}><Minus size={16}/></button><input aria-label={`${item.name} quantity`} type="number" min={1} max={20} value={item.quantity} onChange={event=>setQuantity(item.slug,Number(event.target.value)||1)}/><button type="button" aria-label={`Increase ${item.name} quantity`} onClick={()=>setQuantity(item.slug,item.quantity+1)}><Plus size={16}/></button></div><strong className="checkout-line-total">{formatNaira(item.priceKobo*item.quantity)}</strong><button type="button" className="checkout-remove-item" aria-label={`Remove ${item.name}`} onClick={()=>remove(item.slug)}><Trash2 size={17}/><span>Remove</span></button></article>)}</div>
+ <div className="checkout-add-more"><div className="checkout-add-more-heading"><h3>Add more products</h3><p>You can combine products in one order and pay once.</p></div><div className="checkout-add-product-grid">{PRODUCTS.map(product=>{const current=items.find(item=>item.slug===product.slug);const priceKobo=catalogPrices[product.slug]??product.priceKobo;return <article className={`checkout-add-product${current?" selected":""}`} key={product.slug}><Image src={product.image} alt={`${product.name} product pack`} width={62} height={54}/><div><strong>{product.name}</strong><small>{formatNaira(priceKobo)}</small></div>{current?<span className="already-added"><CheckCircle2 size={16}/> {current.quantity} in order</span>:<button type="button" className="button secondary compact-button" onClick={()=>addExtraProduct({slug:product.slug,name:product.name,priceKobo})}><Plus size={16}/> Add</button>}</article>})}</div></div></div>
  <h2>Customer information</h2><div className="form-row"><label>Full name<input name="fullName" required autoComplete="name"/></label><label>Email<input name="email" type="email" required autoComplete="email" value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)}/></label></div><label>Phone number<input name="phone" required autoComplete="tel"/></label>
  <h2>Delivery address</h2><div className="form-row"><label>Recipient name<input name="recipientName" required/></label><label>Recipient phone<input name="recipientPhone" required/></label></div>
  <label>House number and street address<input name="addressLine1" required autoComplete="address-line1"/></label><label>Apartment, estate or additional address<input name="addressLine2" autoComplete="address-line2"/></label>

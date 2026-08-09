@@ -632,3 +632,207 @@ body{background:#fff;color:var(--ink)}
   .floating-contact-button.whatsapp{padding:7px;min-width:0;background:#fff}
   .floating-contact-button.whatsapp .floating-contact-icon{width:48px;height:48px}
 }
+
+/* v6.4.18 — Direct Order Now checkout flow */
+.order-flow-hint{
+  margin:10px 0 0;
+  max-width:620px;
+  color:#5f6f78;
+  font-size:14px;
+  line-height:1.5;
+}
+.checkout-order-editor{
+  display:grid;
+  gap:18px;
+  padding:20px;
+  margin-bottom:26px;
+  border:1px solid #dce8ee;
+  border-radius:22px;
+  background:linear-gradient(180deg,#f8fcff 0%,#fff 100%);
+}
+.checkout-section-heading{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+}
+.checkout-section-heading h2{
+  margin:4px 0 6px;
+}
+.checkout-section-heading p,
+.checkout-add-more-heading p{
+  margin:0;
+  color:#63737c;
+  line-height:1.5;
+}
+.checkout-section-heading>svg{
+  flex:0 0 auto;
+  color:#0878b7;
+  margin-top:4px;
+}
+.checkout-order-items{
+  display:grid;
+  gap:10px;
+}
+.checkout-order-item{
+  display:grid;
+  grid-template-columns:72px minmax(130px,1fr) auto auto auto;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  border:1px solid #e3ebef;
+  border-radius:16px;
+  background:#fff;
+}
+.checkout-order-item img{
+  width:72px;
+  height:62px;
+  object-fit:contain;
+  border-radius:10px;
+  background:#f7fbfd;
+}
+.checkout-order-item-copy{
+  display:grid;
+  gap:3px;
+}
+.checkout-order-item-copy small,
+.checkout-add-product small{
+  color:#697982;
+  font-size:13px;
+}
+.quantity-stepper{
+  display:grid;
+  grid-template-columns:34px 50px 34px;
+  align-items:center;
+  border:1px solid #d4e0e5;
+  border-radius:12px;
+  overflow:hidden;
+  background:#fff;
+}
+.quantity-stepper button{
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:38px;
+  border:0;
+  background:#f1f8fb;
+  color:#076fa8;
+  cursor:pointer;
+}
+.quantity-stepper input{
+  width:50px;
+  height:38px;
+  padding:0;
+  border:0;
+  border-left:1px solid #d4e0e5;
+  border-right:1px solid #d4e0e5;
+  border-radius:0;
+  text-align:center;
+  font:inherit;
+  font-weight:800;
+  background:#fff;
+  -moz-appearance:textfield;
+}
+.quantity-stepper input::-webkit-outer-spin-button,
+.quantity-stepper input::-webkit-inner-spin-button{
+  margin:0;
+  -webkit-appearance:none;
+}
+.checkout-line-total{
+  white-space:nowrap;
+}
+.checkout-remove-item{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  border:0;
+  background:transparent;
+  color:#9b3b3b;
+  font:inherit;
+  font-size:13px;
+  font-weight:750;
+  cursor:pointer;
+}
+.checkout-add-more{
+  padding-top:4px;
+  border-top:1px solid #e4ecef;
+}
+.checkout-add-more-heading{
+  margin:14px 0 12px;
+}
+.checkout-add-more-heading h3{
+  margin:0 0 4px;
+  font-size:18px;
+}
+.checkout-add-product-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.checkout-add-product{
+  display:grid;
+  grid-template-columns:62px 1fr;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  border:1px solid #e0e9ed;
+  border-radius:15px;
+  background:#fff;
+}
+.checkout-add-product.selected{
+  background:#f3fbf7;
+  border-color:#c8e5d4;
+}
+.checkout-add-product img{
+  width:62px;
+  height:54px;
+  object-fit:contain;
+}
+.checkout-add-product>div{
+  display:grid;
+  gap:2px;
+  min-width:0;
+}
+.checkout-add-product>div strong{
+  font-size:14px;
+  line-height:1.25;
+}
+.checkout-add-product .compact-button,
+.checkout-add-product .already-added{
+  grid-column:1/-1;
+}
+.compact-button{
+  min-height:38px;
+  padding:8px 12px;
+  font-size:13px;
+}
+.already-added{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:#176b46;
+  font-size:13px;
+  font-weight:800;
+}
+
+@media(max-width:760px){
+  .checkout-order-editor{padding:15px;border-radius:18px}
+  .checkout-section-heading>svg{display:none}
+  .checkout-order-item{
+    grid-template-columns:58px minmax(0,1fr) auto;
+    gap:9px;
+  }
+  .checkout-order-item img{width:58px;height:52px}
+  .quantity-stepper{grid-column:2/3;width:max-content}
+  .checkout-line-total{grid-column:3/4;grid-row:2/3}
+  .checkout-remove-item{grid-column:2/4;justify-self:start;padding:3px 0}
+  .checkout-add-product-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:430px){
+  .checkout-order-item{grid-template-columns:52px 1fr}
+  .checkout-order-item img{width:52px;height:48px}
+  .quantity-stepper{grid-column:2/3}
+  .checkout-line-total{grid-column:2/3;grid-row:auto}
+  .checkout-remove-item{grid-column:2/3}
+}

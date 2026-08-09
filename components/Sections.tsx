@@ -21,7 +21,6 @@ import { products } from "@/data/site";
 import { formatNaira } from "@/lib/store";
 import { getProductPriceMap } from "@/lib/product-prices";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
-import { BuyNowButton } from "@/components/cart/BuyNowButton";
 
 const benefits = {
   aspivit: [
@@ -70,7 +69,7 @@ export async function ProductGrid(){
         {productBenefits.map(([Icon,label])=><span className="product-benefit" key={label}><span className="product-benefit-icon"><Icon size={18}/></span><small>{label}</small></span>)}
       </div>
       <strong className="product-price">{formatNaira(priceKobo)}</strong>
-      <div className="product-card-actions"><AddToCartButton slug={p.slug} name={p.name} priceKobo={priceKobo}/><BuyNowButton slug={p.slug} name={p.name} priceKobo={priceKobo}/><Link className="text-link" href={`/products/${p.slug}`}>Details <ArrowRight size={17}/></Link></div>
+      <div className="product-card-actions"><AddToCartButton slug={p.slug} name={p.name} priceKobo={priceKobo}/><Link className="text-link" href={`/products/${p.slug}`}>Details <ArrowRight size={17}/></Link></div>
     </article>;
   })}</div>;
 }

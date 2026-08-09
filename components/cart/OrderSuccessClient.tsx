@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatNaira } from "@/lib/store";
+import { trackTikTokPurchase } from "@/components/analytics/TikTokCommerceEvents";
 
 type OrderItem={id:string;productSlug?:string|null;productName:string;quantity:number;lineTotalKobo:number};
 type Order={orderNumber:string;paystackReference:string;status:string;subtotalKobo?:number;shippingKobo?:number;discountKobo?:number;couponCode?:string|null;totalKobo:number;recipientName:string;addressLine1:string;addressLine2?:string|null;city:string;lga:string;state:string;items:OrderItem[]};
@@ -62,6 +63,14 @@ export function OrderSuccessClient(){
       const verifiedOrder=x.order as Order;
       if(!verifiedOrder?.paystackReference||!verifiedOrder?.totalKobo)throw new Error("The verified order is incomplete.");
       cancelPurchaseRetry=fireVerifiedPurchase(verifiedOrder);
+      const cancelTikTokPurchaseRetry=trackTikTokPurchase({
+       reference:verifiedOrder.paystackReference,
+       orderNumber:verifiedOrder.orderNumber,
+       totalKobo:verifiedOrder.totalKobo,
+       items:verifiedOrder.items.map(item=>({slug:safeSlug(item),name:item.productName,quantity:item.quantity}))
+      });
+      const previousCancel=cancelPurchaseRetry;
+      cancelPurchaseRetry=()=>{previousCancel?.();cancelTikTokPurchaseRetry?.()};
       if(cancelled)return;
       setOrder(verifiedOrder);
       clear();
