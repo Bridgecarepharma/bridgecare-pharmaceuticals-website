@@ -901,3 +901,51 @@ body{background:#fff;color:var(--ink)}
   .shop-section-v3 .section-head h2{font-size:26px;max-width:230px}
   .shop-section-v3 .product-card{padding:10px}
 }
+
+/* v6.4.21 — Compact mobile above-the-fold correction
+   Deliberately CSS-only: preserves v6.4.20 shopping tools and all checkout/product behavior,
+   while reducing the vertical space before the first product cards. */
+@media(max-width:600px){
+  /* Hero: keep the message and primary CTA, but make it substantially shorter. */
+  .hero-v3 .hero-grid{padding:14px 0 16px;gap:10px}
+  .hero-v3 .hero-copy h1{font-size:32px;line-height:1.02;letter-spacing:-.042em;margin:9px 0 8px}
+  .hero-v3 .hero-eyebrow{font-size:9px;line-height:1.15;padding:5px 8px;margin-bottom:7px;letter-spacing:.12em}
+  .hero-v3 .lead{font-size:14px;line-height:1.38;margin:0 auto 10px}
+  .hero-v3 .hero-actions{margin-top:10px}
+  .hero-v3 .hero-primary{min-height:44px;padding:10px 18px;font-size:14px}
+
+  /* Trust: turn the 2x2 block into one compact horizontal strip. */
+  .trust-strip-v3{overflow:hidden}
+  .trust-strip-v3 .container{width:100%;padding:0 14px}
+  .trust-strip-v3 .trust-strip-grid{display:flex;overflow-x:auto;gap:8px;padding:8px 0;scrollbar-width:none}
+  .trust-strip-v3 .trust-strip-grid::-webkit-scrollbar{display:none}
+  .trust-strip-v3 .trust-strip-grid>div{flex:0 0 auto;min-height:40px;padding:7px 10px;border:1px solid #e1ebe8!important;border-radius:12px;background:#fff;gap:7px}
+  .trust-strip-v3 .trust-strip-grid>div:nth-child(odd),
+  .trust-strip-v3 .trust-strip-grid>div:nth-last-child(-n+2){border:1px solid #e1ebe8!important}
+  .trust-strip-v3 .trust-strip-grid svg{width:22px;height:22px;padding:3px}
+  .trust-strip-v3 .trust-strip-grid strong{font-size:11px;white-space:nowrap}
+
+  /* Shopping shortcuts: useful but no longer a large sticky block. */
+  .mobile-shop-tools{position:static;padding:8px 0 7px;background:#fff;backdrop-filter:none}
+  .mobile-product-search{min-height:44px;padding:0 14px;font-size:14px}
+  .mobile-product-search svg{width:18px;height:18px}
+  .mobile-category-chips{gap:7px;margin-top:7px}
+  .mobile-category-chips a{padding:7px 12px;font-size:11px}
+
+  /* Free-delivery strip stays visible, but compact. */
+  .free-delivery-promo .container{min-height:34px;gap:5px;font-size:11px}
+  .free-delivery-promo .container svg{width:15px;height:15px}
+  .free-delivery-promo strong{font-size:10px}
+
+  /* Pull the catalogue heading and first row of products upward. */
+  .shop-section-v3{padding-top:20px;padding-bottom:42px}
+  .shop-section-v3 .section-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:10px;margin-bottom:14px}
+  .shop-section-v3 .section-head h2{font-size:24px;line-height:1.06;max-width:235px}
+  .shop-section-v3 .section-link{font-size:11px;margin:0 0 2px}
+}
+
+@media(max-width:380px){
+  .hero-v3 .hero-copy h1{font-size:29px}
+  .hero-v3 .lead{font-size:13px}
+  .shop-section-v3 .section-head h2{font-size:22px;max-width:210px}
+}
