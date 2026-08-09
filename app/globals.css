@@ -841,83 +841,63 @@ body{background:#fff;color:var(--ink)}
 /* v6.4.19 — Visible Free Shipping delivery method */
 .delivery-method-list{display:grid;gap:10px;margin:10px 0 18px}.delivery-method-option{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;background:#fff;transition:border-color .18s ease,background .18s ease,box-shadow .18s ease}.delivery-method-option span:nth-child(2){display:grid;gap:3px}.delivery-method-option span:nth-child(2) strong{color:var(--ink)}.delivery-method-option span:nth-child(2) small{color:var(--muted);line-height:1.35}.delivery-method-marker{display:grid!important;place-items:center;width:30px!important;height:30px;border-radius:999px;background:#eef4f2;color:var(--green);font-weight:900}.delivery-method-option>b{font-size:11px;letter-spacing:.06em;color:var(--muted);white-space:nowrap}.free-shipping-method.selected{border-color:#37a874;background:#effaf5;box-shadow:0 0 0 2px rgba(55,168,116,.1)}.free-shipping-method.selected .delivery-method-marker{background:#16865d;color:#fff}.free-shipping-method.selected>b{color:#16865d}.free-shipping-method.locked{border-style:dashed;background:#fbfcfc}.free-shipping-method.locked .delivery-method-marker{background:#f2f5f4;color:#789188}.standard-shipping-method.muted{opacity:.66}.delivery-area-heading{margin:14px 0 8px;font-size:16px}.shipping-threshold-note.unlocked{background:#effaf5;border:1px solid #bfe6d4;color:#176747;padding:10px 12px;border-radius:10px;font-weight:700}.order-summary-v3>div:nth-of-type(3) strong{white-space:nowrap}@media(max-width:600px){.delivery-method-option{grid-template-columns:auto minmax(0,1fr);padding:13px}.delivery-method-option>b{grid-column:2;justify-self:start}.delivery-method-marker{width:28px!important;height:28px}.delivery-method-option span:nth-child(2) small{font-size:12px}}
 
-/* v6.4.21 — iHerb-inspired mobile commerce experience
-   Original Bridgecare branding retained; mobile hierarchy is faster, denser and shopping-first. */
-.mobile-shop-tools{display:none}
-@media(max-width:600px){
-  body{background:#fff}
-  .container{width:min(100% - 22px,1180px)}
-
-  /* Compact commerce header: logo + menu/cart stay visible without consuming the viewport. */
-  .site-header{box-shadow:0 2px 10px rgba(20,48,40,.08);background:#fff}
-  .nav-wrap{min-height:62px;gap:10px}
-  .brand.brand-official>img.official-header-logo{width:118px!important;height:50px!important;object-fit:contain}
-  .menu-button{display:grid;place-items:center;width:42px;height:42px;border:1px solid #dce6e2;border-radius:50%;background:#fff;color:#173f35}
-  .nav{top:62px;padding:18px 16px;gap:10px;box-shadow:0 14px 28px rgba(20,48,40,.12)}
-  .nav a{padding:9px 4px}
-  .nav .cart-link{display:flex;justify-content:center;background:#f0f8f4;border-radius:999px;padding:11px 16px!important}
-
-  /* Hero becomes a compact introduction; catalogue starts in the first few swipes. */
-  .hero{background:linear-gradient(180deg,#f3faf6,#fff)}
-  .hero-grid{display:block;padding:22px 0 18px}
-  .hero-copy h1{font-size:30px;line-height:1.06;letter-spacing:-.035em;margin-bottom:9px}
-  .hero-eyebrow{margin-bottom:8px}
-  .lead{font-size:14px;line-height:1.45}
-  .hero-actions{margin-top:14px}
-  .hero-actions .hero-primary{min-height:44px;padding:10px 18px;font-size:14px}
-  .hero-products{display:none}
-
-  /* Search and swipeable categories are the mobile shopping gateway. */
-  .mobile-shop-tools{display:block;padding:12px 0 6px;background:#fff;border-bottom:1px solid #e5ece9}
-  .mobile-store-search{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;height:46px;padding:0 15px;border:1px solid #ccd9d4;border-radius:23px;background:#f8faf9;color:#65746f;font-size:14px;font-weight:700}
-  .mobile-store-search svg{color:#08775c}
-  .mobile-category-chips{display:flex;gap:8px;overflow-x:auto;padding:11px 1px 7px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-  .mobile-category-chips::-webkit-scrollbar{display:none}
-  .mobile-category-chips a{flex:0 0 auto;padding:7px 12px;border:1px solid #dce7e2;border-radius:999px;background:#fff;color:#294b42;font-size:12px;font-weight:800;white-space:nowrap}
-  .mobile-category-chips a:first-child{background:#08775c;color:#fff;border-color:#08775c}
-
-  /* Trust is present but deliberately secondary to shopping. */
-  .trust-strip-grid{padding:4px 0}
-  .trust-strip-grid>div{padding:9px 7px}
-  .trust-strip svg{width:22px;height:22px}
-  .trust-strip strong{font-size:10px}
-
-  /* Dense two-column catalogue similar to major mobile supplement stores. */
-  .shop-section-v3{padding:24px 0 36px;background:#fff}
-  .shop-section-v3 .section-head{display:grid;grid-template-columns:1fr auto;align-items:end;margin-bottom:15px}
-  .shop-section-v3 .section-head>div{min-width:0}
-  .shop-section-v3 .section-head .eyebrow{display:none}
-  .shop-section-v3 .section-head h2{font-size:22px;line-height:1.12;margin:0}
-  .shop-section-v3 .section-head p{display:none}
-  .shop-section-v3 .section-link{font-size:12px;white-space:nowrap;margin:0}
-  .product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
-  .product-card{display:flex;flex-direction:column;min-width:0;padding:9px!important;border-radius:13px!important;border-color:#e2e9e6;box-shadow:none!important}
-  .product-card:before{display:none}
-  .product-card .product-image-wrap{min-height:145px!important;border-radius:10px!important;margin:0;background:#f7faf8}
-  .product-card .product-image{object-fit:contain;padding:5px}
-  .product-category{font-size:8px;letter-spacing:.08em;margin:8px 0 3px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .product-card h3{font-size:16px!important;line-height:1.15;margin:0 0 4px!important;min-height:37px}
-  .product-summary{font-size:11px!important;line-height:1.35!important;-webkit-line-clamp:2!important;margin:0 0 7px!important;min-height:30px!important}
-  .shop-section-v3 .product-benefits{display:none!important}
-  .product-price{font-size:16px!important;margin-top:auto;color:#153f34!important}
-  .product-card-actions{display:grid!important;grid-template-columns:1fr;gap:5px!important;margin-top:8px!important}
-  .product-card-actions .button{width:100%;min-height:38px;padding:8px 7px!important;border-radius:8px;font-size:11px;gap:4px}
-  .product-card-actions .button svg{width:14px;height:14px}
-  .product-card-actions .text-link{justify-content:center;font-size:10px;padding:3px}
-
-  /* Homepage support/brand content remains available but no longer competes with catalogue. */
-  .why-v3,.facility-v3,.customer-proof-v3,.health-centre-home,.faq-home-v3{padding:38px 0}
-  .center-heading h2,.facility-copy h2,.customer-proof-v3 h2,.health-centre-home h2,.faq-home-v3 h2{font-size:26px}
-  .why-choice-grid{grid-template-columns:1fr 1fr;gap:10px}
-  .why-choice-grid article{padding:16px;border-radius:14px}
-  .why-choice-grid article h3{font-size:15px}
-  .why-choice-grid article p{font-size:12px;line-height:1.45}
-
-  /* Keep only WhatsApp floating support and avoid covering the purchase controls. */
-  .floating-contact{right:12px;bottom:12px}
-  .floating-contact-button.whatsapp .floating-contact-icon{width:44px;height:44px}
+/* v6.4.20 — mobile storefront conversion polish */
+.mobile-header-actions{display:contents}
+.mobile-shop-tools,.free-delivery-promo{display:none}
+@media(max-width:900px){
+  .mobile-header-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .mobile-header-actions>.cart-link{display:inline-flex;min-width:46px;height:46px;justify-content:center;border:1px solid #dce8e4;border-radius:999px;background:#fff}
+  .mobile-header-actions>.cart-link span{display:grid;place-items:center;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:var(--green);color:#fff;font-size:11px;line-height:1}
+  .nav>.cart-link{display:none}
 }
-@media(max-width:360px){
-  .product-card .product-image-wrap{min-height:128px!important}
-  .product-card h3{font-size:15px!important}
+@media(max-width:600px){
+  .nav-wrap{min-height:68px}
+  .official-header-logo{width:112px!important;height:auto!important}
+  .mobile-header-actions>.cart-link,.menu-button{width:44px;height:44px;min-width:44px}
+
+  /* Bring shopping content above the fold without changing desktop. */
+  .hero-v3 .hero-grid{padding:24px 0 26px}
+  .hero-v3 .hero-copy h1{font-size:38px;line-height:1.04;margin:14px 0 10px}
+  .hero-v3 .lead{font-size:16px;line-height:1.5;margin:0 auto 18px}
+  .hero-v3 .hero-eyebrow{font-size:11px;padding:6px 9px}
+  .hero-v3 .hero-actions{margin-top:14px}
+  .hero-v3 .hero-primary{min-height:50px}
+  .hero-v3 .hero-whatsapp,.hero-v3 .hero-assurance{display:none}
+  .hero-v3 .hero-products{display:none}
+  .trust-strip-v3{margin-top:0}
+
+  .mobile-shop-tools{display:block;position:sticky;top:71px;z-index:18;padding:12px 0 10px;background:rgba(255,255,255,.96);border-bottom:1px solid #e4ece9;backdrop-filter:blur(10px)}
+  .mobile-product-search{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;min-height:52px;padding:0 16px;border:1px solid #d7e3df;border-radius:999px;background:#f9fbfa;color:#536760;font-weight:750}
+  .mobile-product-search svg:last-child{color:var(--green)}
+  .mobile-category-chips{display:flex;gap:9px;margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  .mobile-category-chips::-webkit-scrollbar{display:none}
+  .mobile-category-chips a{flex:0 0 auto;padding:9px 15px;border:1px solid #dce5e2;border-radius:999px;background:#fff;color:#31534a;font-size:13px;font-weight:800;white-space:nowrap}
+  .mobile-category-chips a.active{background:var(--green);border-color:var(--green);color:#fff}
+
+  .free-delivery-promo{display:block;background:#edf9f4;border-bottom:1px solid #d3eee2}
+  .free-delivery-promo .container{display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;color:#176747;font-size:13px}
+  .free-delivery-promo strong{font-size:12px;letter-spacing:.04em}
+
+  .shop-section-v3{padding-top:34px}
+  .shop-section-v3 .section-head p,.shop-section-v3 .section-head .eyebrow{display:none}
+  .shop-section-v3 .section-head h2{font-size:29px;line-height:1.08;margin:0;max-width:270px}
+  .shop-section-v3 .section-link{font-size:13px;white-space:nowrap}
+  .shop-section-v3 .product-grid{gap:12px}
+  .shop-section-v3 .product-card{padding:12px;border-radius:18px}
+  .shop-section-v3 .product-image-wrap{border-radius:14px}
+  .shop-section-v3 .product-category{font-size:10px;margin-top:10px}
+  .shop-section-v3 .product-card h3{font-size:20px;line-height:1.15;margin:4px 0 7px}
+  .shop-section-v3 .product-summary{-webkit-line-clamp:2;font-size:13px;line-height:1.35;margin-bottom:8px}
+  .shop-section-v3 .product-price{font-size:18px}
+  .shop-section-v3 .product-card-actions .button{min-height:44px;font-size:13px;padding:9px 8px}
+  .shop-section-v3 .text-link{font-size:12px;justify-content:center}
+
+  .floating-contact{right:10px;bottom:12px}
+  .floating-contact-button.whatsapp{padding:5px!important}
+  .floating-contact-button.whatsapp .floating-contact-icon{width:50px!important;height:50px!important}
+}
+@media(max-width:380px){
+  .hero-v3 .hero-copy h1{font-size:34px}
+  .shop-section-v3 .section-head h2{font-size:26px;max-width:230px}
+  .shop-section-v3 .product-card{padding:10px}
 }
