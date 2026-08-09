@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   ArrowRight, BadgeCheck, BookOpenCheck, Building2, CheckCircle2, HeartPulse,
   Headphones, LockKeyhole, MessageCircle, PackageCheck, ShieldCheck, Sparkles,
-  Stethoscope, Truck, UsersRound, Search
+  Stethoscope, Truck, UsersRound
 } from "lucide-react";
 import { CTA, ProductGrid } from "@/components/Sections";
 import { getPublishedHealthArticles } from "@/lib/health-cms";
@@ -57,11 +57,11 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mobile-shop-tools" aria-label="Mobile shopping shortcuts">
+      <section className="mobile-shop-tools" aria-label="Shop Bridgecare products">
         <div className="container">
-          <Link className="mobile-product-search" href="/products"><Search size={20}/><span>Search Bridgecare products</span><ArrowRight size={20}/></Link>
+          <Link href="/search" className="mobile-store-search"><span>Search Bridgecare products</span><ArrowRight size={18}/></Link>
           <div className="mobile-category-chips" aria-label="Product categories">
-            <Link className="active" href="/products">All products</Link>
+            <Link href="/products">All products</Link>
             <Link href="/products/asfenositol">Women’s wellness</Link>
             <Link href="/products/aspivit">Vitamins</Link>
             <Link href="/products/globivida">Nutritional support</Link>
@@ -69,8 +69,6 @@ export default async function Home() {
           </div>
         </div>
       </section>
-
-      <section className="free-delivery-promo"><div className="container"><Truck size={18}/><strong>FREE DELIVERY</strong><span>when you order any 3 packs</span></div></section>
 
       <section className="section soft shop-section-v3">
         <div className="container">

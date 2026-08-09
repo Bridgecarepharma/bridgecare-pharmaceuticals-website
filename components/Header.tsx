@@ -23,7 +23,7 @@ export function Header() {
             priority
           />
         </Link>
-        <div className="mobile-header-actions"><CartLink /><button className="menu-button" onClick={() => setOpen(!open)} aria-label="Toggle navigation" aria-expanded={open}>{open ? <X /> : <Menu />}</button></div>
+        <button className="menu-button" onClick={() => setOpen(!open)} aria-label="Toggle navigation" aria-expanded={open}>{open ? <X /> : <Menu />}</button>
         <nav className={open ? "nav open" : "nav"} aria-label="Main navigation">
           {navItems.map((item) => <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>{item.label}</Link>)}
           <Link className="nav-search" href="/search" aria-label="Search"><Search size={19} /></Link>
