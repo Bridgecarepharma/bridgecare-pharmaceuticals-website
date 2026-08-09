@@ -37,6 +37,8 @@ export default function CheckoutPage(){
  const activeZones=useMemo(()=>shipping.zones.filter(zone=>zone.isActive).sort((a,b)=>a.sortOrder-b.sortOrder),[shipping.zones]);
  const selectedZone=useMemo(()=>activeZones.find(zone=>zone.code===shippingZoneCode),[activeZones,shippingZoneCode]);
  const shippingKobo=useMemo(()=>calculateShippingForZoneKobo(shippingZoneCode,state,packCount,shipping.zones,shipping.freeShippingPackCount)??0,[shippingZoneCode,state,packCount,shipping]);
+ const freeShippingEligible=shipping.freeShippingPackCount>0&&packCount>=shipping.freeShippingPackCount;
+ const packsToFreeShipping=shipping.freeShippingPackCount>0?Math.max(0,shipping.freeShippingPackCount-packCount):0;
  const zoneMatchesState=Boolean(selectedZone?.states.includes(state));
  const discountKobo=appliedCoupon?.totalDiscountKobo??0;
  const totalKobo=Math.max(0,subtotalKobo+shippingKobo-discountKobo);
@@ -121,7 +123,21 @@ export default function CheckoutPage(){
  <div className="form-row"><label>Landmark<input name="landmark"/></label><label>City<input name="city" required autoComplete="address-level2"/></label></div>
  <div className="form-row"><label>Local Government Area<input name="lga" required/></label><label>State<select name="state" value={state} onChange={e=>{const nextState=e.target.value;setState(nextState);const matching=activeZones.find(zone=>zone.states.includes(nextState));if(matching)setShippingZoneCode(matching.code)}} required>{STATES.map(x=><option key={x}>{x}</option>)}</select></label></div>
  <label>Postal code (optional)<input name="postalCode" autoComplete="postal-code"/></label><label>Delivery instructions (optional)<textarea name="deliveryInstructions" placeholder="Gate code, preferred contact method, or directions for the rider."/></label>
- <h2>Delivery method</h2><input type="hidden" name="deliveryMethod" value="standard"/><div className="shipping-zone-list">{activeZones.map(zone=>{const free=shipping.freeShippingPackCount>0&&packCount>=shipping.freeShippingPackCount;return <label className={`radio-card shipping-zone-option${shippingZoneCode===zone.code?" selected":""}`} key={zone.code}><input type="radio" name="shippingZoneCode" value={zone.code} checked={shippingZoneCode===zone.code} onChange={()=>{setShippingZoneCode(zone.code);if(!zone.states.includes(state))setState(zone.states[0]||state)}}/><span><strong>{zone.name}</strong><small>{free?"Free delivery":formatNaira(zone.priceKobo)}</small></span></label>})}</div>{shipping.freeShippingPackCount>0&&<p className="shipping-threshold-note">Free delivery applies automatically when the cart contains {shipping.freeShippingPackCount} or more packs.</p>}
+ <h2>Delivery method</h2><input type="hidden" name="deliveryMethod" value="standard"/>
+ <div className="delivery-method-list">
+  <div className={`radio-card delivery-method-option free-shipping-method${freeShippingEligible?" selected":" locked"}`}>
+   <span className="delivery-method-marker" aria-hidden="true">{freeShippingEligible?"✓":"☆"}</span>
+   <span><strong>Free Shipping</strong><small>{freeShippingEligible?`Unlocked — ${packCount} pack${packCount===1?"":"s"} in your order · ₦0`:`Add ${packsToFreeShipping} more pack${packsToFreeShipping===1?"":"s"} to unlock free shipping`}</small></span>
+   <b>{freeShippingEligible?"SELECTED":"3+ PACKS"}</b>
+  </div>
+  <div className={`radio-card delivery-method-option standard-shipping-method${freeShippingEligible?" muted":" selected"}`}>
+   <span className="delivery-method-marker" aria-hidden="true">{freeShippingEligible?"○":"●"}</span>
+   <span><strong>Standard Delivery</strong><small>{freeShippingEligible?"Your order qualifies for Free Shipping":"Delivery fee is based on your delivery area"}</small></span>
+  </div>
+ </div>
+ <h3 className="delivery-area-heading">Delivery area</h3>
+ <div className="shipping-zone-list">{activeZones.map(zone=>{return <label className={`radio-card shipping-zone-option${shippingZoneCode===zone.code?" selected":""}`} key={zone.code}><input type="radio" name="shippingZoneCode" value={zone.code} checked={shippingZoneCode===zone.code} onChange={()=>{setShippingZoneCode(zone.code);if(!zone.states.includes(state))setState(zone.states[0]||state)}}/><span><strong>{zone.name}</strong><small>{freeShippingEligible?"₦0 with Free Shipping":formatNaira(zone.priceKobo)}</small></span></label>})}</div>
+ {shipping.freeShippingPackCount>0&&<p className={`shipping-threshold-note${freeShippingEligible?" unlocked":""}`}>{freeShippingEligible?`Free Shipping unlocked — delivery is ₦0 for this ${packCount}-pack order.`:`Add ${packsToFreeShipping} more pack${packsToFreeShipping===1?"":"s"} to get Free Shipping. Free Shipping applies automatically from ${shipping.freeShippingPackCount} packs.`}</p>}
  <div className="checkout-coupon"><div><h2>Coupon code</h2><p>Enter a valid promotion code before continuing to payment.</p></div><div className="coupon-entry"><input value={couponCode} onChange={e=>{setCouponCode(e.target.value.toUpperCase());setAppliedCoupon(null);setCouponError("")}} placeholder="WELCOME10" aria-label="Coupon code"/><button type="button" className="button secondary" onClick={applyCoupon} disabled={couponLoading}>{couponLoading?"Checking…":appliedCoupon?"Reapply":"Apply"}</button></div>{appliedCoupon&&<div className="coupon-applied"><CheckCircle2 size={18}/><span><strong>{appliedCoupon.code}</strong> {appliedCoupon.message}</span><button type="button" onClick={()=>{setAppliedCoupon(null);setCouponCode("")}}>Remove</button></div>}{couponError&&<div className="coupon-error">{couponError}</div>}</div>
  {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone||!zoneMatchesState}>{loading?"Opening Paystack…":`Pay ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
  </form>
