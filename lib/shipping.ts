@@ -28,8 +28,8 @@ export async function ensureShippingConfiguration() {
     ),
     prisma.shippingSetting.upsert({
       where: { id: "default" },
-      update: {},
-      create: { id: "default", freeShippingPackCount: DEFAULT_FREE_SHIPPING_PACK_COUNT },
+      update: { freeShippingPackCount: 3 },
+      create: { id: "default", freeShippingPackCount: 3 },
     }),
   ]);
 }
@@ -49,13 +49,14 @@ export async function getShippingConfiguration() {
       isActive: zone.isActive,
       sortOrder: zone.sortOrder,
     })),
-    freeShippingPackCount: setting?.freeShippingPackCount ?? DEFAULT_FREE_SHIPPING_PACK_COUNT,
+    // Bridgecare policy: any order of 3 packs or more ships free nationwide.
+    freeShippingPackCount: 3,
   };
 }
 
 export async function shippingFeeForDatabaseOrder(state: string, packCount: number) {
   const configuration = await getShippingConfiguration();
-  return calculateShippingKobo(state, packCount, configuration.zones, configuration.freeShippingPackCount);
+  return calculateShippingKobo(state, packCount, configuration.zones, 3);
 }
 
 export async function shippingFeeForSelectedZone(zoneCode: string, state: string, packCount: number) {
@@ -65,6 +66,6 @@ export async function shippingFeeForSelectedZone(zoneCode: string, state: string
     state,
     packCount,
     configuration.zones,
-    configuration.freeShippingPackCount,
+    3,
   );
 }
