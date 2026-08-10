@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   ArrowRight, BadgeCheck, BookOpenCheck, Building2, CheckCircle2, HeartPulse,
   Headphones, LockKeyhole, MessageCircle, PackageCheck, ShieldCheck, Sparkles,
-  Stethoscope, Truck, UsersRound
+  Search, Stethoscope, Truck, UsersRound
 } from "lucide-react";
 import { CTA, ProductGrid } from "@/components/Sections";
 import { getPublishedHealthArticles } from "@/lib/health-cms";
@@ -59,7 +59,11 @@ export default async function Home() {
 
       <section className="mobile-shop-tools" aria-label="Shop Bridgecare products">
         <div className="container">
-          <Link href="/search" className="mobile-store-search"><span>Search Bridgecare products</span><ArrowRight size={18}/></Link>
+          <form action="/search" method="get" role="search" className="mobile-store-search mobile-store-search-form">
+            <Search size={18} aria-hidden="true" />
+            <input type="search" name="q" placeholder="Search Bridgecare products" aria-label="Search Bridgecare products" />
+            <button type="submit" aria-label="Search"><ArrowRight size={18}/></button>
+          </form>
           <div className="mobile-category-chips" aria-label="Product categories">
             <Link href="/products">All products</Link>
             <Link href="/products/asfenositol">Women’s wellness</Link>
