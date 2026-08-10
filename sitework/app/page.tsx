@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   ArrowRight, BadgeCheck, BookOpenCheck, Building2, CheckCircle2, HeartPulse,
   Headphones, LockKeyhole, MessageCircle, PackageCheck, ShieldCheck, Sparkles,
-  Search, Stethoscope, Truck, UsersRound
+  Stethoscope, Truck, UsersRound
 } from "lucide-react";
 import { CTA, ProductGrid } from "@/components/Sections";
 import { getPublishedHealthArticles } from "@/lib/health-cms";
@@ -54,23 +54,6 @@ export default async function Home() {
           <div><LockKeyhole /><span><strong>Paystack secured</strong><small>Protected online payment</small></span></div>
           <div><Truck /><span><strong>Delivery across Nigeria</strong><small>Transparent regional charges</small></span></div>
           <div><Headphones /><span><strong>Human support</strong><small>Help before and after purchase</small></span></div>
-        </div>
-      </section>
-
-      <section className="mobile-shop-tools" aria-label="Shop Bridgecare products">
-        <div className="container">
-          <form action="/search" method="get" role="search" className="mobile-store-search mobile-store-search-form">
-            <Search size={18} aria-hidden="true" />
-            <input type="search" name="q" placeholder="Search Bridgecare products" aria-label="Search Bridgecare products" />
-            <button type="submit" aria-label="Search"><ArrowRight size={18}/></button>
-          </form>
-          <div className="mobile-category-chips" aria-label="Product categories">
-            <Link href="/products">All products</Link>
-            <Link href="/products/asfenositol">Women’s wellness</Link>
-            <Link href="/products/aspivit">Vitamins</Link>
-            <Link href="/products/globivida">Nutritional support</Link>
-            <Link href="/products/herbal-bitter-tea">Herbal wellness</Link>
-          </div>
         </div>
       </section>
 
