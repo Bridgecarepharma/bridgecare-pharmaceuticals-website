@@ -43,6 +43,37 @@ export default function CheckoutPage(){
  const discountKobo=appliedCoupon?.totalDiscountKobo??0;
  const totalKobo=Math.max(0,subtotalKobo+shippingKobo-discountKobo);
 
+ const recommendedSlugs=useMemo(()=>{
+  const inCart=new Set(items.map(item=>item.slug));
+  const ordered:string[]=[];
+  const push=(slug:string)=>{if(!inCart.has(slug)&&!ordered.includes(slug))ordered.push(slug)};
+
+  // Cross-sell rules:
+  // AsFenositol -> Aspivit + Bitter Tea
+  // Aspivit -> Bitter Tea
+  // Globivida -> Aspivit
+  // Bitter Tea -> Aspivit
+  for(const item of items){
+   if(item.slug==="asfenositol"){push("aspivit");push("herbal-bitter-tea")}
+   else if(item.slug==="aspivit"){push("herbal-bitter-tea")}
+   else if(item.slug==="globivida"){push("aspivit")}
+   else if(item.slug==="herbal-bitter-tea"){push("aspivit")}
+  }
+  return ordered;
+ },[items]);
+
+ const recommendedProducts=useMemo(
+  ()=>recommendedSlugs.map(slug=>PRODUCTS.find(product=>product.slug===slug)).filter((product):product is (typeof PRODUCTS)[number]=>Boolean(product)),
+  [recommendedSlugs],
+ );
+ const otherProducts=useMemo(()=>{
+  const inCart=new Set(items.map(item=>item.slug));
+  const recommended=new Set(recommendedSlugs);
+  return PRODUCTS.filter(product=>!inCart.has(product.slug)&&!recommended.has(product.slug));
+ },[items,recommendedSlugs]);
+
+ const crossSellName=(slug:string,name:string)=>slug==="aspivit"?"Omega-3 Supplement (Aspivit®)":name;
+
  useEffect(()=>{
   let active=true;
   fetch("/api/shipping/rates",{cache:"no-store"})
@@ -96,12 +127,10 @@ export default function CheckoutPage(){
   setLoading(true);
   try{
    const data=new FormData(event.currentTarget);
-   const fullName=String(data.get("fullName")||"").trim();
-   const phone=String(data.get("phone")||"").trim();
    const payload={
-    customer:{fullName,email:data.get("email"),phone},
+    customer:{fullName:data.get("fullName"),email:data.get("email"),phone:data.get("phone")},
     couponCode:appliedCoupon?.code||couponCode.trim(),
-    delivery:{recipientName:fullName,recipientPhone:phone,addressLine1:data.get("addressLine1"),addressLine2:data.get("addressLine2"),landmark:data.get("landmark"),city:data.get("city"),lga:data.get("lga"),state:data.get("state"),postalCode:"",deliveryInstructions:data.get("deliveryInstructions"),deliveryMethod:"standard",shippingZoneCode:data.get("shippingZoneCode")},
+    delivery:{recipientName:data.get("recipientName"),recipientPhone:data.get("recipientPhone"),addressLine1:data.get("addressLine1"),addressLine2:data.get("addressLine2"),landmark:data.get("landmark"),city:data.get("city"),lga:data.get("lga"),state:data.get("state"),postalCode:data.get("postalCode"),deliveryInstructions:data.get("deliveryInstructions"),deliveryMethod:"standard",shippingZoneCode:data.get("shippingZoneCode")},
     items:items.map(i=>({slug:i.slug,quantity:i.quantity}))
    };
    const response=await fetch("/api/paystack/initialize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
@@ -118,12 +147,23 @@ export default function CheckoutPage(){
  <section className="section checkout-section-v3"><div className="container checkout-grid"><form className="form checkout-form checkout-form-v3" onSubmit={submit}>
  <div className="checkout-order-editor"><div className="checkout-section-heading"><div><span className="eyebrow">Your order</span><h2>Choose products and quantity</h2><p>The product you selected is already here. Adjust the number of packs or add another Bridgecare product before entering your details.</p></div><ShoppingBag size={26}/></div>
  <div className="checkout-order-items">{items.map(item=><article className="checkout-order-item" key={item.slug}><Image src={`/images/products/${item.slug}.png`} alt={`${item.name} product pack`} width={72} height={62}/><div className="checkout-order-item-copy"><strong>{item.name}</strong><small>{formatNaira(item.priceKobo)} per pack</small></div><div className="quantity-stepper" aria-label={`Quantity for ${item.name}`}><button type="button" aria-label={`Reduce ${item.name} quantity`} onClick={()=>item.quantity<=1?remove(item.slug):setQuantity(item.slug,item.quantity-1)}><Minus size={16}/></button><input aria-label={`${item.name} quantity`} type="number" min={1} max={20} value={item.quantity} onChange={event=>setQuantity(item.slug,Number(event.target.value)||1)}/><button type="button" aria-label={`Increase ${item.name} quantity`} onClick={()=>setQuantity(item.slug,item.quantity+1)}><Plus size={16}/></button></div><strong className="checkout-line-total">{formatNaira(item.priceKobo*item.quantity)}</strong><button type="button" className="checkout-remove-item" aria-label={`Remove ${item.name}`} onClick={()=>remove(item.slug)}><Trash2 size={17}/><span>Remove</span></button></article>)}</div>
- <div className="checkout-add-more"><div className="checkout-add-more-heading"><h3>Add more products</h3><p>You can combine products in one order and pay once.</p></div><div className="checkout-add-product-grid">{PRODUCTS.map(product=>{const current=items.find(item=>item.slug===product.slug);const priceKobo=catalogPrices[product.slug]??product.priceKobo;return <article className={`checkout-add-product${current?" selected":""}`} key={product.slug}><Image src={product.image} alt={`${product.name} product pack`} width={62} height={54}/><div><strong>{product.name}</strong><small>{formatNaira(priceKobo)}</small></div>{current?<span className="already-added"><CheckCircle2 size={16}/> {current.quantity} in order</span>:<button type="button" className="button secondary compact-button" onClick={()=>addExtraProduct({slug:product.slug,name:product.name,priceKobo})}><Plus size={16}/> Add</button>}</article>})}</div></div></div>
- <h2>Contact &amp; delivery information</h2><div className="form-row"><label>Full name<input name="fullName" required autoComplete="name"/></label><label>Phone number<input name="phone" required autoComplete="tel"/></label></div><label>Email<input name="email" type="email" required autoComplete="email" value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)}/></label>
- <label>House number and street address<input name="addressLine1" required autoComplete="address-line1"/></label><label>Apartment, estate or additional address (optional)<input name="addressLine2" autoComplete="address-line2"/></label>
+ <div className="checkout-add-more">
+  {recommendedProducts.length>0&&<div className="checkout-recommendations">
+   <div className="checkout-add-more-heading"><h3>You may also like</h3><p>Helpful additions based on the products already in your order.</p></div>
+   <div className="checkout-add-product-grid">{recommendedProducts.map(product=>{const priceKobo=catalogPrices[product.slug]??product.priceKobo;return <article className="checkout-add-product recommended" key={product.slug}><Image src={product.image} alt={`${product.name} product pack`} width={62} height={54}/><div><strong>{crossSellName(product.slug,product.name)}</strong><small>{formatNaira(priceKobo)}</small></div><button type="button" className="button secondary compact-button" onClick={()=>addExtraProduct({slug:product.slug,name:product.name,priceKobo})}><Plus size={16}/> Add</button></article>})}</div>
+  </div>}
+  {otherProducts.length>0&&<details className="checkout-more-products">
+   <summary>More Bridgecare products</summary>
+   <p className="checkout-more-products-note">Browse other products if you want to combine more items in this order.</p>
+   <div className="checkout-add-product-grid">{otherProducts.map(product=>{const priceKobo=catalogPrices[product.slug]??product.priceKobo;return <article className="checkout-add-product" key={product.slug}><Image src={product.image} alt={`${product.name} product pack`} width={62} height={54}/><div><strong>{crossSellName(product.slug,product.name)}</strong><small>{formatNaira(priceKobo)}</small></div><button type="button" className="button secondary compact-button" onClick={()=>addExtraProduct({slug:product.slug,name:product.name,priceKobo})}><Plus size={16}/> Add</button></article>})}</div>
+  </details>}
+ </div></div>
+ <h2>Customer information</h2><div className="form-row"><label>Full name<input name="fullName" required autoComplete="name"/></label><label>Email<input name="email" type="email" required autoComplete="email" value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)}/></label></div><label>Phone number<input name="phone" required autoComplete="tel"/></label>
+ <h2>Delivery address</h2><div className="form-row"><label>Recipient name<input name="recipientName" required/></label><label>Recipient phone<input name="recipientPhone" required/></label></div>
+ <label>House number and street address<input name="addressLine1" required autoComplete="address-line1"/></label><label>Apartment, estate or additional address<input name="addressLine2" autoComplete="address-line2"/></label>
  <div className="form-row"><label>Landmark<input name="landmark"/></label><label>City<input name="city" required autoComplete="address-level2"/></label></div>
  <div className="form-row"><label>Local Government Area<input name="lga" required/></label><label>State<select name="state" value={state} onChange={e=>{const nextState=e.target.value;setState(nextState);const matching=activeZones.find(zone=>zone.states.includes(nextState));if(matching)setShippingZoneCode(matching.code)}} required>{STATES.map(x=><option key={x}>{x}</option>)}</select></label></div>
- <label>Delivery instructions (optional)<textarea name="deliveryInstructions" placeholder="Gate code, preferred contact method, or directions for the rider."/></label>
+ <label>Postal code (optional)<input name="postalCode" autoComplete="postal-code"/></label><label>Delivery instructions (optional)<textarea name="deliveryInstructions" placeholder="Gate code, preferred contact method, or directions for the rider."/></label>
  <h2>Delivery method</h2><input type="hidden" name="deliveryMethod" value="standard"/>
  <div className="delivery-method-list">
   <div className={`radio-card delivery-method-option free-shipping-method${freeShippingEligible?" selected":" locked"}`}>
@@ -140,7 +180,7 @@ export default function CheckoutPage(){
  <div className="shipping-zone-list">{activeZones.map(zone=>{return <label className={`radio-card shipping-zone-option${shippingZoneCode===zone.code?" selected":""}`} key={zone.code}><input type="radio" name="shippingZoneCode" value={zone.code} checked={shippingZoneCode===zone.code} onChange={()=>{setShippingZoneCode(zone.code);if(!zone.states.includes(state))setState(zone.states[0]||state)}}/><span><strong>{zone.name}</strong><small>{freeShippingEligible?"₦0 with Free Shipping":formatNaira(zone.priceKobo)}</small></span></label>})}</div>
  {shipping.freeShippingPackCount>0&&<p className={`shipping-threshold-note${freeShippingEligible?" unlocked":""}`}>{freeShippingEligible?`Free Shipping Nationwide unlocked — delivery is ₦0 for this ${packCount}-pack order.`:`Add ${packsToFreeShipping} more pack${packsToFreeShipping===1?"":"s"} to get Free Shipping. Free Shipping applies automatically from ${shipping.freeShippingPackCount} packs.`}</p>}
  <div className="checkout-coupon"><div><h2>Coupon code</h2><p>Enter a valid promotion code before continuing to payment.</p></div><div className="coupon-entry"><input value={couponCode} onChange={e=>{setCouponCode(e.target.value.toUpperCase());setAppliedCoupon(null);setCouponError("")}} placeholder="WELCOME10" aria-label="Coupon code"/><button type="button" className="button secondary" onClick={applyCoupon} disabled={couponLoading}>{couponLoading?"Checking…":appliedCoupon?"Reapply":"Apply"}</button></div>{appliedCoupon&&<div className="coupon-applied"><CheckCircle2 size={18}/><span><strong>{appliedCoupon.code}</strong> {appliedCoupon.message}</span><button type="button" onClick={()=>{setAppliedCoupon(null);setCouponCode("")}}>Remove</button></div>}{couponError&&<div className="coupon-error">{couponError}</div>}</div>
- {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone||!zoneMatchesState}>{loading?"Opening Paystack…":`Checkout ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
+ {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone||!zoneMatchesState}>{loading?"Opening Paystack…":`Pay ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
  </form>
  <aside className="order-summary order-summary-v3"><div className="summary-secure"><ShieldCheck size={22}/><span><strong>Secure checkout</strong><small>Your payment is processed by Paystack.</small></span></div><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{selectedZone?formatNaira(shippingKobo):"Unavailable"}</strong></div>{discountKobo>0&&<div className="summary-discount"><span>Coupon {appliedCoupon?.code}</span><strong>-{formatNaira(discountKobo)}</strong></div>}<div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div><div className="checkout-confidence"><span><LockKeyhole size={17}/> Encrypted payment</span><span><Truck size={17}/> Delivery details confirmed</span><span><CheckCircle2 size={17}/> Order saved before payment</span></div></aside>
  </div></section></>
