@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { CartProvider } from "@/components/cart/CartProvider";
+import { CartProvider } from "@/components/cart/CartProvider";\nimport { CartDrawer } from "@/components/cart/CartDrawer";
 import { FloatingContact } from "@/components/FloatingContact";
 import { TawkToChat } from "@/components/TawkToChat";
 import { MarketingAnalytics } from "@/components/analytics/MarketingAnalytics";
@@ -89,7 +89,7 @@ export default function RootLayout({
 
           {children}
 
-          <Footer />
+          <CartDrawer />\n          <Footer />
           <FloatingContact />
           <TawkToChat />
           <MarketingAnalytics />
