@@ -1,0 +1,36 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { Minus, Plus, ShoppingBag, Trash2, Truck, X } from "lucide-react";
+import { PRODUCTS } from "@/data/products";
+import { formatNaira } from "@/lib/store";
+import { DEFAULT_FREE_SHIPPING_PACK_COUNT } from "@/lib/shipping-rates";
+import { trackMetaAddToCart } from "@/components/analytics/MetaCommerceEvents";
+import { trackTikTokAddToCart } from "@/components/analytics/TikTokCommerceEvents";
+import { useCart } from "./CartProvider";
+
+export function CartDrawer(){
+ const {items,count,subtotalKobo,add,remove,setQuantity,isCartOpen,closeCart}=useCart();
+ if(!isCartOpen)return null;
+ const packsToFree=Math.max(0,DEFAULT_FREE_SHIPPING_PACK_COUNT-count);
+ const suggested=PRODUCTS.filter(product=>!items.some(item=>item.slug===product.slug)).slice(0,2);
+ function addSuggested(product:(typeof PRODUCTS)[number]){
+  add({slug:product.slug,name:product.name,priceKobo:product.priceKobo});
+  trackMetaAddToCart(product);trackTikTokAddToCart(product);
+ }
+ return <div className="cart-drawer-layer" role="dialog" aria-modal="true" aria-label="Your cart">
+  <button className="cart-drawer-backdrop" aria-label="Close cart" onClick={closeCart}/>
+  <aside className="cart-drawer-panel">
+   <header className="cart-drawer-header"><div><ShoppingBag size={20}/><strong>Your Cart ({count} {count===1?"pack":"packs"})</strong></div><button type="button" onClick={closeCart} aria-label="Close cart"><X size={24}/></button></header>
+   <div className={`cart-free-shipping${packsToFree===0?" unlocked":""}`}><Truck size={19}/><span>{packsToFree===0?<><strong>FREE DELIVERY unlocked</strong><small>Your order qualifies for free nationwide shipping.</small></>:<><strong>Add {packsToFree} more pack{packsToFree===1?"":"s"} for FREE DELIVERY</strong><small>Free nationwide shipping from {DEFAULT_FREE_SHIPPING_PACK_COUNT} packs.</small></>}</span></div>
+   <div className="cart-drawer-scroll">
+    {items.length===0?<div className="cart-drawer-empty"><ShoppingBag size={34}/><h3>Your cart is empty</h3><Link href="/products" onClick={closeCart} className="button">Shop products</Link></div>:<>
+     <div className="cart-drawer-items">{items.map(item=><article key={item.slug} className="cart-drawer-item"><Image src={`/images/products/${item.slug}.png`} alt={`${item.name} product pack`} width={74} height={64}/><div className="cart-drawer-item-copy"><strong>{item.name}</strong><small>{formatNaira(item.priceKobo)} per pack</small><div className="cart-drawer-item-actions"><div className="quantity-stepper"><button type="button" onClick={()=>item.quantity<=1?remove(item.slug):setQuantity(item.slug,item.quantity-1)} aria-label={`Reduce ${item.name}`}><Minus size={15}/></button><span>{item.quantity}</span><button type="button" onClick={()=>setQuantity(item.slug,item.quantity+1)} aria-label={`Increase ${item.name}`}><Plus size={15}/></button></div><button className="cart-drawer-remove" type="button" onClick={()=>remove(item.slug)} aria-label={`Remove ${item.name}`}><Trash2 size={17}/></button></div></div><strong className="cart-drawer-line-total">{formatNaira(item.priceKobo*item.quantity)}</strong></article>)}</div>
+     {suggested.length>0&&<section className="cart-suggestions"><h3>You may also like</h3><div>{suggested.map(product=><article key={product.slug}><Image src={product.image} alt={`${product.name} product pack`} width={56} height={48}/><span><strong>{product.name}</strong><small>{formatNaira(product.priceKobo)}</small></span><button type="button" onClick={()=>addSuggested(product)}><Plus size={15}/> Add</button></article>)}</div></section>}
+    </>}
+   </div>
+   {items.length>0&&<footer className="cart-drawer-footer"><div><span>Estimated total</span><strong>{formatNaira(subtotalKobo)}</strong></div><Link href="/checkout" onClick={closeCart} className="button full">Checkout {formatNaira(subtotalKobo)} securely</Link><small>Delivery is calculated at checkout. 3+ packs ship free nationwide.</small></footer>}
+  </aside>
+ </div>
+}
