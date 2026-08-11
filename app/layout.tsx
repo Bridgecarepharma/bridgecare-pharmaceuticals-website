@@ -4,7 +4,8 @@ import "./globals.css";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { CartProvider } from "@/components/cart/CartProvider";\nimport { CartDrawer } from "@/components/cart/CartDrawer";
+import { CartProvider } from "@/components/cart/CartProvider";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 import { FloatingContact } from "@/components/FloatingContact";
 import { TawkToChat } from "@/components/TawkToChat";
 import { MarketingAnalytics } from "@/components/analytics/MarketingAnalytics";
