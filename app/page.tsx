@@ -57,6 +57,19 @@ export default async function Home() {
         </div>
       </section>
 
+      <section className="mobile-shop-tools" aria-label="Shop Bridgecare products">
+        <div className="container">
+          <Link href="/search" className="mobile-store-search"><span>Search Bridgecare products</span><ArrowRight size={18}/></Link>
+          <div className="mobile-category-chips" aria-label="Product categories">
+            <Link href="/products">All products</Link>
+            <Link href="/products/asfenositol">Women’s wellness</Link>
+            <Link href="/products/aspivit">Vitamins</Link>
+            <Link href="/products/globivida">Nutritional support</Link>
+            <Link href="/products/herbal-bitter-tea">Herbal wellness</Link>
+          </div>
+        </div>
+      </section>
+
       <section className="section soft shop-section-v3">
         <div className="container">
           <div className="section-head">

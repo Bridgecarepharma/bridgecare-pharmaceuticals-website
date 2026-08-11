@@ -1,21 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
-import { BuyNowButton } from "@/components/cart/BuyNowButton";
 import { BrandIcon } from "./BrandIcon";
 import { IngredientCard, SafetyPanel, SectionTitle } from "./ProductPageSections";
 import { formatNaira } from "@/lib/store";
 import { BadgeCheck, Headphones, LockKeyhole, Truck } from "lucide-react";
 import type { Product } from "@/data/products";
 import { PRODUCTS } from "@/data/products";
+import { ProductCommunitySection } from "./ProductCommunitySection";
+import { MetaProductView } from "@/components/analytics/MetaCommerceEvents";
+import { TikTokProductView } from "@/components/analytics/TikTokCommerceEvents";
 
 export function PremiumProductPage({ product }: { product: Product }) {
   const complete = product.ingredients.length > 0;
   const related = PRODUCTS.filter(p => p.slug !== product.slug).slice(0,3);
-  return <main className={`product-page ${product.theme}-theme`}>
+  return <main className={`product-page ${product.theme}-theme`}><MetaProductView slug={product.slug} name={product.name} priceKobo={product.priceKobo}/><TikTokProductView slug={product.slug} name={product.name} priceKobo={product.priceKobo}/>
     <section className="premium-product-hero"><div className="container premium-product-grid">
       <div className="premium-pack-stage"><div className="pack-halo"/><div className="premium-pack-image"><Image src={product.image} alt={`${product.name} product pack`} fill priority sizes="(max-width: 900px) 90vw, 46vw"/></div><div className="glass-pedestal"><span/></div></div>
-      <div className="premium-product-copy"><span className="eyebrow">{product.category}</span><h1>{product.name}</h1><p className="approved-indication">Approved indication</p><h2>{product.indication}</h2><p className="lead">{product.summary}</p><div className="purchase-line"><strong>{formatNaira(product.priceKobo)}</strong><span>{product.packSize} per pack</span></div><div className="hero-actions"><AddToCartButton slug={product.slug} name={product.name} priceKobo={product.priceKobo}/><BuyNowButton slug={product.slug} name={product.name} priceKobo={product.priceKobo}/></div><div className="product-trust-badges"><span><LockKeyhole size={17}/><b>Secure Paystack</b><small>Protected payment</small></span><span><Truck size={17}/><b>Nationwide delivery</b><small>Rates shown at checkout</small></span><span><Headphones size={17}/><b>Customer support</b><small>Help when you need it</small></span><span><BadgeCheck size={17}/><b>Bridgecare direct</b><small>Order from the source</small></span></div></div>
+      <div className="premium-product-copy"><span className="eyebrow">{product.category}</span><h1>{product.name}</h1><p className="approved-indication">Approved indication</p><h2>{product.indication}</h2><p className="lead">{product.summary}</p><div className="purchase-line"><strong>{formatNaira(product.priceKobo)}</strong><span>{product.packSize} per pack</span></div><div className="hero-actions"><AddToCartButton slug={product.slug} name={product.name} priceKobo={product.priceKobo}/><Link className="button secondary" href="/cart">View order</Link></div><p className="order-flow-hint">Choose quantity, add other products and enter delivery details on the next screen.</p><div className="product-trust-badges"><span><LockKeyhole size={17}/><b>Secure Paystack</b><small>Protected payment</small></span><span><Truck size={17}/><b>Nationwide delivery</b><small>Rates shown at checkout</small></span><span><Headphones size={17}/><b>Customer support</b><small>Help when you need it</small></span><span><BadgeCheck size={17}/><b>Bridgecare direct</b><small>Order from the source</small></span></div></div>
     </div></section>
     <nav className="product-anchor-nav" aria-label="Product page sections"><div className="container"><a href="#overview">Overview</a>{complete&&<a href="#ingredients">Ingredients</a>}<a href="#directions">Directions</a><a href="#safety">Safety</a><a href="#faq">FAQs</a></div></nav>
     <section className="section" id="overview"><div className="container product-content-narrow"><SectionTitle eyebrow="Overview" title={`Why ${product.name}`} intro={product.overview}/>{complete ? <div className="why-grid">{product.reasons.map(r=><article className="product-info-card" key={r.title}><BrandIcon symbol={r.symbol}/><h3>{r.title}</h3><p>{r.text}</p></article>)}</div> : <div className="notice">The complete premium information page will be populated only from the approved pack copy.</div>}</div></section>
@@ -27,6 +29,7 @@ export function PremiumProductPage({ product }: { product: Product }) {
     <section className="section" id="faq"><div className="container product-content-narrow"><SectionTitle eyebrow="Frequently asked questions" title="Helpful answers before purchase"/><div className="faq-list">{product.faqs.length ? product.faqs.map(f=><details key={f.question}><summary>{f.question}</summary><p>{f.answer}</p></details>) : <details><summary>Where can I find the complete approved information?</summary><p>Read the physical product pack or contact Bridgecare customer support.</p></details>}</div></div></section>
     <section className="section product-tint"><div className="container"><SectionTitle eyebrow="Resources" title="Product support and information"/><div className="resource-grid"><Link href="/downloads" className="resource-card"><BrandIcon symbol="PDF"/><h3>Product resources</h3><p>Access available product and corporate downloads.</p></Link><Link href="/contact" className="resource-card"><BrandIcon symbol="?"/><h3>Need more information?</h3><p>Speak with Bridgecare customer support.</p></Link></div></div></section>
     <section className="section"><div className="container"><SectionTitle eyebrow="Related products" title="Explore more from Bridgecare"/><div className="related-grid">{related.map(p=><Link href={`/products/${p.slug}`} className="related-product" key={p.slug}><span className="related-image"><Image src={p.image} alt="" fill sizes="180px"/></span><strong>{p.name}</strong><small>{formatNaira(p.priceKobo)}</small></Link>)}</div></div></section>
+    <ProductCommunitySection productSlug={product.slug} productName={product.name} />
     <section className="product-closing-cta"><div className="container product-closing-grid"><div><span className="eyebrow">Shop directly from Bridgecare</span><h2>Order {product.name} securely</h2><p>Clear delivery fees and free shipping when your basket contains any three packs or more.</p></div><div className="closing-purchase"><strong>{formatNaira(product.priceKobo)}</strong><AddToCartButton slug={product.slug} name={product.name} priceKobo={product.priceKobo}/><Link className="button secondary" href="/products">Explore all products</Link></div></div></section>
   </main>;
 }

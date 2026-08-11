@@ -17,7 +17,7 @@ export async function POST(request:Request){
   if(event.event==="charge.success"&&process.env.DATABASE_URL){
    const tx=event.data;
    const order=await prisma.order.findUnique({where:{paystackReference:tx.reference},include:{payment:true}});
-   if(order&&tx.status==="success"&&tx.amount===order.totalKobo&&tx.currency===order.currency){
+   if(order&&tx.status==="success"&&tx.currency===order.currency&&Number(tx.amount)>=Number(order.totalKobo)&&String(tx.metadata?.order_id||"")===order.id&&Number(tx.metadata?.total_kobo)===Number(order.totalKobo)){
     const paidAt=new Date(tx.paid_at||Date.now());
     await prisma.$transaction(async (db) => {
      // A repeated charge.success webhook must not deduct inventory twice.

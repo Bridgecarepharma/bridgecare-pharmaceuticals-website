@@ -1,0 +1,12 @@
+BRIDGECARE v6.4.19 — MINIMAL FREE SHIPPING PATCH
+
+Use this patch on top of the current working Bridgecare project.
+
+Replace ONLY:
+1. app/checkout/page.tsx
+2. app/globals.css
+
+Do not upload or replace _next, node_modules, Prisma, package.json, or other project files.
+
+Suggested commit:
+Show Free Shipping in delivery method v6.4.19 minimal patch

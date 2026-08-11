@@ -14,6 +14,14 @@ export function TawkToChat() {
     <Script id="tawk-to-chat" strategy="afterInteractive">
       {`
         window.Tawk_API = window.Tawk_API || {};
+        // On phones Bridgecare already provides a single floating WhatsApp action.
+        // Hide the separate Tawk bubble there to avoid overlapping contact buttons.
+        var bridgecareMobile = window.matchMedia("(max-width: 600px)");
+        window.Tawk_API.onLoad = function () {
+          if (bridgecareMobile.matches && window.Tawk_API && typeof window.Tawk_API.hideWidget === "function") {
+            window.Tawk_API.hideWidget();
+          }
+        };
         window.Tawk_LoadStart = new Date();
         (function () {
           var s1 = document.createElement("script");

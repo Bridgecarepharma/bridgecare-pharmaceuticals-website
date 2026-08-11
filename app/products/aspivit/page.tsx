@@ -1,8 +1,11 @@
 import Image from "next/image";
+import { MetaProductView } from "@/components/analytics/MetaCommerceEvents";
+import { TikTokProductView } from "@/components/analytics/TikTokCommerceEvents";
 import Link from "next/link";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { formatNaira } from "@/lib/store";
 import { getProductPrice } from "@/lib/product-prices";
+import { ProductCommunitySection } from "@/components/product/ProductCommunitySection";
 
 export const metadata = {
   title: "Aspivit® | Omega-3, Vitamins & Minerals",
@@ -33,6 +36,8 @@ const benefits = [
 export default async function Page() {
   const priceKobo = await getProductPrice("aspivit");
   return <>
+    <MetaProductView slug="aspivit" name="Aspivit®" priceKobo={priceKobo} />
+    <TikTokProductView slug="aspivit" name="Aspivit®" priceKobo={priceKobo} />
     <section className="product-detail-hero">
       <div className="container product-detail">
         <div className="product-detail-image"><Image src="/images/products/aspivit.png" alt="Aspivit® product pack" fill priority sizes="(max-width: 850px) 90vw, 45vw" /></div>
@@ -41,7 +46,8 @@ export default async function Page() {
           <h1>Aspivit® Tablet</h1>
           <p className="lead">A comprehensive nutritional supplement formulated with Omega-3 fatty acids, essential vitamins and trace minerals to support overall health and wellbeing.</p>
           <div className="detail-price">{formatNaira(priceKobo)}</div>
-          <div className="hero-actions"><AddToCartButton slug="aspivit" name="Aspivit®" priceKobo={priceKobo} /><Link className="button secondary" href="/cart">View cart</Link><Link className="button secondary" href="/products">All products</Link></div>
+          <div className="hero-actions"><AddToCartButton slug="aspivit" name="Aspivit®" priceKobo={priceKobo} /><Link className="button secondary" href="/cart">View order</Link><Link className="button secondary" href="/products">All products</Link></div>
+          <p className="order-flow-hint">Choose quantity, add other products and enter delivery details on the next screen.</p>
           <p className="product-disclaimer">Food supplements should not be used as a substitute for a varied and balanced diet. Use only as directed.</p>
         </div>
       </div>
@@ -96,5 +102,6 @@ export default async function Page() {
         </div>
       </div>
     </div></section>
+    <ProductCommunitySection productSlug="aspivit" productName="Aspivit® Tablet" />
   </>;
 }

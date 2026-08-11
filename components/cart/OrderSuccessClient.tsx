@@ -5,12 +5,94 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatNaira } from "@/lib/store";
-type Order={orderNumber:string;paystackReference:string;status:string;subtotalKobo?:number;shippingKobo?:number;discountKobo?:number;couponCode?:string|null;totalKobo:number;recipientName:string;addressLine1:string;addressLine2?:string|null;city:string;lga:string;state:string;items:{id:string;productName:string;quantity:number;lineTotalKobo:number}[]};
+import { trackTikTokPurchase } from "@/components/analytics/TikTokCommerceEvents";
+
+type OrderItem={id:string;productSlug?:string|null;productName:string;quantity:number;lineTotalKobo:number};
+type Order={orderNumber:string;paystackReference:string;status:string;subtotalKobo?:number;shippingKobo?:number;discountKobo?:number;couponCode?:string|null;totalKobo:number;recipientName:string;addressLine1:string;addressLine2?:string|null;city:string;lga:string;state:string;items:OrderItem[]};
+type Fbq=(...args:unknown[])=>void;
+
+function safeSlug(item:OrderItem){
+ if(item.productSlug)return item.productSlug;
+ return item.productName.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+}
+
+function fireVerifiedPurchase(order:Order){
+ const storageKey=`bridgecare-meta-purchase:${order.paystackReference}`;
+ try{if(window.localStorage.getItem(storageKey)==="sent")return()=>{}}catch{}
+
+ const contentIds=order.items.map(safeSlug).filter(Boolean);
+ const payload={
+  value:Number((order.totalKobo/100).toFixed(2)),
+  currency:"NGN",
+  content_type:"product",
+  content_ids:contentIds,
+  num_items:order.items.reduce((sum,item)=>sum+item.quantity,0)
+ };
+ let attempts=0;
+ const send=()=>{
+  const fbq=(window as Window & {fbq?:Fbq}).fbq;
+  if(typeof fbq!=="function")return false;
+  // Keep Purchase deliberately simple: these are the same standard fields Meta
+  // already accepts from the other working commerce events on this site.
+  fbq("track","Purchase",payload);
+  try{window.localStorage.setItem(storageKey,"sent")}catch{}
+  return true;
+ };
+ if(send())return()=>{};
+ const timer=window.setInterval(()=>{
+  attempts+=1;
+  if(send()||attempts>=40)window.clearInterval(timer);
+ },250);
+ return()=>window.clearInterval(timer);
+}
+
 export function OrderSuccessClient(){
  const params=useSearchParams();const reference=params.get("reference")||params.get("trxref");
  const {clear}=useCart();const[order,setOrder]=useState<Order|null>(null);const[error,setError]=useState("");const[loading,setLoading]=useState(true);
- useEffect(()=>{if(!reference){setError("The payment reference is missing.");setLoading(false);return}
-  fetch(`/api/paystack/verify?reference=${encodeURIComponent(reference)}`).then(r=>r.json().then(x=>({ok:r.ok,x}))).then(({ok,x})=>{if(!ok||!x.paid)throw new Error(x.error||"Payment has not been confirmed.");setOrder(x.order);clear()}).catch(e=>setError(e.message)).finally(()=>setLoading(false));
+ useEffect(()=>{
+  if(!reference){setError("The payment reference is missing.");setLoading(false);return}
+  let cancelled=false;
+  let cancelPurchaseRetry:(()=>void)|undefined;
+  const verify=async()=>{
+   const maxAttempts=10;
+   for(let attempt=1;attempt<=maxAttempts&&!cancelled;attempt+=1){
+    try{
+     const r=await fetch(`/api/paystack/verify?reference=${encodeURIComponent(reference)}`,{cache:"no-store"});
+     const x=await r.json();
+     if(r.ok&&x.paid){
+      const verifiedOrder=x.order as Order;
+      if(!verifiedOrder?.paystackReference||!verifiedOrder?.totalKobo)throw new Error("The verified order is incomplete.");
+      cancelPurchaseRetry=fireVerifiedPurchase(verifiedOrder);
+      const cancelTikTokPurchaseRetry=trackTikTokPurchase({
+       reference:verifiedOrder.paystackReference,
+       orderNumber:verifiedOrder.orderNumber,
+       totalKobo:verifiedOrder.totalKobo,
+       items:verifiedOrder.items.map(item=>({slug:safeSlug(item),name:item.productName,quantity:item.quantity}))
+      });
+      const previousCancel=cancelPurchaseRetry;
+      cancelPurchaseRetry=()=>{previousCancel?.();cancelTikTokPurchaseRetry?.()};
+      if(cancelled)return;
+      setOrder(verifiedOrder);
+      clear();
+      setLoading(false);
+      return;
+     }
+     if(x.retryable&&attempt<maxAttempts){
+      await new Promise(resolve=>window.setTimeout(resolve,1500));
+      continue;
+     }
+     throw new Error(x.error||"Payment has not been confirmed.");
+    }catch(e){
+     if(attempt<maxAttempts){
+      await new Promise(resolve=>window.setTimeout(resolve,1500));
+      continue;
+     }
+     if(!cancelled){setError(e instanceof Error?e.message:"Unable to verify payment.");setLoading(false)}
+    }
+   }
+  };
+  void verify();
+  return()=>{cancelled=true;cancelPurchaseRetry?.()};
  // clear is intentionally omitted so clearing the cart does not trigger repeated verification.
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[reference]);
