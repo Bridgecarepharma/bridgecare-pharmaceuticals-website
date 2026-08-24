@@ -1,0 +1,2 @@
+import Image from "next/image"; import Link from "next/link";
+export default function Header(){return <header><div className="container nav"><Link href="/"><Image src="/images/logo.webp" alt="Bridgecare Pharmaceuticals" width={180} height={70}/></Link><nav><Link href="/#products">Products</Link><Link href="/about/">About Us</Link><Link href="/#health-centre">Health Centre</Link><Link href="/distributor/">Distributors</Link><Link href="/contact/">Contact</Link></nav><a className="btn primary" href="https://paystack.shop/pay/btzq7yqk7p">Shop Now →</a></div></header>}

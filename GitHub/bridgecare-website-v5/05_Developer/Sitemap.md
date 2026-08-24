@@ -1,0 +1,34 @@
+# Sitemap
+
+- Home
+- About
+  - Our Story
+  - Vision, Mission & Values
+  - Leadership
+  - CEO Message
+  - Quality Promise
+  - Community Impact
+  - Careers
+- Products
+  - Aspivit
+  - AsFenositol
+  - Globivida
+  - Bridgecare Herbal Bitter Tea
+  - RenerveVitaX
+- Health Academy
+  - Heart & Daily Wellness
+  - Women's Wellness
+  - Blood Sugar Wellness
+  - Sickle Cell Wellness
+  - Nerve Health
+  - Healthy Living
+- Health Library A–Z
+- Ingredient Library
+- Wellness Tools
+- Download Centre
+- Bridgecare TV
+- Healthcare Professionals
+- Distributors
+- News & Events
+- Contact & Support
+- Legal

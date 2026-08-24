@@ -19,7 +19,28 @@ export default async function OrderDetails({ params, searchParams }: { params: P
   const order = await prisma.order.findUnique({ where: { id }, include: { items: true, payment: true, statusHistory: { orderBy: { createdAt: "desc" } } } });
   if (!order) notFound();
   const whatsappPhone = order.customerPhone.replace(/\D/g, "").replace(/^0/, "234");
-  const whatsappText = encodeURIComponent(`Hello ${order.customerName}, this is Bridgecare Pharmaceuticals regarding order ${order.orderNumber}.`);
+  const customerFirstName = order.customerName.trim().split(/\s+/)[0] || order.customerName;
+  const isPendingPayment = order.status === "PENDING_PAYMENT" || !order.payment || ["PENDING", "FAILED", "ABANDONED"].includes(order.payment.status);
+  const whatsappOrderItems = order.items
+    .map(item => `• ${item.productName} — ${item.quantity} pack${item.quantity === 1 ? "" : "s"}`)
+    .join("\n");
+  const pendingWhatsappMessage = [
+    `Hello ${customerFirstName}, thank you for your order with Bridgecare Pharmaceuticals Limited.`,
+    "",
+    `We noticed that payment for your order ${order.orderNumber} has not been completed.`,
+    "",
+    "Your order:",
+    whatsappOrderItems,
+    `Order total: ${naira(order.totalKobo)}`,
+    "",
+    "If you experienced any difficulty while making payment, please reply to this message and we'll be happy to assist you.",
+    "",
+    "If you would still like to complete your order, we can send you a secure payment link.",
+    "",
+    "Thank you for choosing Bridgecare Pharmaceuticals Limited.",
+  ].join("\n");
+  const paidWhatsappMessage = `Hello ${order.customerName}, this is Bridgecare Pharmaceuticals regarding order ${order.orderNumber}.`;
+  const whatsappText = encodeURIComponent(isPendingPayment ? pendingWhatsappMessage : paidWhatsappMessage);
 
   return <section className="section admin-shell"><div className="container"><AdminNav/>
     <div className="admin-heading admin-order-heading"><div><span className="eyebrow">Order management</span><h1>{order.orderNumber}</h1><p>Placed {adminDate(order.createdAt)} · {order.items.reduce((sum, item) => sum + item.quantity, 0)} pack(s)</p></div><div className="admin-order-actions"><Link className="button secondary" href={`/admin/orders/${order.id}/invoice`}>Invoice</Link><Link className="button secondary" href={`/admin/orders/${order.id}/packing-slip`}>Packing slip</Link><a className="button secondary" href={`https://wa.me/${whatsappPhone}?text=${whatsappText}`} target="_blank" rel="noreferrer">WhatsApp customer</a></div></div>
