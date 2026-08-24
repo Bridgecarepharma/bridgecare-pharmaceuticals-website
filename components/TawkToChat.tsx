@@ -2,13 +2,6 @@
 
 import Script from "next/script";
 
-declare global {
-  interface Window {
-    Tawk_API?: Record<string, unknown>;
-    Tawk_LoadStart?: Date;
-  }
-}
-
 export function TawkToChat() {
   return (
     <Script id="tawk-to-chat" strategy="afterInteractive">
