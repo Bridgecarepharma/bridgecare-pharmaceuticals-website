@@ -90,7 +90,8 @@ export default function RootLayout({
 
           {children}
 
-          <CartDrawer />\n          <Footer />
+          <CartDrawer />
+          <Footer />
           <FloatingContact />
           <TawkToChat />
           <MarketingAnalytics />

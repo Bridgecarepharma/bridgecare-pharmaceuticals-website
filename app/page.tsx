@@ -70,6 +70,19 @@ export default async function Home() {
         </div>
       </section>
 
+
+      <section className="section health-needs-section">
+        <div className="container">
+          <div className="center-heading"><span className="eyebrow">Shop by health need</span><h2>Find the right Bridgecare range faster</h2><p>Start with the wellness area that matters to you, then review the product information before ordering.</p></div>
+          <div className="health-needs-grid">
+            <Link href="/products/asfenositol"><span><HeartPulse size={24}/></span><strong>Women’s Health</strong><small>Daily women’s wellness support</small></Link>
+            <Link href="/products/aspivit"><span><Sparkles size={24}/></span><strong>Daily Nutrition</strong><small>Vitamins, minerals &amp; omega-3</small></Link>
+            <Link href="/products/globivida"><span><BadgeCheck size={24}/></span><strong>Blood &amp; Vitality</strong><small>Specialised nutritional support</small></Link>
+            <Link href="/products/herbal-bitter-tea"><span><HeartPulse size={24}/></span><strong>Herbal Wellness</strong><small>Plant-based everyday wellness</small></Link>
+          </div>
+        </div>
+      </section>
+
       <section className="section soft shop-section-v3">
         <div className="container">
           <div className="section-head">

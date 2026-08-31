@@ -2,15 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, Search, Truck, X } from "lucide-react";
 import { useState } from "react";
 import { navItems } from "@/data/site";
 import { CartLink } from "@/components/cart/CartLink";
+
+function TruckIcon(){ return <Truck size={15} aria-hidden="true"/>; }
 
 export function Header() {
   const [open, setOpen] = useState(false);
   return (
     <header className="site-header">
+      <div className="delivery-announcement"><div className="container"><TruckIcon /> <strong>FREE nationwide delivery on 4+ packs</strong><span>Regional delivery from ₦3,500 for smaller orders</span></div></div>
       <div className="header-accent" />
       <div className="container nav-wrap">
         <Link href="/" className="brand brand-official" aria-label="Bridgecare Pharmaceuticals Limited home">
