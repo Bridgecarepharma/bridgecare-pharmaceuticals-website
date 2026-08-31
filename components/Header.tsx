@@ -34,6 +34,16 @@ export function Header() {
           <CartLink />
         </nav>
       </div>
+      <div className="shop-nav-bar" aria-label="Shop categories">
+        <div className="container shop-nav-inner">
+          <Link href="/products"><strong>SHOP ALL</strong></Link>
+          <Link href="/products/asfenositol">WOMEN’S HEALTH</Link>
+          <Link href="/products/aspivit">DAILY NUTRITION</Link>
+          <Link href="/products/globivida">BLOOD &amp; VITALITY</Link>
+          <Link href="/products/herbal-bitter-tea">HERBAL WELLNESS</Link>
+          <Link href="/health-centre">HEALTH CENTRE</Link>
+        </div>
+      </div>
     </header>
   );
 }
