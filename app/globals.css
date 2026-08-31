@@ -1395,6 +1395,7 @@ body{background:#fff;color:var(--ink)}
   .cart-suggestions article button{padding:.35rem .5rem;font-size:.8rem}
   .cart-drawer-footer{padding:.7rem .75rem calc(.75rem + env(safe-area-inset-bottom))}
 }
+<<<<<<< HEAD
 
 
 /* Storefront commerce refresh */
@@ -1414,3 +1415,5 @@ body{background:#fff;color:var(--ink)}
 .cart-free-delivery.unlocked{background:#effaf5;border-style:solid;border-color:#bfe6d4}
 @media(max-width:800px){.health-needs-grid{grid-template-columns:repeat(2,1fr)}.delivery-announcement span{display:none}}
 @media(max-width:480px){.delivery-announcement .container{min-height:31px;font-size:11px}.health-needs-grid{gap:9px}.health-needs-grid a{padding:15px;border-radius:15px}.health-needs-grid strong{font-size:14px}.health-needs-grid small{font-size:11px}}
+=======
+>>>>>>> 20b27f9658cf97a6f004891923a23bbea2507cd9

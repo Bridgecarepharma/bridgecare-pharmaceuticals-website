@@ -4,6 +4,7 @@ import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { formatNaira } from "@/lib/store";
 import { getProductPrice } from "@/lib/product-prices";
 
+import { StickyProductActions } from "@/components/cart/StickyProductActions";
 export const metadata = {
   title: "Aspivit® | Omega-3, Vitamins & Minerals",
   description: "Aspivit Tablet is a daily nutritional supplement with EPA, DHA, essential vitamins and trace minerals for overall health and wellbeing.",
@@ -96,5 +97,6 @@ export default async function Page() {
         </div>
       </div>
     </div></section>
+    <StickyProductActions slug="aspivit" name="Aspivit®" priceKobo={priceKobo}/>
   </>;
 }

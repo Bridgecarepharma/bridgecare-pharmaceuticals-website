@@ -1,0 +1,4 @@
+import type { Metadata } from 'next';
+export const metadata: Metadata = { title: 'Become a Distributor', description: 'Explore distributor and trade partnership opportunities with Bridgecare Pharmaceuticals across Nigeria.', alternates: { canonical: '/distributor/' } };
+
+export default function Page(){return <main className="inner"><section className="banner"><div className="container"><span className="kicker">Partner with Bridgecare</span><h1>Build your market with a growing healthcare brand.</h1><p>We welcome pharmacies, hospitals, wholesalers, supermarkets and qualified retailers.</p><div className="actions"><a className="btn primary" href="https://wa.link/bridgecarepharmaltd">Start on WhatsApp →</a><a className="btn ghost" href="mailto:smith@bridgecarepharma.com?subject=Distributor Enquiry">Send an email</a></div></div></section></main>}
