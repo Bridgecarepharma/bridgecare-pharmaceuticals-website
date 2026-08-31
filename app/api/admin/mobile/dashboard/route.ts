@@ -51,6 +51,7 @@ export async function GET(request: Request) {
       totalKobo: order.totalKobo,
       status: order.status,
       paymentStatus: order.payment?.status || "PENDING",
+      paymentChannel: order.paymentChannel || order.payment?.channel || null,
       createdAt: order.createdAt.toISOString(),
       packs: order.items.reduce((sum, item) => sum + item.quantity, 0),
       products: order.items.map(item => item.productName),
