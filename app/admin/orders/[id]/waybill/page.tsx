@@ -109,7 +109,12 @@ export default async function WaybillPage({ params }: { params: Promise<{ id: st
       .waybill-footer{padding-top:3mm;border-top:2px solid #173f58}.waybill-footer>div{display:grid;gap:.5mm}.waybill-footer strong{font-size:9pt}.waybill-footer span{font-size:7.4pt;line-height:1.25;color:#536b79}.waybill-barcode{padding-top:3mm;text-align:center;color:#071b2b}.waybill-barcode svg{display:block;width:100%;height:13mm}.waybill-barcode strong{display:block;margin-top:1mm;font-size:8pt;letter-spacing:.08em}
       @media(max-width:520px){.waybill-screen{padding:14px 8px 35px}.waybill-label{width:100%;min-height:auto;padding:18px}.waybill-logo{width:45%}.waybill-title strong{font-size:15pt}.waybill-recipient h1{font-size:17pt}.waybill-actions{justify-content:stretch}.waybill-actions>*{flex:1}}
       @page{size:100mm 150mm;margin:0}
-      @media print{html,body{margin:0!important;padding:0!important;background:#fff!important}.no-print{display:none!important}.waybill-screen{min-height:0;padding:0;background:#fff}.waybill-label{width:100mm;height:150mm;min-height:150mm;margin:0;border:0;box-shadow:none;padding:7mm;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+      @media print{
+        html,body{width:100mm!important;height:150mm!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#fff!important}
+        .site-header,.footer,.floating-contact,.cart-drawer-layer,.no-print,iframe,[id^="tawk"],[class*="tawk"]{display:none!important}
+        .waybill-screen{position:fixed!important;inset:0!important;width:100mm!important;height:150mm!important;min-height:150mm!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#fff!important;z-index:2147483647!important}
+        .waybill-label{box-sizing:border-box!important;width:100mm!important;height:150mm!important;min-height:150mm!important;max-height:150mm!important;margin:0!important;border:0!important;box-shadow:none!important;padding:7mm!important;overflow:hidden!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+      }
     `}</style>
   </main>;
 }
