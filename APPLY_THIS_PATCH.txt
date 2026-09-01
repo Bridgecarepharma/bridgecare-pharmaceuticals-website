@@ -1,1 +1,18 @@
-Copy these files into the root of the current Bridgecare website project, preserving folders, and replace the existing files when prompted. Then deploy normally.
+Bridgecare v6.6.2 — Delivery Waybill Label
+
+Copy the app folder from this patch over the app folder in the current Bridgecare website project, preserving paths.
+
+Adds:
+- Print waybill button on each admin order detail page
+- 100mm x 150mm (4 x 6 style) delivery waybill page
+- Customer/recipient name, phone and delivery address
+- Landmark and delivery instructions when present
+- Product names and quantities only
+- Total pack count
+- Bridgecare sender identity and order reference
+- No prices, payment amount or delivery charge
+
+Route:
+/admin/orders/[id]/waybill
+
+After applying, deploy the website normally. Open any admin order and select Print waybill.
