@@ -1,12 +1,13 @@
-BRIDGECARE v6.4.19 — MINIMAL FREE SHIPPING PATCH
+Bridgecare Pharmaceuticals Limited — Delivery Waybill Patch v6.6.3
 
-Use this patch on top of the current working Bridgecare project.
+Updates:
+- 100 mm × 150 mm delivery/waybill label
+- Adds a scannable Code 39 barcode generated from the order number
+- Prints the order number below the barcode
+- Updates sender address to Lascofed Building, 13 Isaacstan Close, off Wemco Road, Ogba, Lagos
+- Updates sender phone numbers to 08122218470 and 08077733373
+- No prices or payment amounts appear on the label
 
-Replace ONLY:
-1. app/checkout/page.tsx
-2. app/globals.css
-
-Do not upload or replace _next, node_modules, Prisma, package.json, or other project files.
-
-Suggested commit:
-Show Free Shipping in delivery method v6.4.19 minimal patch
+Apply:
+Copy the included app folder into the root of the Bridgecare website project and replace the matching files.
+Then deploy normally.

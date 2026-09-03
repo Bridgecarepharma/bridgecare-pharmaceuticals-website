@@ -12,10 +12,20 @@ export type { ShippingZoneView } from "@/lib/shipping-rates";
 
 export async function ensureShippingConfiguration() {
   await prisma.$transaction([
+    prisma.shippingZone.updateMany({
+      where: { code: { in: ["LAGOS", "NORTHERN_STATE"] } },
+      data: { isActive: false },
+    }),
     ...DEFAULT_SHIPPING_ZONES.map((zone) =>
       prisma.shippingZone.upsert({
         where: { code: zone.code },
-        update: {},
+        update: {
+          name: zone.name,
+          priceKobo: zone.priceKobo,
+          states: zone.states,
+          isActive: zone.isActive,
+          sortOrder: zone.sortOrder,
+        },
         create: {
           code: zone.code,
           name: zone.name,
@@ -28,8 +38,8 @@ export async function ensureShippingConfiguration() {
     ),
     prisma.shippingSetting.upsert({
       where: { id: "default" },
-      update: { freeShippingPackCount: 3 },
-      create: { id: "default", freeShippingPackCount: 3 },
+      update: { freeShippingPackCount: DEFAULT_FREE_SHIPPING_PACK_COUNT },
+      create: { id: "default", freeShippingPackCount: DEFAULT_FREE_SHIPPING_PACK_COUNT },
     }),
   ]);
 }
@@ -49,14 +59,14 @@ export async function getShippingConfiguration() {
       isActive: zone.isActive,
       sortOrder: zone.sortOrder,
     })),
-    // Bridgecare policy: any order of 3 packs or more ships free nationwide.
-    freeShippingPackCount: 3,
+    // Bridgecare policy: any order of 4 packs or more ships free nationwide.
+    freeShippingPackCount: DEFAULT_FREE_SHIPPING_PACK_COUNT,
   };
 }
 
 export async function shippingFeeForDatabaseOrder(state: string, packCount: number) {
   const configuration = await getShippingConfiguration();
-  return calculateShippingKobo(state, packCount, configuration.zones, 3);
+  return calculateShippingKobo(state, packCount, configuration.zones, DEFAULT_FREE_SHIPPING_PACK_COUNT);
 }
 
 export async function shippingFeeForSelectedZone(zoneCode: string, state: string, packCount: number) {
@@ -66,6 +76,6 @@ export async function shippingFeeForSelectedZone(zoneCode: string, state: string
     state,
     packCount,
     configuration.zones,
-    3,
+    DEFAULT_FREE_SHIPPING_PACK_COUNT,
   );
 }

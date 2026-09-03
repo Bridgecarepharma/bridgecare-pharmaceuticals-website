@@ -1395,3 +1395,130 @@ body{background:#fff;color:var(--ink)}
   .cart-suggestions article button{padding:.35rem .5rem;font-size:.8rem}
   .cart-drawer-footer{padding:.7rem .75rem calc(.75rem + env(safe-area-inset-bottom))}
 }
+
+
+/* Storefront commerce refresh */
+.delivery-announcement{background:#073b6b;color:#fff;font-size:12px}
+.delivery-announcement .container{min-height:34px;display:flex;align-items:center;justify-content:center;gap:9px;text-align:center}
+.delivery-announcement span{opacity:.82}
+.health-needs-section{padding-bottom:34px}
+.health-needs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:30px}
+.health-needs-grid a{display:grid;gap:7px;padding:22px;border:1px solid #dceaf3;border-radius:20px;background:#fff;box-shadow:0 10px 28px rgba(9,48,75,.05);transition:.2s}
+.health-needs-grid a:hover{transform:translateY(-4px);border-color:#9cc9e5;box-shadow:0 18px 36px rgba(9,48,75,.1)}
+.health-needs-grid a>span{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:#edf7fc;color:#096a9f}
+.health-needs-grid strong{font-size:17px;color:var(--ink)}
+.health-needs-grid small{color:var(--muted);line-height:1.4}
+.cart-free-delivery{display:grid!important;gap:3px!important;margin:12px 0!important;padding:12px!important;border-radius:12px;background:#f7faf8;border:1px dashed #a9c6bd}
+.cart-free-delivery strong{font-size:13px!important;color:#0a614d}
+.cart-free-delivery span{font-size:11px;color:var(--muted)}
+.cart-free-delivery.unlocked{background:#effaf5;border-style:solid;border-color:#bfe6d4}
+@media(max-width:800px){.health-needs-grid{grid-template-columns:repeat(2,1fr)}.delivery-announcement span{display:none}}
+@media(max-width:480px){.delivery-announcement .container{min-height:31px;font-size:11px}.health-needs-grid{gap:9px}.health-needs-grid a{padding:15px;border-radius:15px}.health-needs-grid strong{font-size:14px}.health-needs-grid small{font-size:11px}}
+
+/* v6.5.2 — Lagos Pay on Delivery */
+.payment-method-list{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0 18px}
+.payment-method-option{cursor:pointer;align-items:flex-start!important;padding:18px!important;transition:.2s}
+.payment-method-option span{display:grid!important;gap:4px!important}
+.payment-method-option small{color:var(--muted);line-height:1.45}
+.payment-method-option.selected{border-color:#0b6fae;background:#f2f9fe;box-shadow:0 0 0 2px rgba(11,111,174,.08)}
+.payment-method-option.cod-option.selected{border-color:#16834f;background:#f1faf5;box-shadow:0 0 0 2px rgba(22,131,79,.08)}
+@media(max-width:600px){.payment-method-list{grid-template-columns:1fr}.payment-method-option{padding:15px!important}}
+
+
+/* v6.6.0 shopping-first storefront inspired by best-in-class Nigerian ecommerce patterns */
+.shop-nav-bar{background:#fff;border-top:1px solid #edf3f7;border-bottom:1px solid #dceaf3}
+.shop-nav-inner{min-height:42px;display:flex;align-items:center;justify-content:center;gap:30px;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
+.shop-nav-inner::-webkit-scrollbar{display:none}.shop-nav-inner a{font-size:11px;font-weight:850;letter-spacing:.055em;color:#294b61;transition:.2s}.shop-nav-inner a:hover{color:var(--blue);transform:translateY(-1px)}.shop-nav-inner strong{color:var(--blue-deep)}
+.commerce-promo-band{background:#073b6b;color:#fff}.commerce-promo-grid{display:grid;grid-template-columns:repeat(3,1fr)}.commerce-promo-grid>div{min-height:88px;display:flex;align-items:center;justify-content:center;gap:13px;padding:16px 22px;border-right:1px solid rgba(255,255,255,.16)}.commerce-promo-grid>div:last-child{border-right:0}.commerce-promo-grid svg{color:#8bd3f3;flex:0 0 auto}.commerce-promo-grid span{display:grid}.commerce-promo-grid strong{font-size:14px}.commerce-promo-grid small{font-size:11px;color:#c8dfed;margin-top:2px}
+.storefront-featured{padding-top:82px}.storefront-featured .product-card{background:#fff}.health-needs-section{background:#fff}.health-needs-grid a{position:relative;overflow:hidden}.health-needs-grid a:after{content:"Shop →";font-size:11px;font-weight:900;color:var(--blue);margin-top:5px}
+.shop-catalog-tools{background:#f5faff;border-bottom:1px solid #dceaf3;padding:24px 0}.catalog-search-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center}.catalog-search{min-height:52px;display:flex;align-items:center;gap:11px;padding:0 18px;border:1px solid #cfe2ef;border-radius:15px;background:#fff;color:#607482;box-shadow:0 7px 22px rgba(7,84,134,.05)}.catalog-search span{flex:1}.catalog-delivery{display:flex;align-items:center;gap:9px;padding:13px 16px;border-radius:14px;background:#e8f6fd;color:#164f72;font-size:13px}.catalog-delivery svg{color:var(--blue)}.catalog-chips{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding-top:15px}.catalog-chips::-webkit-scrollbar{display:none}.catalog-chips a{white-space:nowrap;padding:9px 13px;border:1px solid #d3e5f0;border-radius:999px;background:#fff;color:#315e78;font-size:12px;font-weight:800}.catalog-chips a:hover{border-color:#8bc5e5;color:var(--blue-deep)}.catalog-section{padding-top:72px}
+@media(max-width:900px){.shop-nav-bar{display:none}.commerce-promo-grid{grid-template-columns:1fr}.commerce-promo-grid>div{min-height:68px;justify-content:flex-start;border-right:0;border-bottom:1px solid rgba(255,255,255,.13)}.commerce-promo-grid>div:last-child{border-bottom:0}.catalog-search-row{grid-template-columns:1fr}.catalog-delivery{justify-content:center}}
+@media(max-width:600px){.commerce-promo-grid>div{padding:13px 4px}.commerce-promo-grid small{font-size:10px}.storefront-featured{padding-top:62px}.shop-catalog-tools{padding:17px 0}.catalog-search{min-height:48px}.catalog-section{padding-top:55px}}
+
+
+/* v6.6.1 — Ome’s-inspired two-column mobile catalogue
+   Keep the complete shopping essentials visible in every card: image, category,
+   product name, full concise description, price, Add to Cart and Details. */
+@media(max-width:600px){
+  .product-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px!important;
+    align-items:stretch;
+  }
+  .product-card{
+    display:flex!important;
+    flex-direction:column!important;
+    height:100%;
+    padding:10px!important;
+    border:1px solid #bfd0dc!important;
+    border-radius:18px!important;
+    background:#fff!important;
+    box-shadow:0 4px 14px rgba(7,63,90,.05)!important;
+  }
+  .product-card .product-image-wrap{
+    min-height:150px!important;
+    border-radius:13px!important;
+    background:#fff!important;
+  }
+  .product-card .product-image{object-fit:contain!important;padding:7px!important}
+  .product-category{
+    margin:10px 0 4px!important;
+    font-size:9px!important;
+    line-height:1.25!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+  }
+  .product-card h3{
+    min-height:0!important;
+    margin:0 0 5px!important;
+    font-size:16px!important;
+    line-height:1.2!important;
+  }
+  .product-summary{
+    display:block!important;
+    min-height:0!important;
+    margin:0 0 10px!important;
+    overflow:visible!important;
+    font-size:11px!important;
+    line-height:1.42!important;
+    -webkit-line-clamp:unset!important;
+    -webkit-box-orient:initial!important;
+  }
+  .product-benefits{display:none!important}
+  .product-price{
+    display:block;
+    margin-top:auto!important;
+    padding-top:3px;
+    font-size:17px!important;
+    line-height:1.2;
+    color:#0b4568!important;
+    white-space:nowrap;
+  }
+  .product-card-actions{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:6px!important;
+    margin-top:9px!important;
+  }
+  .product-card-actions .button{
+    width:100%!important;
+    min-height:42px!important;
+    padding:8px 5px!important;
+    border-radius:999px!important;
+    font-size:11px!important;
+  }
+  .product-card-actions .text-link{
+    justify-content:center!important;
+    min-height:26px;
+    font-size:10px!important;
+  }
+}
+@media(max-width:360px){
+  .product-grid{gap:8px!important}
+  .product-card{padding:8px!important;border-radius:15px!important}
+  .product-card .product-image-wrap{min-height:128px!important}
+  .product-card h3{font-size:15px!important}
+  .product-summary{font-size:10.5px!important}
+  .product-price{font-size:16px!important}
+}

@@ -23,8 +23,9 @@ type AppliedCouponView = { code: string; message: string; discountKobo: number; 
 export default function CheckoutPage(){
  const {items,subtotalKobo,add,remove,setQuantity}=useCart();
  const [state,setState]=useState("Lagos");
- const [shippingZoneCode,setShippingZoneCode]=useState("LAGOS");
+ const [shippingZoneCode,setShippingZoneCode]=useState("LAGOS_MAINLAND");
  const [loading,setLoading]=useState(false);
+ const [paymentMethod,setPaymentMethod]=useState<"paystack"|"pay_on_delivery">("paystack");
  const [error,setError]=useState("");
  const [customerEmail,setCustomerEmail]=useState("");
  const [couponCode,setCouponCode]=useState("");
@@ -40,6 +41,7 @@ export default function CheckoutPage(){
  const freeShippingEligible=shipping.freeShippingPackCount>0&&packCount>=shipping.freeShippingPackCount;
  const packsToFreeShipping=shipping.freeShippingPackCount>0?Math.max(0,shipping.freeShippingPackCount-packCount):0;
  const zoneMatchesState=Boolean(selectedZone?.states.includes(state));
+ const payOnDeliveryEligible=state==="Lagos"&&(shippingZoneCode==="LAGOS_MAINLAND"||shippingZoneCode==="LAGOS_ISLAND");
  const discountKobo=appliedCoupon?.totalDiscountKobo??0;
  const totalKobo=Math.max(0,subtotalKobo+shippingKobo-discountKobo);
 
@@ -99,6 +101,7 @@ export default function CheckoutPage(){
  },[]);
 
  useEffect(()=>{setAppliedCoupon(null);setCouponError("")},[subtotalKobo,shippingKobo,customerEmail]);
+ useEffect(()=>{if(!payOnDeliveryEligible&&paymentMethod==="pay_on_delivery")setPaymentMethod("paystack")},[payOnDeliveryEligible,paymentMethod]);
 
  async function applyCoupon(){
   setCouponError("");
@@ -133,6 +136,13 @@ export default function CheckoutPage(){
     delivery:{recipientName:data.get("fullName"),recipientPhone:data.get("phone"),addressLine1:data.get("addressLine1"),addressLine2:data.get("addressLine2"),landmark:data.get("landmark"),city:data.get("city"),lga:data.get("lga"),state:data.get("state"),postalCode:"",deliveryInstructions:data.get("deliveryInstructions"),deliveryMethod:"standard",shippingZoneCode:data.get("shippingZoneCode")},
     items:items.map(i=>({slug:i.slug,quantity:i.quantity}))
    };
+   if(paymentMethod==="pay_on_delivery"){
+    const response=await fetch("/api/orders/pay-on-delivery",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(result.error||"Unable to place your Pay on Delivery order.");
+    window.location.assign(`/order-received?reference=${encodeURIComponent(result.reference)}`);
+    return;
+   }
    const response=await fetch("/api/paystack/initialize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
    const result=await response.json().catch(()=>({}));
    if(!response.ok)throw new Error(result.error||"Unable to start payment.");
@@ -168,7 +178,7 @@ export default function CheckoutPage(){
   <div className={`radio-card delivery-method-option free-shipping-method${freeShippingEligible?" selected":" locked"}`}>
    <span className="delivery-method-marker" aria-hidden="true">{freeShippingEligible?"✓":"☆"}</span>
    <span><strong>Free Shipping Nationwide</strong><small>{freeShippingEligible?`Unlocked — ${packCount} pack${packCount===1?"":"s"} in your order · ₦0`:`Add ${packsToFreeShipping} more pack${packsToFreeShipping===1?"":"s"} to unlock free shipping`}</small></span>
-   <b>{freeShippingEligible?"SELECTED":"3+ PACKS"}</b>
+   <b>{freeShippingEligible?"SELECTED":`${shipping.freeShippingPackCount}+ PACKS`}</b>
   </div>
   <div className={`radio-card delivery-method-option standard-shipping-method${freeShippingEligible?" muted":" selected"}`}>
    <span className="delivery-method-marker" aria-hidden="true">{freeShippingEligible?"○":"●"}</span>
@@ -178,9 +188,14 @@ export default function CheckoutPage(){
  <h3 className="delivery-area-heading">Delivery area</h3>
  <div className="shipping-zone-list">{activeZones.map(zone=>{return <label className={`radio-card shipping-zone-option${shippingZoneCode===zone.code?" selected":""}`} key={zone.code}><input type="radio" name="shippingZoneCode" value={zone.code} checked={shippingZoneCode===zone.code} onChange={()=>{setShippingZoneCode(zone.code);if(!zone.states.includes(state))setState(zone.states[0]||state)}}/><span><strong>{zone.name}</strong><small>{freeShippingEligible?"₦0 with Free Shipping":formatNaira(zone.priceKobo)}</small></span></label>})}</div>
  {shipping.freeShippingPackCount>0&&<p className={`shipping-threshold-note${freeShippingEligible?" unlocked":""}`}>{freeShippingEligible?`Free Shipping Nationwide unlocked — delivery is ₦0 for this ${packCount}-pack order.`:`Add ${packsToFreeShipping} more pack${packsToFreeShipping===1?"":"s"} to get Free Shipping. Free Shipping applies automatically from ${shipping.freeShippingPackCount} packs.`}</p>}
+ <h2>Payment method</h2>
+ <div className="payment-method-list">
+  <label className={`radio-card payment-method-option${paymentMethod==="paystack"?" selected":""}`}><input type="radio" name="paymentMethod" value="paystack" checked={paymentMethod==="paystack"} onChange={()=>setPaymentMethod("paystack")}/><span><strong>Pay Online with Paystack</strong><small>Pay securely now with card, bank transfer, USSD or other available Paystack options.</small></span></label>
+  {payOnDeliveryEligible&&<label className={`radio-card payment-method-option cod-option${paymentMethod==="pay_on_delivery"?" selected":""}`}><input type="radio" name="paymentMethod" value="pay_on_delivery" checked={paymentMethod==="pay_on_delivery"} onChange={()=>setPaymentMethod("pay_on_delivery")}/><span><strong>Pay on Delivery — Lagos Only</strong><small>Place your order now and pay when it is delivered. We may call or WhatsApp you to confirm before dispatch.</small></span></label>}
+ </div>
  <div className="checkout-coupon"><div><h2>Coupon code</h2><p>Enter a valid promotion code before continuing to payment.</p></div><div className="coupon-entry"><input value={couponCode} onChange={e=>{setCouponCode(e.target.value.toUpperCase());setAppliedCoupon(null);setCouponError("")}} placeholder="WELCOME10" aria-label="Coupon code"/><button type="button" className="button secondary" onClick={applyCoupon} disabled={couponLoading}>{couponLoading?"Checking…":appliedCoupon?"Reapply":"Apply"}</button></div>{appliedCoupon&&<div className="coupon-applied"><CheckCircle2 size={18}/><span><strong>{appliedCoupon.code}</strong> {appliedCoupon.message}</span><button type="button" onClick={()=>{setAppliedCoupon(null);setCouponCode("")}}>Remove</button></div>}{couponError&&<div className="coupon-error">{couponError}</div>}</div>
- {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone||!zoneMatchesState}>{loading?"Opening Paystack…":`Checkout ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
+ {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone||!zoneMatchesState}>{loading?(paymentMethod==="pay_on_delivery"?"Placing order…":"Opening Paystack…"):(paymentMethod==="pay_on_delivery"?`Place order — Pay ${formatNaira(totalKobo)} on delivery`:`Checkout ${formatNaira(totalKobo)} securely`)}</button><p className="secure-note">{paymentMethod==="pay_on_delivery"?"Pay on Delivery is available only for Lagos Mainland and Lagos Island orders. Bridgecare may call or WhatsApp to confirm before dispatch.":"Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook."}</p>
  </form>
- <aside className="order-summary order-summary-v3"><div className="summary-secure"><ShieldCheck size={22}/><span><strong>Secure checkout</strong><small>Your payment is processed by Paystack.</small></span></div><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{selectedZone?formatNaira(shippingKobo):"Unavailable"}</strong></div>{discountKobo>0&&<div className="summary-discount"><span>Coupon {appliedCoupon?.code}</span><strong>-{formatNaira(discountKobo)}</strong></div>}<div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div><div className="checkout-confidence"><span><LockKeyhole size={17}/> Encrypted payment</span><span><Truck size={17}/> Delivery details confirmed</span><span><CheckCircle2 size={17}/> Order saved before payment</span></div></aside>
+ <aside className="order-summary order-summary-v3"><div className="summary-secure"><ShieldCheck size={22}/><span><strong>{paymentMethod==="pay_on_delivery"?"Pay on Delivery":"Secure checkout"}</strong><small>{paymentMethod==="pay_on_delivery"?"Available for Lagos delivery addresses.":"Your payment is processed by Paystack."}</small></span></div><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{selectedZone?formatNaira(shippingKobo):"Unavailable"}</strong></div>{discountKobo>0&&<div className="summary-discount"><span>Coupon {appliedCoupon?.code}</span><strong>-{formatNaira(discountKobo)}</strong></div>}<div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div><div className="checkout-confidence"><span><LockKeyhole size={17}/> Encrypted payment</span><span><Truck size={17}/> Delivery details confirmed</span><span><CheckCircle2 size={17}/> Order saved before payment</span></div></aside>
  </div></section></>
 }
