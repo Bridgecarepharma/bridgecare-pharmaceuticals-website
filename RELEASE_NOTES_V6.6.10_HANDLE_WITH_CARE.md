@@ -1,4 +1,5 @@
-# Bridgecare v6.6.10 — Handle With Care
+# Bridgecare v6.6.10 — Handle With Care Waybill
 
-Adds a bold boxed HANDLE WITH CARE notice directly above the barcode.
-The notice is anchored within the existing 100 × 150 mm print layout.
+- Adds a bold boxed HANDLE WITH CARE notice.
+- Places it directly above the barcode on the 100 × 150 mm printed waybill.
+- Reserves print space for the notice and barcode to keep both on the same label.
