@@ -93,8 +93,11 @@ export default async function WaybillPage({ params }: { params: Promise<{ id: st
         <div><small>FROM</small><strong>Bridgecare Pharmaceuticals Limited</strong><span>Lascofed Building, 13 Isaacstan Close, off Wemco Road, Ogba, Lagos.</span><span>0812 221 8470 · 0807 773 3373</span><span>bridgecarepharmang.com</span></div>
       </footer>
 
+<<<<<<< HEAD
       <div className="waybill-handle-care">HANDLE WITH CARE</div>
 
+=======
+>>>>>>> 2415ea69805d791a19edc427bf21daf90ed3d5da
       <Code39Barcode value={order.orderNumber} />
     </article>
 
@@ -108,6 +111,7 @@ export default async function WaybillPage({ params }: { params: Promise<{ id: st
       .waybill-order-row{display:grid;grid-template-columns:1.2fr .8fr;gap:4mm;padding:4mm 0;border-bottom:1px solid #cfd9df}.waybill-order-row>div{display:grid;gap:1mm}.waybill-order-row small,.waybill-recipient>small,.waybill-section-head small,.waybill-footer small{font-size:7.5pt;font-weight:900;letter-spacing:.12em;color:#657986}.waybill-order-row strong{font-size:10pt}.waybill-date{text-align:right}
       .waybill-recipient{padding:5mm 0;border-bottom:2px solid #173f58}.waybill-recipient h1{margin:1.5mm 0 0;font-size:19pt;line-height:1.08;text-transform:uppercase;letter-spacing:-.02em}.waybill-recipient>a{display:block;margin-top:2mm;font-size:15pt;font-weight:900;color:#102f46;text-decoration:none}.waybill-recipient>p{margin:2mm 0 0;font-size:11pt;font-weight:700;line-height:1.35;color:#233f50}.waybill-callout{padding:2mm 2.5mm;background:#f0f7fa;border-left:3px solid #0b76ad;font-size:9.5pt!important}.waybill-callout strong{color:#0b5f8b}
       .waybill-items{padding:4mm 0;flex:1}.waybill-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:2mm}.waybill-section-head>strong{font-size:9pt;padding:1mm 2.5mm;border-radius:999px;background:#e8f4fa;color:#0b5f8b}.waybill-item{display:flex;justify-content:space-between;gap:6mm;padding:2.2mm 0;border-bottom:1px dashed #ccd7dd;font-size:10pt;font-weight:700}.waybill-item strong{white-space:nowrap;font-size:11pt}
+<<<<<<< HEAD
       .waybill-footer{padding-top:3mm;border-top:2px solid #173f58}.waybill-handle-care{margin-top:2mm;padding:1.5mm 2mm;border:2px solid #071b2b;text-align:center;font-size:14pt;font-weight:900;letter-spacing:.08em;line-height:1;color:#071b2b}.waybill-footer>div{display:grid;gap:.5mm}.waybill-footer strong{font-size:9pt}.waybill-footer span{font-size:7.4pt;line-height:1.25;color:#536b79}.waybill-barcode{padding-top:3mm;text-align:center;color:#071b2b}.waybill-barcode svg{display:block;width:100%;height:13mm}.waybill-barcode strong{display:block;margin-top:1mm;font-size:8pt;letter-spacing:.08em}
       @media(max-width:520px){.waybill-screen{padding:14px 8px 35px}.waybill-label{width:100%;min-height:auto;padding:18px}.waybill-logo{width:45%}.waybill-title strong{font-size:15pt}.waybill-recipient h1{font-size:17pt}.waybill-actions{justify-content:stretch}.waybill-actions>*{flex:1}}
       @page{size:100mm 150mm;margin:0}
@@ -123,6 +127,22 @@ export default async function WaybillPage({ params }: { params: Promise<{ id: st
         .waybill-footer{margin-top:auto!important;padding-top:1.2mm!important;flex:0 0 auto!important;break-inside:avoid!important;page-break-inside:avoid!important}.waybill-footer>div{gap:.1mm!important}.waybill-footer strong{font-size:7.3pt!important}.waybill-footer span{font-size:5.8pt!important;line-height:1.02!important}
         .waybill-handle-care{position:absolute!important;left:5mm!important;right:5mm!important;bottom:13mm!important;margin:0!important;padding:1mm 1.5mm!important;border:1.5px solid #071b2b!important;font-size:10pt!important;font-weight:900!important;letter-spacing:.08em!important;line-height:1!important}
         .waybill-barcode{position:absolute!important;left:5mm!important;right:5mm!important;bottom:3mm!important;padding:0!important;height:9mm!important;overflow:hidden!important;break-inside:avoid!important;page-break-inside:avoid!important}.waybill-barcode svg{height:6mm!important}.waybill-barcode strong{margin-top:.25mm!important;font-size:6.2pt!important;line-height:1!important}
+=======
+      .waybill-footer{padding-top:3mm;border-top:2px solid #173f58}.waybill-footer>div{display:grid;gap:.5mm}.waybill-footer strong{font-size:9pt}.waybill-footer span{font-size:7.4pt;line-height:1.25;color:#536b79}.waybill-barcode{padding-top:3mm;text-align:center;color:#071b2b}.waybill-barcode svg{display:block;width:100%;height:13mm}.waybill-barcode strong{display:block;margin-top:1mm;font-size:8pt;letter-spacing:.08em}
+      @media(max-width:520px){.waybill-screen{padding:14px 8px 35px}.waybill-label{width:100%;min-height:auto;padding:18px}.waybill-logo{width:45%}.waybill-title strong{font-size:15pt}.waybill-recipient h1{font-size:17pt}.waybill-actions{justify-content:stretch}.waybill-actions>*{flex:1}}
+      @page{size:100mm 150mm;margin:0}
+      @media print{
+        html,body{width:100mm!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;overflow:visible!important;background:#fff!important}
+        .site-header,.footer,.floating-contact,.cart-drawer-layer,.no-print,iframe,[id^="tawk"],[class*="tawk"]{display:none!important}
+        .waybill-screen{position:relative!important;width:100mm!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;overflow:visible!important;background:#fff!important;z-index:2147483647!important}
+        .waybill-label{position:relative!important;box-sizing:border-box!important;width:100mm!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;border:0!important;box-shadow:none!important;padding:3.5mm 5mm 3.5mm!important;overflow:visible!important;display:block!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;break-inside:avoid!important;page-break-inside:avoid!important}
+        .waybill-header{gap:3mm!important;padding-bottom:1.5mm!important;flex:0 0 auto!important}.waybill-logo{width:38mm!important}.waybill-title strong{font-size:13pt!important}.waybill-title span{font-size:7pt!important}
+        .waybill-order-row{padding:1.6mm 0!important;gap:2mm!important;flex:0 0 auto!important}.waybill-order-row small,.waybill-recipient>small,.waybill-section-head small,.waybill-footer small{font-size:6.3pt!important}.waybill-order-row strong{font-size:8.2pt!important}
+        .waybill-recipient{padding:2mm 0!important;flex:0 0 auto!important}.waybill-recipient h1{margin-top:.6mm!important;font-size:14pt!important;line-height:1!important}.waybill-recipient>a{margin-top:.7mm!important;font-size:11.5pt!important}.waybill-recipient>p{margin-top:.7mm!important;font-size:8pt!important;line-height:1.08!important}.waybill-callout{padding:.7mm 1.5mm!important;font-size:6.8pt!important;line-height:1.05!important}
+        .waybill-items{padding:1.7mm 0!important;min-height:0!important}.waybill-section-head{margin-bottom:.5mm!important}.waybill-section-head>strong{font-size:7pt!important;padding:.6mm 1.5mm!important}.waybill-item{padding:.8mm 0!important;font-size:7.7pt!important;line-height:1.05!important}.waybill-item strong{font-size:8pt!important}
+        .waybill-footer{margin-top:2mm!important;padding-top:1.2mm!important;break-inside:avoid!important;page-break-inside:avoid!important}.waybill-footer>div{gap:.1mm!important}.waybill-footer strong{font-size:7.3pt!important}.waybill-footer span{font-size:5.8pt!important;line-height:1.02!important}
+        .waybill-barcode{position:static!important;margin-top:2mm!important;padding:0!important;height:auto!important;overflow:visible!important;text-align:center!important;break-inside:avoid!important;page-break-inside:avoid!important}.waybill-barcode svg{display:block!important;width:100%!important;height:7mm!important}.waybill-barcode strong{margin-top:.35mm!important;font-size:6.2pt!important;line-height:1!important}
+>>>>>>> 2415ea69805d791a19edc427bf21daf90ed3d5da
       }
     `}</style>
   </main>;
