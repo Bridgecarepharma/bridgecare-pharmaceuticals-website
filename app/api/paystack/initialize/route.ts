@@ -194,7 +194,7 @@ export async function POST(request: Request) {
             { display_name: "Delivery Zone", variable_name: "delivery_zone", value: payload.delivery.shippingZoneCode },
             ...(appliedCoupon ? [{ display_name: "Coupon", variable_name: "coupon_code", value: appliedCoupon.coupon.code }] : []),
             {
-              display_name: "Delivery Address",
+              display_name: payload.delivery.state === "Lagos" ? "Delivery Address" : "Bus Park Pickup",
               variable_name: "delivery_address",
               value: `${payload.delivery.addressLine1}, ${payload.delivery.city}, ${payload.delivery.state}`,
             },

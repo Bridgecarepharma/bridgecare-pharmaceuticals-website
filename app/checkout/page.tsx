@@ -23,6 +23,7 @@ type AppliedCouponView = { code: string; message: string; discountKobo: number; 
 export default function CheckoutPage(){
  const {items,subtotalKobo,add,remove,setQuantity}=useCart();
  const [state,setState]=useState("Lagos");
+ const isLagos=state==="Lagos";
  const [shippingZoneCode,setShippingZoneCode]=useState("LAGOS_MAINLAND");
  const [loading,setLoading]=useState(false);
  const [error,setError]=useState("");
@@ -130,7 +131,7 @@ export default function CheckoutPage(){
    const payload={
     customer:{fullName:data.get("fullName"),email:data.get("email"),phone:data.get("phone")},
     couponCode:appliedCoupon?.code||couponCode.trim(),
-    delivery:{recipientName:data.get("fullName"),recipientPhone:data.get("phone"),addressLine1:data.get("addressLine1"),addressLine2:data.get("addressLine2"),landmark:data.get("landmark"),city:data.get("city"),lga:data.get("lga"),state:data.get("state"),postalCode:"",deliveryInstructions:data.get("deliveryInstructions"),deliveryMethod:"standard",shippingZoneCode:data.get("shippingZoneCode")},
+    delivery:{recipientName:data.get("fullName"),recipientPhone:data.get("phone"),addressLine1:isLagos?String(data.get("addressLine1")||""):"",addressLine2:isLagos?String(data.get("addressLine2")||""):"",landmark:isLagos?String(data.get("landmark")||""):"",busPark:isLagos?"":String(data.get("busPark")||""),city:data.get("city"),lga:isLagos?String(data.get("lga")||""):"",state:data.get("state"),postalCode:"",deliveryInstructions:isLagos?String(data.get("deliveryInstructions")||""):"",deliveryMethod:"standard",shippingZoneCode:data.get("shippingZoneCode")},
     items:items.map(i=>({slug:i.slug,quantity:i.quantity}))
    };
    const response=await fetch("/api/paystack/initialize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
@@ -159,10 +160,15 @@ export default function CheckoutPage(){
   </details>}
  </div></div>
  <h2>Contact &amp; delivery information</h2><div className="form-row"><label>Full name<input name="fullName" required autoComplete="name"/></label><label>Email<input name="email" type="email" required autoComplete="email" value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)}/></label></div><label>Phone number<input name="phone" required autoComplete="tel"/></label>
- <label>House number and street address<input name="addressLine1" required autoComplete="address-line1"/></label><label>Apartment, estate or additional address (optional)<input name="addressLine2" autoComplete="address-line2"/></label>
- <div className="form-row"><label>Landmark<input name="landmark"/></label><label>City<input name="city" required autoComplete="address-level2"/></label></div>
- <div className="form-row"><label>Local Government Area<input name="lga" required/></label><label>State<select name="state" value={state} onChange={e=>{const nextState=e.target.value;setState(nextState);const matching=activeZones.find(zone=>zone.states.includes(nextState));if(matching)setShippingZoneCode(matching.code)}} required>{STATES.map(x=><option key={x}>{x}</option>)}</select></label></div>
- <label>Delivery instructions (optional)<textarea name="deliveryInstructions" placeholder="Gate code, preferred contact method, or directions for the rider."/></label>
+ <div className="form-row"><label>State<select name="state" value={state} onChange={e=>{const nextState=e.target.value;setState(nextState);const matching=activeZones.find(zone=>zone.states.includes(nextState));if(matching)setShippingZoneCode(matching.code)}} required>{STATES.map(x=><option key={x}>{x}</option>)}</select></label><label>City<input name="city" required minLength={2} maxLength={100} autoComplete="address-level2"/></label></div>
+ {isLagos?<div key="lagos-address">
+  <label>House number and street address<input name="addressLine1" required minLength={5} maxLength={180} autoComplete="address-line1"/></label><label>Apartment, estate or additional address (optional)<input name="addressLine2" maxLength={180} autoComplete="address-line2"/></label>
+  <div className="form-row"><label>Landmark<input name="landmark" maxLength={180}/></label><label>Local Government Area<input name="lga" required minLength={2} maxLength={100}/></label></div>
+  <label>Delivery instructions (optional)<textarea name="deliveryInstructions" maxLength={500} placeholder="Gate code, preferred contact method, or directions for the rider."/></label>
+ </div>:<div key="bus-park-pickup">
+  <p>Orders outside Lagos are sent to a bus park or bus station for collection. We do not deliver to home or office addresses outside Lagos.</p>
+  <label>Nearest bus park / bus station<input name="busPark" required minLength={2} maxLength={180} placeholder="Enter the bus park or bus station name"/></label>
+ </div>}
  <h2>Delivery method</h2><input type="hidden" name="deliveryMethod" value="standard"/>
  <div className="delivery-method-list">
   <div className={`radio-card delivery-method-option free-shipping-method${freeShippingEligible?" selected":" locked"}`}>
@@ -172,7 +178,7 @@ export default function CheckoutPage(){
   </div>
   <div className={`radio-card delivery-method-option standard-shipping-method${freeShippingEligible?" muted":" selected"}`}>
    <span className="delivery-method-marker" aria-hidden="true">{freeShippingEligible?"○":"●"}</span>
-   <span><strong>Standard Delivery</strong><small>{freeShippingEligible?"Your order qualifies for Free Shipping":"Delivery fee is based on your delivery area"}</small></span>
+   <span><strong>{isLagos?"Standard Delivery":"Bus Park / Bus Station Pickup"}</strong><small>{freeShippingEligible?"Your order qualifies for Free Shipping":"Delivery fee is based on your delivery area"}</small></span>
   </div>
  </div>
  <h3 className="delivery-area-heading">Delivery area</h3>
@@ -183,7 +189,7 @@ export default function CheckoutPage(){
   <label className="radio-card payment-method-option selected"><input type="radio" name="paymentMethod" value="paystack" checked readOnly/><span><strong>Pay Online with Paystack</strong><small>Pay securely now with card, bank transfer, USSD or other available Paystack options.</small></span></label>
  </div>
  <div className="checkout-coupon"><div><h2>Coupon code</h2><p>Enter a valid promotion code before continuing to payment.</p></div><div className="coupon-entry"><input value={couponCode} onChange={e=>{setCouponCode(e.target.value.toUpperCase());setAppliedCoupon(null);setCouponError("")}} placeholder="WELCOME10" aria-label="Coupon code"/><button type="button" className="button secondary" onClick={applyCoupon} disabled={couponLoading}>{couponLoading?"Checking…":appliedCoupon?"Reapply":"Apply"}</button></div>{appliedCoupon&&<div className="coupon-applied"><CheckCircle2 size={18}/><span><strong>{appliedCoupon.code}</strong> {appliedCoupon.message}</span><button type="button" onClick={()=>{setAppliedCoupon(null);setCouponCode("")}}>Remove</button></div>}{couponError&&<div className="coupon-error">{couponError}</div>}</div>
- {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone||!zoneMatchesState}>{loading?"Opening Paystack…":`Checkout ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery address are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
+ {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone||!zoneMatchesState}>{loading?"Opening Paystack…":`Checkout ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery details are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
  </form>
  <aside className="order-summary order-summary-v3"><div className="summary-secure"><ShieldCheck size={22}/><span><strong>Secure checkout</strong><small>Your payment is processed by Paystack.</small></span></div><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{selectedZone?formatNaira(shippingKobo):"Unavailable"}</strong></div>{discountKobo>0&&<div className="summary-discount"><span>Coupon {appliedCoupon?.code}</span><strong>-{formatNaira(discountKobo)}</strong></div>}<div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div><div className="checkout-confidence"><span><LockKeyhole size={17}/> Encrypted payment</span><span><Truck size={17}/> Delivery details confirmed</span><span><CheckCircle2 size={17}/> Order saved before payment</span></div></aside>
  </div></section></>

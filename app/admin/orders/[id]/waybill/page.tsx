@@ -76,10 +76,10 @@ export default async function WaybillPage({ params }: { params: Promise<{ id: st
       </section>
 
       <section className="waybill-recipient">
-        <small>DELIVER TO</small>
+        <small>{order.state==="Lagos"?"DELIVER TO":"BUS PARK PICKUP"}</small>
         <h1>{order.recipientName || order.customerName}</h1>
         <a href={`tel:${order.recipientPhone || order.customerPhone}`}>{order.recipientPhone || order.customerPhone}</a>
-        <p>{order.addressLine1}{order.addressLine2 ? `, ${order.addressLine2}` : ""}<br/>{order.city}, {order.lga}, {order.state}{order.postalCode ? ` ${order.postalCode}` : ""}</p>
+        <p>{order.addressLine1}{order.addressLine2 ? `, ${order.addressLine2}` : ""}<br/>{[order.city,order.lga,order.state].filter(Boolean).join(", ")}{order.postalCode ? ` ${order.postalCode}` : ""}</p>
         {order.landmark ? <p className="waybill-callout"><strong>LANDMARK:</strong> {order.landmark}</p> : null}
         {order.deliveryInstructions ? <p className="waybill-callout"><strong>DELIVERY NOTE:</strong> {order.deliveryInstructions}</p> : null}
       </section>
