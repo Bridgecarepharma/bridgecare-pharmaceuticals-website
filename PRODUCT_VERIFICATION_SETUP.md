@@ -5,7 +5,7 @@
 - Public page: `/verify`; API: `POST /api/verify`.
 - Protected admin: `/admin/verification` (existing administrator login).
 - Products initially enabled: AsFenositol Tablets and Globivida Capsules.
-- Separate link to NAFDAC Greenbook. Registration lookup does not authenticate an individual pack.
+- Registration information lists the supplied product registration numbers and links to Bridgecare support for documentation. No Greenbook search link is shown.
 - Downloadable generic QR: `/images/verification/bridgecare-verify-qr.svg`. It opens `https://bridgecarepharmang.com/verify`. It contains no pack secret and scanning it does not mark a code as checked.
 - Codes: 96 bits of cryptographic randomness, displayed as six groups of four hexadecimal characters. Only SHA-256 hashes are stored; plaintext is returned in the initial CSV download only.
 - Batch activation/deactivation, individual code disabling from verification history, audit records and paginated verification history.
@@ -37,7 +37,7 @@
 - **Expired:** advise against using expired products.
 - **Service unavailable:** no verification claim is made. Existing store checkout is unaffected.
 
-A valid code cannot guarantee authenticity; genuine codes can be copied. This is Bridgecare's own check, not NAFDAC pack authentication. The public page links to existing support/contact channels for suspicious-pack reports. It is not an SMS service.
+A valid code cannot guarantee authenticity; genuine codes can be copied. This is Bridgecare's own check, not NAFDAC pack authentication. The public page links to existing support/contact channels for registration documentation and suspicious-pack reports. It is not an SMS service.
 
 ## Privacy and maintenance
 
