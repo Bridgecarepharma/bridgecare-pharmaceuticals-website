@@ -14,6 +14,7 @@ const links = [
   ["/admin/reviews-and-questions", "Reviews & Q&A"],
   ["/admin/marketing/coupons", "Marketing"],
   ["/admin/reports", "Sales analytics"],
+  ["/admin/verification", "Product verification"],
 ] as const;
 
 export function AdminNav() {

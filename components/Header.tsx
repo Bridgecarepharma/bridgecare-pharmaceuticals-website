@@ -31,6 +31,7 @@ export function Header() {
           {navItems.map((item) => <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>{item.label}</Link>)}
           <Link className="nav-search" href="/search" aria-label="Search"><Search size={19} /></Link>
           <Link className="button small distributor-button" href="/distributors">Become a Distributor</Link>
+          <Link href="/verify" onClick={() => setOpen(false)}>Verify product</Link>
           <CartLink />
         </nav>
       </div>

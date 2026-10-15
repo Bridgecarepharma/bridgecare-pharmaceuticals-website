@@ -407,3 +407,46 @@ model ProductQuestion {
   @@index([status, createdAt])
   @@index([customerEmail, createdAt])
 }
+
+model VerificationBatch {
+  id          String   @id @default(cuid())
+  productSlug String
+  productName String
+  batchNumber String
+  manufacturedAt DateTime
+  expiresAt   DateTime
+  active      Boolean @default(false)
+  createdAt   DateTime @default(now())
+  codes       VerificationCode[]
+  @@unique([productSlug, batchNumber])
+}
+
+model VerificationCode {
+  id          String @id @default(cuid())
+  codeHash    String @unique
+  batchId     String
+  batch       VerificationBatch @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  disabled    Boolean @default(false)
+  checks      Int @default(0)
+  firstCheckedAt DateTime?
+  lastCheckedAt DateTime?
+  events      VerificationEvent[]
+  @@index([batchId])
+}
+
+model VerificationEvent {
+  id        String @id @default(cuid())
+  codeId    String?
+  code      VerificationCode? @relation(fields: [codeId], references: [id], onDelete: SetNull)
+  outcome   String
+  createdAt DateTime @default(now())
+  @@index([createdAt])
+  @@index([codeId, createdAt])
+}
+
+model VerificationLimit {
+  key       String @id
+  count     Int @default(1)
+  expiresAt DateTime
+  @@index([expiresAt])
+}
