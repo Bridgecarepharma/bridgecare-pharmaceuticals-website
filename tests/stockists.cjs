@@ -58,3 +58,20 @@ test('migration and authenticated transactional add/edit/hide/delete lifecycle',
  assert.equal((await route.POST(req({action:'delete'}))).status,400);
  await db.close();
 });
+
+test('confirmed nationwide import is active, complete, repeatable and preserves admin edits',async()=>{
+ const locations=JSON.parse(fs.readFileSync(path.join(root,'data/stockists-import.json'),'utf8'));
+ assert.equal(new Set(locations.map(s=>s.state)).size,37);
+ assert.equal(new Set(locations.map(s=>s.id)).size,locations.length);
+ for(const shop of locations){assert.equal(shop.isActive,true);utils.stockistSchema.parse(shop);}
+ const db=new PGlite();
+ await db.exec(fs.readFileSync(path.join(root,'prisma/migrations/20261019090000_store_locations/migration.sql'),'utf8'));
+ const sql=fs.readFileSync(path.join(root,'prisma/migrations/20261019150000_activate_confirmed_stockists/migration.sql'),'utf8');
+ await db.exec(sql);
+ assert.equal((await db.query('SELECT count(*)::int AS n FROM "Stockist" WHERE "isActive"=true')).rows[0].n,locations.length);
+ await db.query('UPDATE "Stockist" SET "phone"=$1 WHERE "id"=$2',['08012345678',locations[0].id]);
+ await db.exec(sql);
+ assert.equal((await db.query('SELECT count(*)::int AS n FROM "Stockist"')).rows[0].n,locations.length);
+ assert.equal((await db.query('SELECT "phone" FROM "Stockist" WHERE "id"=$1',[locations[0].id])).rows[0].phone,'08012345678');
+ await db.close();
+});

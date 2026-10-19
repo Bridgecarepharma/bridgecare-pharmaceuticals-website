@@ -6,10 +6,10 @@ const phone = z.string().trim().max(30).regex(/^\+?[\d ()-]{7,30}$/, "Enter a va
 const products = new Set(PRODUCTS.map(product => product.slug));
 export const stockistSchema = z.object({
   name: z.string().trim().min(2).max(120),
-  address: z.string().trim().min(5).max(240),
-  city: z.string().trim().min(2).max(80),
+  address: z.string().trim().min(2).max(240),
+  city: z.union([z.literal(""), z.string().trim().min(2).max(80)]),
   state: z.enum(NIGERIAN_STATES),
-  phone,
+  phone: z.union([z.literal(""), phone]),
   whatsapp: z.union([z.literal(""), phone]).default(""),
   productSlugs: z.array(z.string().refine(slug => products.has(slug), "Select a Bridgecare product.")).max(PRODUCTS.length).transform(slugs => [...new Set(slugs)]),
   openingHours: z.string().trim().max(180).default(""),
@@ -23,7 +23,7 @@ export function whatsappHref(value: string) {
   return `https://wa.me/${digits.startsWith("0") ? `234${digits.slice(1)}` : digits}`;
 }
 export function directionsHref(location: { address: string; city: string; state: string }) {
-  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${location.address}, ${location.city}, ${location.state}, Nigeria`)}`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([location.address, location.city, location.state, "Nigeria"].filter(Boolean).join(", "))}`;
 }
 export function filterStockists(locations: PublicStockist[], state: string, city: string, product: string, search: string) {
  const query = search.trim().toLocaleLowerCase();
