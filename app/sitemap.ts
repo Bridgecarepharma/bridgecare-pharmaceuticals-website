@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getPublishedHealthArticles } from "@/lib/health-cms";
 
-const pages = ["", "/about", "/products", "/products/aspivit", "/products/asfenositol", "/products/globivida", "/products/herbal-bitter-tea", "/cart", "/checkout", "/health-centre", "/quality-compliance", "/csr", "/news", "/contact", "/distributors", "/careers", "/faq", "/downloads", "/privacy-policy", "/terms", "/cookie-policy"];
+const pages = ["", "/about", "/products", "/products/aspivit", "/products/asfenositol", "/products/globivida", "/products/herbal-bitter-tea", "/cart", "/checkout", "/health-centre", "/quality-compliance", "/csr", "/news", "/contact", "/store-locations", "/distributors", "/careers", "/faq", "/downloads", "/privacy-policy", "/terms", "/cookie-policy"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.NEXT_PUBLIC_SITE_URL || "https://bridgecarepharmang.com";

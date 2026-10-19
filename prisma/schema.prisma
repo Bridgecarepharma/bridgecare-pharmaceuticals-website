@@ -450,3 +450,20 @@ model VerificationLimit {
   expiresAt DateTime
   @@index([expiresAt])
 }
+
+model Stockist {
+  id           String   @id @default(cuid())
+  name         String
+  address      String
+  city         String
+  state        String
+  phone        String
+  whatsapp     String   @default("")
+  productSlugs String[] @default([])
+  openingHours String   @default("")
+  isActive     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive, state, city])
+}

@@ -14,7 +14,8 @@
     "db:deploy": "prisma generate",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:recover:qna": "node scripts/recover-prisma-qna.mjs",
-    "test:verification": "node --test tests/verification.cjs"
+    "test:verification": "node --test tests/verification.cjs",
+    "test:stockists": "node --test tests/stockists.cjs"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",

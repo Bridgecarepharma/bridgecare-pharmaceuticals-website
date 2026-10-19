@@ -3,6 +3,7 @@ export const navItems = [
   { label: "Products", href: "/products" }, { label: "Health Centre", href: "/health-centre" },
   { label: "Quality", href: "/quality-compliance" }, { label: "News", href: "/news" },
   { label: "Contact", href: "/contact" },
+  { label: "Where to Buy", href: "/store-locations" },
 ];
 export const products = [
  {slug:"aspivit",name:"Aspivit®",category:"Daily Nutrition",summary:"Omega-3 fatty acids, essential vitamins and trace minerals to support overall health and wellbeing.",accent:"gold",image:"/images/products/aspivit.png",priceKobo:800000,paymentLink:"https://paystack.shop/pay/obsk4o4n5y"},
