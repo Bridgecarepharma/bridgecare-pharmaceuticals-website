@@ -2,7 +2,7 @@
 
 ## What changes immediately on deployment
 
-`/verify` has its own page layout: Bridgecare name, code form, verification result, registration details and telephone support only. It has no store navigation, footer links, cart, prices, sales chat, marketing analytics or advertising pixels. Existing QR codes and the existing POST `/api/verify` endpoint continue to work. Codes, batches, admin records, rate limiting and verification rules are unchanged. No database migration is needed for this layout change (the earlier stockist migrations remain in this package).
+`/verify` has its own page layout: Bridgecare name, code form, a result pop-up, verification reminders and telephone support only. It has no store navigation, footer links, cart, prices, sales chat, marketing analytics or advertising pixels. Existing QR codes and the existing POST `/api/verify` endpoint continue to work. Codes, batches, admin records, rate limiting and verification rules are unchanged. Batch dates remain available internally and expired or inactive packs still trigger a warning, but these dates and batch numbers are not returned to customers. No database migration is needed for this layout change (the earlier stockist migrations remain in this package).
 
 ## Connect the separate address
 
@@ -29,4 +29,8 @@ This package has been prepared locally. It does not itself change Cloudflare, Ne
 
 ## Validation performed
 
-Production build and changed-file lint passed. Eight automated tests cover existing verification/stockist behavior, standalone markup, host routing, redirect fallback and blocking shopping/admin routes on the verification hostname. Verification API, database migrations and stockist import records are unchanged.
+Production build and changed-file lint passed. Eight automated tests cover existing verification/stockist behavior, standalone markup, host routing, redirect fallback and blocking shopping/admin routes on the verification hostname. Database migrations and stockist import records are unchanged. The verification API now returns the check count instead of exposing batch, manufacturing and expiry details.
+
+## Customer result presentation
+
+The result is a native accessible modal with an OK button, close button and Escape support. Recognised and repeat-check results include product name, first-verification time in Africa/Lagos and total successful checks including the current check. Invalid codes show no product or check history. Expired and inactive records retain their warnings without exposing batch or date fields. The page uses Bridgecare styling and does not claim a security code alone proves a pack is genuine. Existing scratch codes remain 24 characters, not the 16-digit format of the supplied visual reference.

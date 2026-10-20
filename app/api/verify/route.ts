@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     await tx.verificationCode.update({ where: { id: pack.id }, data: { checks: { increment: 1 }, firstCheckedAt: pack.firstCheckedAt || now, lastCheckedAt: now } });
    }
    await tx.verificationEvent.create({ data: { codeId: pack.id, outcome: status } });
-   return { status, product: pack.batch.productName, batchNumber: pack.batch.batchNumber, manufacturedAt: pack.batch.manufacturedAt.toISOString(), expiresAt: pack.batch.expiresAt.toISOString(), firstCheckedAt: pack.firstCheckedAt?.toISOString() || (status === "RECOGNISED" ? now.toISOString() : null) };
+   return { status, product: pack.batch.productName, checkCount: pack.checks + ((status === "RECOGNISED" || status === "PREVIOUSLY_CHECKED") ? 1 : 0), firstCheckedAt: pack.firstCheckedAt?.toISOString() || (status === "RECOGNISED" ? now.toISOString() : null) };
   });
   return reply(result);
  } catch {

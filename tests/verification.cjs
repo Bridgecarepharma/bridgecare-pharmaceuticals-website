@@ -73,7 +73,7 @@ test('migration + admin lifecycle + public verification + repeat/rate-limit/erro
  assert.equal((await (await verify(securityCodes[0])).json()).status,'INACTIVE');
  assert.equal((await admin.POST(req({action:'activate',id:batch.id}))).status,200);
  const simultaneous=await Promise.all([verify(securityCodes[0],'192.0.2.2'),verify(securityCodes[0],'192.0.2.3')]);
- const statuses=await Promise.all(simultaneous.map(r=>r.json()));assert.deepEqual(statuses.map(x=>x.status).sort(),['PREVIOUSLY_CHECKED','RECOGNISED']);assert.equal(statuses[0].batchNumber,'QA-001');
+ const statuses=await Promise.all(simultaneous.map(r=>r.json()));assert.deepEqual(statuses.map(x=>x.status).sort(),['PREVIOUSLY_CHECKED','RECOGNISED']);assert.deepEqual(statuses.map(x=>x.checkCount).sort(),[1,2]);for(const result of statuses){assert(!('batchNumber' in result));assert(!('manufacturedAt' in result));assert(!('expiresAt' in result));}
  const pack=(await rows('SELECT * FROM "VerificationCode" WHERE "codeHash"=$1',[utils.securityCodeHash(securityCodes[0])]))[0];assert.equal(pack.checks,2);assert(pack.firstCheckedAt);assert.equal(pack.codeHash.length,64);
  assert.equal((await admin.POST(req({action:'disable-code',id:batch.id,codeId:pack.id}))).status,200);
  assert.equal((await (await verify(securityCodes[0])).json()).status,'INACTIVE');

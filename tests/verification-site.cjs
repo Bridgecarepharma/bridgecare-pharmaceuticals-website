@@ -35,7 +35,7 @@ test('verification markup has support and code entry without store links',()=>{
  const client=load('app/verify/VerifyClient.tsx').VerifyClient;
  const page=load('app/verify/page.tsx',{'./VerifyClient':{VerifyClient:client}}).default;
  const markup=renderToStaticMarkup(React.createElement(page));
- assert(markup.includes('Security code'));assert(markup.includes('tel:+2348077733373'));
+ assert(markup.includes('Security check'));assert(markup.includes('Verification reminder'));assert(!markup.includes('Batch number'));assert(!markup.includes('Manufactured'));assert(!markup.includes('Expiry'));assert(markup.includes('tel:+2348077733373'));
  assert(!/href="\/(products|cart|checkout|contact)/.test(markup));
  assert(!markup.includes('₦'));assert(!markup.includes('Shop online'));
 });
