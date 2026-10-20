@@ -1,0 +1,196 @@
+"use client";
+import Image from "next/image";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { CheckCircle2, LockKeyhole, Minus, Plus, ShieldCheck, ShoppingBag, Trash2, Truck } from "lucide-react";
+import { useCart } from "@/components/cart/CartProvider";
+import { formatNaira } from "@/lib/store";
+import { MetaInitiateCheckout, trackMetaAddToCart } from "@/components/analytics/MetaCommerceEvents";
+import { TikTokInitiateCheckout, trackTikTokAddToCart } from "@/components/analytics/TikTokCommerceEvents";
+import { PRODUCTS } from "@/data/products";
+import {
+  calculateShippingForZoneKobo,
+  DEFAULT_FREE_SHIPPING_PACK_COUNT,
+  DEFAULT_SHIPPING_ZONES,
+  type ShippingZoneView,
+} from "@/lib/shipping-rates";
+
+const STATES=["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara","Abuja"];
+
+type ShippingConfiguration = { zones: ShippingZoneView[]; freeShippingPackCount: number };
+type AppliedCouponView = { code: string; message: string; discountKobo: number; shippingDiscountKobo: number; totalDiscountKobo: number; totalKobo: number };
+
+export default function CheckoutPage(){
+ const {items,subtotalKobo,add,remove,setQuantity}=useCart();
+ const [state,setState]=useState("Lagos");
+ const isLagos=state==="Lagos";
+ const [shippingZoneCode,setShippingZoneCode]=useState("LAGOS_MAINLAND");
+ const [loading,setLoading]=useState(false);
+ const [error,setError]=useState("");
+ const [customerEmail,setCustomerEmail]=useState("");
+ const [couponCode,setCouponCode]=useState("");
+ const [couponLoading,setCouponLoading]=useState(false);
+ const [couponError,setCouponError]=useState("");
+ const [appliedCoupon,setAppliedCoupon]=useState<AppliedCouponView|null>(null);
+ const [shipping,setShipping]=useState<ShippingConfiguration>({zones:DEFAULT_SHIPPING_ZONES,freeShippingPackCount:DEFAULT_FREE_SHIPPING_PACK_COUNT});
+ const [catalogPrices,setCatalogPrices]=useState<Record<string,number>>(()=>Object.fromEntries(PRODUCTS.map(product=>[product.slug,product.priceKobo])));
+ const packCount=useMemo(()=>items.reduce((sum,item)=>sum+item.quantity,0),[items]);
+ const activeZones=useMemo(()=>shipping.zones.filter(zone=>zone.isActive).sort((a,b)=>a.sortOrder-b.sortOrder),[shipping.zones]);
+ const selectedZone=useMemo(()=>activeZones.find(zone=>zone.code===shippingZoneCode),[activeZones,shippingZoneCode]);
+ const shippingKobo=useMemo(()=>calculateShippingForZoneKobo(shippingZoneCode,state,packCount,shipping.zones,shipping.freeShippingPackCount)??0,[shippingZoneCode,state,packCount,shipping]);
+ const freeShippingEligible=shipping.freeShippingPackCount>0&&packCount>=shipping.freeShippingPackCount;
+ const packsToFreeShipping=shipping.freeShippingPackCount>0?Math.max(0,shipping.freeShippingPackCount-packCount):0;
+ const zoneMatchesState=Boolean(selectedZone?.states.includes(state));
+ const discountKobo=appliedCoupon?.totalDiscountKobo??0;
+ const totalKobo=Math.max(0,subtotalKobo+shippingKobo-discountKobo);
+
+ const recommendedSlugs=useMemo(()=>{
+  const inCart=new Set(items.map(item=>item.slug));
+  const ordered:string[]=[];
+  const push=(slug:string)=>{if(!inCart.has(slug)&&!ordered.includes(slug))ordered.push(slug)};
+
+  // Cross-sell rules:
+  // AsFenositol -> Aspivit + Bitter Tea
+  // Aspivit -> Bitter Tea
+  // Globivida -> Aspivit
+  // Bitter Tea -> Aspivit
+  for(const item of items){
+   if(item.slug==="asfenositol"){push("aspivit");push("herbal-bitter-tea")}
+   else if(item.slug==="aspivit"){push("herbal-bitter-tea")}
+   else if(item.slug==="globivida"){push("aspivit")}
+   else if(item.slug==="herbal-bitter-tea"){push("aspivit")}
+  }
+  return ordered;
+ },[items]);
+
+ const recommendedProducts=useMemo(
+  ()=>recommendedSlugs.map(slug=>PRODUCTS.find(product=>product.slug===slug)).filter((product):product is (typeof PRODUCTS)[number]=>Boolean(product)),
+  [recommendedSlugs],
+ );
+ const otherProducts=useMemo(()=>{
+  const inCart=new Set(items.map(item=>item.slug));
+  const recommended=new Set(recommendedSlugs);
+  return PRODUCTS.filter(product=>!inCart.has(product.slug)&&!recommended.has(product.slug));
+ },[items,recommendedSlugs]);
+
+ const crossSellName=(slug:string,name:string)=>slug==="aspivit"?"Omega-3 Supplement (Aspivit®)":name;
+
+ useEffect(()=>{
+  let active=true;
+  fetch("/api/shipping/rates",{cache:"no-store"})
+   .then(response=>response.ok?response.json():Promise.reject(new Error("Unable to load delivery charges")))
+   .then((data:ShippingConfiguration)=>{
+    if(active&&Array.isArray(data.zones)){
+     setShipping(data);
+     const matching=data.zones.find(zone=>zone.isActive&&zone.states.includes(state));
+     if(matching)setShippingZoneCode(matching.code);
+    }
+   })
+   .catch(()=>{});
+  return()=>{active=false};
+ },[]);
+
+ useEffect(()=>{
+  let active=true;
+  fetch("/api/products/prices",{cache:"no-store"})
+   .then(response=>response.ok?response.json():Promise.reject(new Error("Unable to load product prices")))
+   .then(data=>{if(active&&data?.prices)setCatalogPrices(current=>({...current,...data.prices}))})
+   .catch(()=>{});
+  return()=>{active=false};
+ },[]);
+
+ useEffect(()=>{setAppliedCoupon(null);setCouponError("")},[subtotalKobo,shippingKobo,customerEmail]);
+
+ async function applyCoupon(){
+  setCouponError("");
+  if(!couponCode.trim()){setCouponError("Enter a coupon code.");return}
+  if(!customerEmail.trim()){setCouponError("Enter your email address above before applying a coupon.");return}
+  setCouponLoading(true);
+  try{
+   const response=await fetch("/api/coupons/validate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:couponCode,customerEmail,shippingZoneCode,state,items:items.map(i=>({slug:i.slug,quantity:i.quantity}))})});
+   const result=await response.json().catch(()=>({}));
+   if(!response.ok)throw new Error(result.error||"Unable to apply coupon.");
+   setAppliedCoupon(result);setCouponCode(result.code);
+  }catch(e){setAppliedCoupon(null);setCouponError(e instanceof Error?e.message:"Unable to apply coupon.")}
+  finally{setCouponLoading(false)}
+ }
+
+ function addExtraProduct(product:{slug:string;name:string;priceKobo:number}){
+  add(product);
+  trackMetaAddToCart(product);
+  trackTikTokAddToCart(product);
+ }
+
+ async function submit(event:FormEvent<HTMLFormElement>){
+  event.preventDefault();setError("");
+  if(!items.length){setError("Your cart is empty.");return}
+  if(!selectedZone||!zoneMatchesState){setError("Please select the delivery zone that matches your delivery state.");return}
+  setLoading(true);
+  try{
+   const data=new FormData(event.currentTarget);
+   const payload={
+    customer:{fullName:data.get("fullName"),email:data.get("email"),phone:data.get("phone")},
+    couponCode:appliedCoupon?.code||couponCode.trim(),
+    delivery:{recipientName:data.get("fullName"),recipientPhone:data.get("phone"),addressLine1:isLagos?String(data.get("addressLine1")||""):"",addressLine2:isLagos?String(data.get("addressLine2")||""):"",landmark:isLagos?String(data.get("landmark")||""):"",busPark:isLagos?"":String(data.get("busPark")||""),city:data.get("city"),lga:isLagos?String(data.get("lga")||""):"",state:data.get("state"),postalCode:"",deliveryInstructions:isLagos?String(data.get("deliveryInstructions")||""):"",deliveryMethod:"standard",shippingZoneCode:data.get("shippingZoneCode")},
+    items:items.map(i=>({slug:i.slug,quantity:i.quantity}))
+   };
+   const response=await fetch("/api/paystack/initialize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+   const result=await response.json().catch(()=>({}));
+   if(!response.ok)throw new Error(result.error||"Unable to start payment.");
+   if(!result.authorizationUrl)throw new Error("Paystack did not return a payment page. Please try again.");
+   window.location.assign(result.authorizationUrl);
+  }catch(e){setError(e instanceof Error?e.message:"Unable to continue.");setLoading(false)}
+ }
+
+ if(!items.length)return <section className="page-hero"><div className="container narrow"><h1>Your cart is empty</h1><p>Add products before checking out.</p><Link className="button" href="/products">Shop products</Link></div></section>;
+
+ return <><MetaInitiateCheckout items={items} subtotalKobo={subtotalKobo}/><TikTokInitiateCheckout items={items} subtotalKobo={subtotalKobo}/><section className="checkout-hero-v3"><div className="container"><div><span className="eyebrow">Secure checkout</span><h1>Complete your order</h1><p>Enter your contact and delivery information, review your order, then continue securely to Paystack.</p></div><div className="checkout-steps"><span className="active"><b>1</b>Details</span><i/><span><b>2</b>Payment</span><i/><span><b>3</b>Confirmation</span></div></div></section>
+ <section className="section checkout-section-v3"><div className="container checkout-grid"><form className="form checkout-form checkout-form-v3" onSubmit={submit}>
+ <div className="checkout-order-editor"><div className="checkout-section-heading"><div><span className="eyebrow">Your order</span><h2>Choose products and quantity</h2><p>The product you selected is already here. Adjust the number of packs or add another Bridgecare product before entering your details.</p></div><ShoppingBag size={26}/></div>
+ <div className="checkout-order-items">{items.map(item=><article className="checkout-order-item" key={item.slug}><Image src={`/images/products/${item.slug}.png`} alt={`${item.name} product pack`} width={72} height={62}/><div className="checkout-order-item-copy"><strong>{item.name}</strong><small>{formatNaira(item.priceKobo)} per pack</small></div><div className="quantity-stepper" aria-label={`Quantity for ${item.name}`}><button type="button" aria-label={`Reduce ${item.name} quantity`} onClick={()=>item.quantity<=1?remove(item.slug):setQuantity(item.slug,item.quantity-1)}><Minus size={16}/></button><input aria-label={`${item.name} quantity`} type="number" min={1} max={20} value={item.quantity} onChange={event=>setQuantity(item.slug,Number(event.target.value)||1)}/><button type="button" aria-label={`Increase ${item.name} quantity`} onClick={()=>setQuantity(item.slug,item.quantity+1)}><Plus size={16}/></button></div><strong className="checkout-line-total">{formatNaira(item.priceKobo*item.quantity)}</strong><button type="button" className="checkout-remove-item" aria-label={`Remove ${item.name}`} onClick={()=>remove(item.slug)}><Trash2 size={17}/><span>Remove</span></button></article>)}</div>
+ <div className="checkout-add-more">
+  {recommendedProducts.length>0&&<div className="checkout-recommendations">
+   <div className="checkout-add-more-heading"><h3>You may also like</h3><p>Helpful additions based on the products already in your order.</p></div>
+   <div className="checkout-add-product-grid">{recommendedProducts.map(product=>{const priceKobo=catalogPrices[product.slug]??product.priceKobo;return <article className="checkout-add-product recommended" key={product.slug}><Image src={product.image} alt={`${product.name} product pack`} width={62} height={54}/><div><strong>{crossSellName(product.slug,product.name)}</strong><small>{formatNaira(priceKobo)}</small></div><button type="button" className="button secondary compact-button" onClick={()=>addExtraProduct({slug:product.slug,name:product.name,priceKobo})}><Plus size={16}/> Add</button></article>})}</div>
+  </div>}
+  {otherProducts.length>0&&<details className="checkout-more-products">
+   <summary>More Bridgecare products</summary>
+   <p className="checkout-more-products-note">Browse other products if you want to combine more items in this order.</p>
+   <div className="checkout-add-product-grid">{otherProducts.map(product=>{const priceKobo=catalogPrices[product.slug]??product.priceKobo;return <article className="checkout-add-product" key={product.slug}><Image src={product.image} alt={`${product.name} product pack`} width={62} height={54}/><div><strong>{crossSellName(product.slug,product.name)}</strong><small>{formatNaira(priceKobo)}</small></div><button type="button" className="button secondary compact-button" onClick={()=>addExtraProduct({slug:product.slug,name:product.name,priceKobo})}><Plus size={16}/> Add</button></article>})}</div>
+  </details>}
+ </div></div>
+ <h2>Contact &amp; delivery information</h2><div className="form-row"><label>Full name<input name="fullName" required autoComplete="name"/></label><label>Email<input name="email" type="email" required autoComplete="email" value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)}/></label></div><label>Phone number<input name="phone" required autoComplete="tel"/></label>
+ <div className="form-row"><label>State<select name="state" value={state} onChange={e=>{const nextState=e.target.value;setState(nextState);const matching=activeZones.find(zone=>zone.states.includes(nextState));if(matching)setShippingZoneCode(matching.code)}} required>{STATES.map(x=><option key={x}>{x}</option>)}</select></label><label>City<input name="city" required minLength={2} maxLength={100} autoComplete="address-level2"/></label></div>
+ {isLagos?<div key="lagos-address">
+  <label>House number and street address<input name="addressLine1" required minLength={5} maxLength={180} autoComplete="address-line1"/></label><label>Apartment, estate or additional address (optional)<input name="addressLine2" maxLength={180} autoComplete="address-line2"/></label>
+  <div className="form-row"><label>Landmark<input name="landmark" maxLength={180}/></label><label>Local Government Area<input name="lga" required minLength={2} maxLength={100}/></label></div>
+  <label>Delivery instructions (optional)<textarea name="deliveryInstructions" maxLength={500} placeholder="Gate code, preferred contact method, or directions for the rider."/></label>
+ </div>:<div key="bus-park-pickup">
+  <p>Orders outside Lagos are sent to a bus park or bus station for collection. We do not deliver to home or office addresses outside Lagos.</p>
+  <label>Nearest bus park / bus station<input name="busPark" required minLength={2} maxLength={180} placeholder="Enter the bus park or bus station name"/></label>
+ </div>}
+ <h2>Delivery method</h2><input type="hidden" name="deliveryMethod" value="standard"/>
+ <div className="delivery-method-list">
+  <div className={`radio-card delivery-method-option free-shipping-method${freeShippingEligible?" selected":" locked"}`}>
+   <span className="delivery-method-marker" aria-hidden="true">{freeShippingEligible?"✓":"☆"}</span>
+   <span><strong>Free Shipping Nationwide</strong><small>{freeShippingEligible?`Unlocked — ${packCount} pack${packCount===1?"":"s"} in your order · ₦0`:`Add ${packsToFreeShipping} more pack${packsToFreeShipping===1?"":"s"} to unlock free shipping`}</small></span>
+   <b>{freeShippingEligible?"SELECTED":`${shipping.freeShippingPackCount}+ PACKS`}</b>
+  </div>
+  <div className={`radio-card delivery-method-option standard-shipping-method${freeShippingEligible?" muted":" selected"}`}>
+   <span className="delivery-method-marker" aria-hidden="true">{freeShippingEligible?"○":"●"}</span>
+   <span><strong>{isLagos?"Standard Delivery":"Bus Park / Bus Station Pickup"}</strong><small>{freeShippingEligible?"Your order qualifies for Free Shipping":"Delivery fee is based on your delivery area"}</small></span>
+  </div>
+ </div>
+ <h3 className="delivery-area-heading">Delivery area</h3>
+ <div className="shipping-zone-list">{activeZones.map(zone=>{return <label className={`radio-card shipping-zone-option${shippingZoneCode===zone.code?" selected":""}`} key={zone.code}><input type="radio" name="shippingZoneCode" value={zone.code} checked={shippingZoneCode===zone.code} onChange={()=>{setShippingZoneCode(zone.code);if(!zone.states.includes(state))setState(zone.states[0]||state)}}/><span><strong>{zone.name}</strong><small>{freeShippingEligible?"₦0 with Free Shipping":formatNaira(zone.priceKobo)}</small></span></label>})}</div>
+ {shipping.freeShippingPackCount>0&&<p className={`shipping-threshold-note${freeShippingEligible?" unlocked":""}`}>{freeShippingEligible?`Free Shipping Nationwide unlocked — delivery is ₦0 for this ${packCount}-pack order.`:`Add ${packsToFreeShipping} more pack${packsToFreeShipping===1?"":"s"} to get Free Shipping. Free Shipping applies automatically from ${shipping.freeShippingPackCount} packs.`}</p>}
+ <h2>Payment method</h2>
+ <div className="payment-method-list">
+  <label className="radio-card payment-method-option selected"><input type="radio" name="paymentMethod" value="paystack" checked readOnly/><span><strong>Pay Online with Paystack</strong><small>Pay securely now with card, bank transfer, USSD or other available Paystack options.</small></span></label>
+ </div>
+ <div className="checkout-coupon"><div><h2>Coupon code</h2><p>Enter a valid promotion code before continuing to payment.</p></div><div className="coupon-entry"><input value={couponCode} onChange={e=>{setCouponCode(e.target.value.toUpperCase());setAppliedCoupon(null);setCouponError("")}} placeholder="WELCOME10" aria-label="Coupon code"/><button type="button" className="button secondary" onClick={applyCoupon} disabled={couponLoading}>{couponLoading?"Checking…":appliedCoupon?"Reapply":"Apply"}</button></div>{appliedCoupon&&<div className="coupon-applied"><CheckCircle2 size={18}/><span><strong>{appliedCoupon.code}</strong> {appliedCoupon.message}</span><button type="button" onClick={()=>{setAppliedCoupon(null);setCouponCode("")}}>Remove</button></div>}{couponError&&<div className="coupon-error">{couponError}</div>}</div>
+ {error&&<div className="error-box">{error}</div>}<button className="button full" disabled={loading||!selectedZone||!zoneMatchesState}>{loading?"Opening Paystack…":`Checkout ${formatNaira(totalKobo)} securely`}</button><p className="secure-note">Your order and delivery details are saved before payment. Payment status is confirmed by the server and Paystack webhook.</p>
+ </form>
+ <aside className="order-summary order-summary-v3"><div className="summary-secure"><ShieldCheck size={22}/><span><strong>Secure checkout</strong><small>Your payment is processed by Paystack.</small></span></div><h2>Order summary</h2>{items.map(i=><div className="summary-product" key={i.slug}><Image src={`/images/products/${i.slug}.png`} alt="" width={58} height={48}/><span>{i.name} × {i.quantity}</span><strong>{formatNaira(i.priceKobo*i.quantity)}</strong></div>)}<hr/><div><span>Subtotal</span><strong>{formatNaira(subtotalKobo)}</strong></div><div><span>Delivery</span><strong>{selectedZone?formatNaira(shippingKobo):"Unavailable"}</strong></div>{discountKobo>0&&<div className="summary-discount"><span>Coupon {appliedCoupon?.code}</span><strong>-{formatNaira(discountKobo)}</strong></div>}<div className="summary-total"><span>Total</span><strong>{formatNaira(totalKobo)}</strong></div><div className="checkout-confidence"><span><LockKeyhole size={17}/> Encrypted payment</span><span><Truck size={17}/> Delivery details confirmed</span><span><CheckCircle2 size={17}/> Order saved before payment</span></div></aside>
+ </div></section></>
+}

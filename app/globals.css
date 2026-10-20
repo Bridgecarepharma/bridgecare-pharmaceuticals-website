@@ -1556,3 +1556,14 @@ body{background:#fff;color:var(--ink)}
 
 /* Allow the additional directory link to wrap cleanly in the existing menu. */
 .site-header .nav{flex-wrap:wrap;row-gap:8px}.site-header .nav>a{white-space:nowrap}#find-store{scroll-margin-top:180px}
+
+/* Standalone pack verification: no storefront navigation or promotional widgets. */
+.verification-standalone { min-height:100vh; background:#f4f8f9; }
+.verification-brand { display:flex; flex-direction:column; align-items:center; gap:4px; padding:26px 20px; background:white; color:#10354b; border-bottom:1px solid #dae5e8; }
+.verification-brand strong { font-size:25px; letter-spacing:.12em; }
+.verification-brand span { font-size:13px; }
+.verification-brand small { margin-top:8px; color:#476673; }
+.verification-standalone .page-hero { padding:40px 0 28px; }
+.verification-standalone .page-hero h1 { font-size:clamp(28px,5vw,42px); }
+.verification-standalone .section { padding-top:24px; }
+.verification-footer { padding:24px; text-align:center; font-size:13px; color:#476673; }

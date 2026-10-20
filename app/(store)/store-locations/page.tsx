@@ -1,0 +1,10 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import { StoreLocator } from "./StoreLocator";
+export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "Where to Buy | Bridgecare Store Locations", description: "Find Bridgecare pharmacies and distributors by state, city and product. Contact the store to confirm availability before visiting." };
+export default async function StoreLocationsPage() {
+ const shops = await prisma.stockist.findMany({ where: { isActive: true }, orderBy: [{ state: "asc" }, { city: "asc" }, { name: "asc" }], select: { id:true,name:true,address:true,city:true,state:true,phone:true,whatsapp:true,productSlugs:true,openingHours:true,isActive:true } }).catch(()=>null);
+ return <><section className="page-hero stockist-hero"><div className="container"><span className="eyebrow">Bridgecare near you</span><h1>Find a store. Find your Bridgecare.</h1><p>Explore our listed pharmacies and distributors. Find a location in your area, then call to confirm your product is available before visiting.</p><div className="hero-actions"><a href="#find-store" className="button">Find a store</a><Link href="/products" className="button secondary">Shop online</Link></div></div></section><section className="section" id="find-store"><div className="container">{shops ? <StoreLocator locations={shops}/> : <div className="stockist-empty"><h2>Store locations are temporarily unavailable</h2><p>Please contact Bridgecare for help finding a stockist near you.</p><Link className="button" href="/contact">Contact Bridgecare</Link></div>}</div></section><section className="section stockist-support"><div className="container"><h2>Can’t find a store nearby?</h2><p>Order directly from Bridgecare or ask our team for help. Stock and product ranges vary by location.</p><div className="hero-actions"><Link className="button" href="/products">Shop Bridgecare online</Link><Link className="button secondary" href="/contact">Contact our team</Link><Link className="button secondary" href="/distributors">Become a stockist</Link></div></div></section></>;
+}

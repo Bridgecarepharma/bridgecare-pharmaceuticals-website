@@ -23,7 +23,7 @@ test('validation, Nigerian states, public filtering and contact links',()=>{
  assert.equal(utils.filterStockists(shops,'','','','No matching pharmacy').length,0);
 });
 test('public UI renders useful empty state, limited results and safe links',()=>{
- const component=load('app/store-locations/StoreLocator.tsx',{'@/data/products':catalogue,'@/lib/stockists':utils}).StoreLocator;
+ const component=load('app/(store)/store-locations/StoreLocator.tsx',{'@/data/products':catalogue,'@/lib/stockists':utils}).StoreLocator;
  const React=require('react');const {renderToStaticMarkup}=require('react-dom/server');
  const empty=renderToStaticMarkup(React.createElement(component,{locations:[]}));assert(empty.includes('Our store directory is being updated'));assert(!empty.includes('QA Example Pharmacy'));
  const shops=Array.from({length:14},(_,i)=>({...fixture,id:String(i),isActive:true,name:`QA Example ${i}`}));
