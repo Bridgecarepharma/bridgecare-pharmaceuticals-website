@@ -5,3 +5,6 @@ node_modules/
 .DS_Store
 *.log
 .vercel/
+
+# Archived legacy pages from overlay uploads (not deployed routes).
+.bridgecare-route-backup/
