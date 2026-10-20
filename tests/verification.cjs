@@ -19,7 +19,7 @@ const utils = load('lib/verification-codes.ts', {});
 test('security codes: random, unique, normalized, hashed, safe CSV', () => {
  const codes = utils.generateSecurityCodes(5000);
  assert.equal(new Set(codes.map(x=>x.codeHash)).size,5000);
- for(const c of codes){assert.match(c.code,/^(?:[A-F0-9]{4}-){5}[A-F0-9]{4}$/);assert.equal(c.codeHash,utils.securityCodeHash(c.code.toLowerCase().replaceAll('-',' ')));assert(!c.codeHash.includes(c.code));}
+ for(const c of codes){assert.match(c.code,/^(?:[0-9]{4}-){3}[0-9]{4}$/);assert.equal(c.codeHash,utils.securityCodeHash(c.code.toLowerCase().replaceAll('-',' ')));assert(!c.codeHash.includes(c.code));}
  assert.throws(()=>utils.generateSecurityCodes(5001));assert.throws(()=>utils.generateSecurityCodes(0));
  assert.equal(utils.csvCell('=SUM(A1)'), '"\'=SUM(A1)"');assert.equal(utils.csvCell('a"b'),'"a""b"');
 });
@@ -68,10 +68,18 @@ test('migration + admin lifecycle + public verification + repeat/rate-limit/erro
  assert.equal((await admin.POST(req(create,undefined,'https://attacker.example'))).status,403);
  assert.equal((await admin.POST(req({...create,expiresAt:'2026-02-30'}))).status,400);
  const generated=await admin.POST(req(create));assert.equal(generated.status,200);assert.match(generated.headers.get('cache-control'),/no-store/);
- const csv=await generated.text();const securityCodes=[...csv.matchAll(/[A-F0-9]{4}(?:-[A-F0-9]{4}){5}/g)].map(x=>x[0]);assert.equal(securityCodes.length,2);
+ const csv=await generated.text();const securityCodes=[...csv.matchAll(/[0-9]{4}(?:-[0-9]{4}){3}/g)].map(x=>x[0]);assert.equal(securityCodes.length,2);
  const batch=(await rows('SELECT * FROM "VerificationBatch"'))[0];assert.equal(batch.active,false);
  assert.equal((await (await verify(securityCodes[0])).json()).status,'INACTIVE');
  assert.equal((await admin.POST(req({action:'activate',id:batch.id}))).status,200);
+ const legacy='ABCD-0123-EF45-6789-ABCD-EF01';
+ const leadingZero='0000-1234-5678-9012';
+ for(const code of [legacy,leadingZero])await rows('INSERT INTO "VerificationCode" ("id","codeHash","batchId") VALUES ($1,$2,$3)',[randomUUID(),utils.securityCodeHash(code),batch.id]);
+ for(const code of [legacy.toLowerCase().replaceAll('-',' '),leadingZero.replaceAll('-',' ')]){
+  assert.equal((await (await verify(code,'192.0.2.10')).json()).status,'RECOGNISED');
+  const again=await (await verify(code,'192.0.2.10')).json();assert.equal(again.status,'PREVIOUSLY_CHECKED');assert.equal(again.checkCount,2);
+ }
+ for(const code of ['123456789012345','12345678901234567','ABCD123456789012','12345678901234567890123'])assert.equal((await verify(code,'192.0.2.11')).status,400);
  const simultaneous=await Promise.all([verify(securityCodes[0],'192.0.2.2'),verify(securityCodes[0],'192.0.2.3')]);
  const statuses=await Promise.all(simultaneous.map(r=>r.json()));assert.deepEqual(statuses.map(x=>x.status).sort(),['PREVIOUSLY_CHECKED','RECOGNISED']);assert.deepEqual(statuses.map(x=>x.checkCount).sort(),[1,2]);for(const result of statuses){assert(!('batchNumber' in result));assert(!('manufacturedAt' in result));assert(!('expiresAt' in result));}
  const pack=(await rows('SELECT * FROM "VerificationCode" WHERE "codeHash"=$1',[utils.securityCodeHash(securityCodes[0])]))[0];assert.equal(pack.checks,2);assert(pack.firstCheckedAt);assert.equal(pack.codeHash.length,64);

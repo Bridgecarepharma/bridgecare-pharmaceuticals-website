@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomInt } from "node:crypto";
 
 export const VERIFICATION_PRODUCTS = {
  asfenositol: { name: "AsFenositol Tablets", registration: "A7-102870" },
@@ -14,7 +14,8 @@ export function securityCodeHash(value: string) {
 export function generateSecurityCodes(count: number) {
  if (!Number.isInteger(count) || count < 1 || count > 5000) throw new Error("Choose 1 to 5,000 codes.");
  const codes = new Set<string>();
- while (codes.size < count) codes.add(randomBytes(12).toString("hex").toUpperCase());
+ // Four independent, unbiased random groups retain leading zeros as text.
+ while (codes.size < count) codes.add(Array.from({ length: 4 }, () => randomInt(0, 10000).toString().padStart(4, "0")).join(""));
  return [...codes].map(code => ({ code: code.match(/.{4}/g)!.join("-"), codeHash: securityCodeHash(code) }));
 }
 export function csvCell(value: string) {

@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   try { body = JSON.parse(raw); } catch { return reply({ error: "Enter your security code." }, 400); }
   if (typeof body?.code !== "string" || body.code.length > 100) return reply({ error: "Enter your security code." }, 400);
   const code = normalizeSecurityCode(body.code);
-  if (!/^[A-F0-9]{24}$/.test(code)) return reply({ error: "Enter all 24 letters and numbers from the scratch panel." }, 400);
+  if (!/^(?:[0-9]{16}|[A-F0-9]{24})$/.test(code)) return reply({ error: "Enter the full 16-digit code from the scratch panel. Older 24-character Bridgecare codes are also accepted." }, 400);
   const codeHash = securityCodeHash(code);
   const result = await prisma.$transaction(async tx => {
    const found = await tx.verificationCode.findUnique({ where: { codeHash } });
