@@ -1,6 +1,6 @@
 export type StoreProduct={slug:string;name:string;priceKobo:number};
 export const STORE_PRODUCTS:Record<string,StoreProduct>={
- aspivit:{slug:"aspivit",name:"Aspivit®",priceKobo:800000},
+ aspivit:{slug:"aspivit",name:"Aspivit®",priceKobo:600000},
  asfenositol:{slug:"asfenositol",name:"AsFenositol®",priceKobo:600000},
  globivida:{slug:"globivida",name:"Globivida® Capsules",priceKobo:1500000},
  "herbal-bitter-tea":{slug:"herbal-bitter-tea",name:"Bridgecare Herbal Bitter Tea®",priceKobo:550000}

@@ -53,7 +53,7 @@ export const PRODUCTS: Product[] = [
     ], nafdac:"A7-102870"
   },
   ...[
-    ["aspivit","Aspivit®","Daily nutrition","Omega-3 fatty acids, essential vitamins and trace minerals to support overall health and wellbeing.","/images/products/aspivit.png",800000,"gold"],
+    ["aspivit","Aspivit®","Daily nutrition","Omega-3 fatty acids, essential vitamins and trace minerals to support overall health and wellbeing.","/images/products/aspivit.png",600000,"gold"],
     ["globivida","Globivida®","Specialized support","A blend of botanical extracts, amino acids, vitamins and minerals.","/images/products/globivida.png",1500000,"red"],
     ["herbal-bitter-tea","Bridgecare Herbal Bitter Tea®","Herbal wellness","Herbal tea prepared from 100% Hunteria umbellata.","/images/products/herbal-bitter-tea.png",550000,"green"]
   ].map(([slug,name,category,summary,image,priceKobo,theme]) => ({

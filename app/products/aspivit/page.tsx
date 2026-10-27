@@ -45,7 +45,7 @@ export default async function Page() {
           <span className="eyebrow">Omega-3 Fatty Acids, Vitamins & Minerals</span>
           <h1>Aspivit® Tablet</h1>
           <p className="lead">A comprehensive nutritional supplement formulated with Omega-3 fatty acids, essential vitamins and trace minerals to support overall health and wellbeing.</p>
-          <div className="detail-price">{formatNaira(priceKobo)}</div>
+          <div className="detail-price">{priceKobo === 600000 ? <><span style={{textDecoration:"line-through",color:"#777",fontSize:"0.65em",marginRight:12}}>₦8,000</span><span>{formatNaira(priceKobo)}</span><span style={{display:"inline-block",marginLeft:12,fontSize:"0.5em",background:"#e6f6ec",color:"#08773d",padding:"5px 9px",borderRadius:8}}>25% OFF</span></> : formatNaira(priceKobo)}</div>
           <div className="hero-actions"><AddToCartButton slug="aspivit" name="Aspivit®" priceKobo={priceKobo} /><Link className="button secondary" href="/cart">View order</Link><Link className="button secondary" href="/products">All products</Link></div>
           <p className="order-flow-hint">Choose quantity, add other products and enter delivery details on the next screen.</p>
           <p className="product-disclaimer">Food supplements should not be used as a substitute for a varied and balanced diet. Use only as directed.</p>
