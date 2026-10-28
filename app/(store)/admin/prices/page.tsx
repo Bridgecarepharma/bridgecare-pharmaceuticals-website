@@ -24,7 +24,7 @@ export default async function AdminPricesPage({ searchParams }: { searchParams: 
           <div>
             <span className="eyebrow">Bridgecare operations</span>
             <h1>Product prices</h1>
-            <p>Change selling prices in naira. Checkout uses the new price immediately.</p>
+            <p>Change selling prices in naira. Checkout uses the new price immediately, except Aspivit currently has a temporary ₦6,000 promotional override in lib/product-prices.ts.</p>
           </div>
           <Link className="button secondary" href="/products" target="_blank">View storefront</Link>
         </div>

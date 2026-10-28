@@ -6,10 +6,10 @@ export async function getProductPriceMap() {
     const rows = await prisma.inventory.findMany({ select: { productSlug: true, priceKobo: true } });
     return Object.fromEntries(Object.entries(STORE_PRODUCTS).map(([slug, product]) => {
       const row = rows.find((item) => item.productSlug === slug);
-      return [slug, row?.priceKobo && row.priceKobo > 0 ? row.priceKobo : product.priceKobo];
+      return [slug, slug === "aspivit" ? 600000 : (row?.priceKobo && row.priceKobo > 0 ? row.priceKobo : product.priceKobo)];
     }));
   } catch {
-    return Object.fromEntries(Object.entries(STORE_PRODUCTS).map(([slug, product]) => [slug, product.priceKobo]));
+    return Object.fromEntries(Object.entries(STORE_PRODUCTS).map(([slug, product]) => [slug, slug === "aspivit" ? 600000 : product.priceKobo]));
   }
 }
 

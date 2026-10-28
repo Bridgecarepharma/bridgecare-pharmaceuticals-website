@@ -68,7 +68,7 @@ export async function ProductGrid(){
       <div className="product-benefits" aria-label={`${p.name} support areas`}>
         {productBenefits.map(([Icon,label])=><span className="product-benefit" key={label}><span className="product-benefit-icon"><Icon size={18}/></span><small>{label}</small></span>)}
       </div>
-      <strong className="product-price">{formatNaira(priceKobo)}</strong>
+      <strong className="product-price">{p.slug === "aspivit" && priceKobo === 600000 ? <><span style={{textDecoration:"line-through",color:"#777",fontSize:"0.78em",marginRight:10}}>₦8,000</span><span>{formatNaira(priceKobo)}</span><span style={{display:"inline-block",marginLeft:8,padding:"4px 8px",borderRadius:8,background:"#e7f7ed",color:"#08743b",fontSize:"0.7em"}}>25% OFF</span></> : formatNaira(priceKobo)}</strong>
       <div className="product-card-actions"><AddToCartButton slug={p.slug} name={p.name} priceKobo={priceKobo}/><Link className="text-link" href={`/products/${p.slug}`}>Details <ArrowRight size={17}/></Link></div>
     </article>;
   })}</div>;
